@@ -51,7 +51,7 @@ Target angka belum ditetapkan di scope; diisi bersama tim sebelum pilot.
 | --- | --- | --- |
 | Pencairan tepat SLA (north star) | % pencairan berstatus `ditransfer` maksimal H+1 setelah diajukan | Ditentukan |
 | Pencairan gagal | % pencairan berstatus `gagal` dari total pengajuan | Ditentukan |
-| Aktivasi creator | % pendaftar yang menyelesaikan onboarding (akun sosial + rekening) | Ditentukan |
+| Aktivasi creator | % pendaftar yang menyelesaikan onboarding (profil + minimal satu akun sosial terverifikasi) | Ditentukan |
 | Job terisi | % slot creator yang terisi sebelum deadline pendaftaran | Ditentukan |
 | Waktu review konten | Median jam dari konten dikirim sampai disetujui/ditolak tim Tali | Ditentukan |
 | Creator aktif berulang | % creator yang menyelesaikan job kedua dalam 90 hari | Ditentukan |
@@ -75,12 +75,12 @@ Enam modul MVP mengikuti urutan di scope. Kolom "Di luar MVP" adalah batas yang 
 
 | # | Modul | Pengguna | Termasuk MVP | Di luar MVP |
 | --- | --- | --- | --- | --- |
-| M1 | Onboarding creator | Creator | Daftar (email/Google/OTP), profil, hubungkan akun Instagram, TikTok, YouTube, Threads, dan X secara manual (username + bukti), data rekening bank/e-wallet, persetujuan syarat dan privasi | Verifikasi akun via API resmi, eKYC otomatis |
+| M1 | Onboarding creator | Creator | Daftar (email/Google/OTP), profil, hubungkan akun Instagram, TikTok, YouTube, Threads, dan X lewat link profil (username diekstrak otomatis, followers diisi manual), persetujuan syarat dan privasi | Verifikasi akun via API resmi, eKYC otomatis |
 | M2 | Daftar dan detail job | Creator | Daftar job yang buka, filter dasar (platform, kategori), detail berisi fee, syarat, deadline, TOP; tombol bergabung | Rekomendasi personal, pencarian lanjutan |
 | M3 | Eksekusi job + timeline status | Creator, Tim Tali | Konfirmasi alamat dan status produk (non-visit) atau lokasi, jadwal, dan bukti beli (visit); storyline (Google Docs), draft (Google Drive/foto, maks. 2 revisi), dan caption yang masing-masing wajib diapprove; feedback dan riwayat per versi, tautan dan tanggal posting, timeline status dari Bergabung sampai Dibayar | Tarik metrik postingan otomatis |
 | M4 | Kurasi campaign oleh tim Tali | Tim Tali | Buat job dari brief klien (fee, kuota, syarat, deadline, TOP), undang/setujui creator, review storyline dan konten (setujui, minta revisi dengan feedback, tolak), konfirmasi postingan tayang | Akun brand, portal laporan untuk klien |
 | M5 | Saldo + riwayat pencairan | Creator | Saldo per status (menunggu TOP, siap dicairkan, diajukan, ditransfer), tombol ajukan pencairan, riwayat dengan tanggal transfer | Ekspor laporan pajak |
-| M6 | Pencairan manual by request | Creator, Admin keuangan | Pengajuan pencairan setelah posting sesuai TOP, antrean admin dengan SLA H+1, transfer manual, admin menandai sudah dibayar, notifikasi ke creator | Xendit Disbursement otomatis, pencairan instan |
+| M6 | Pencairan manual by request | Creator, Admin keuangan | Pengajuan pencairan setelah posting sesuai TOP (data rekening diisi saat pengajuan pertama), antrean admin dengan SLA H+1, transfer manual, admin menandai sudah dibayar, notifikasi ke creator | Xendit Disbursement otomatis, pencairan instan |
 
 ## User flow utama
 
@@ -122,13 +122,14 @@ Setiap kebutuhan punya ID agar bisa dirujuk di tiket dan pengujian. P0 = wajib u
 
 1. **FR-1.1 (P0) Daftar dan masuk.** Creator mendaftar dengan email + OTP atau Google via Supabase Auth.
    - Akun baru langsung masuk ke langkah onboarding; sesi bertahan setelah PWA ditutup.
+   - Onboarding hanya meminta profil dan minimal satu akun sosial. Data rekening tidak diminta di awal, tetapi saat pengajuan pencairan pertama (FR-6.7).
 2. **FR-1.2 (P0) Profil creator.** Nama, kota, kategori konten (maks. 3), persona, nomor HP, dan alamat pengiriman default untuk job non-visit.
-3. **FR-1.3 (P0) Hubungkan akun sosial (manual).** Creator menghubungkan satu atau lebih akun Instagram, TikTok, YouTube, Threads, dan X: username/handle, jumlah followers (subscribers untuk YouTube), dan screenshot profil sebagai bukti.
-   - Status akun: `menunggu verifikasi` → `terverifikasi` / `ditolak` oleh admin, dengan alasan bila ditolak.
-4. **FR-1.4 (P0) Data rekening.** Bank atau e-wallet, nomor rekening, nama pemilik.
-   - Nomor rekening dienkripsi dan selalu ditampilkan tersamar (`BCA •••4417`).
-   - Admin mencocokkan nama pemilik saat transfer; jika tidak cocok, pencairan ditandai gagal dengan alasan dan creator diminta memperbaiki rekening.
-5. **FR-1.5 (P0) Persetujuan.** Creator menyetujui syarat layanan dan kebijakan privasi (UU PDP) sebelum bisa bergabung ke campaign.
+3. **FR-1.3 (P0) Hubungkan akun sosial lewat link.** Creator menempelkan link profil Instagram, TikTok, YouTube, Threads, atau X (bisa lebih dari satu). Sistem mengenali platform dan mengekstrak username/handle dari link; jumlah followers (subscribers untuk YouTube) diisi manual.
+   - Pola link yang dikenali: instagram.com/{username}, tiktok.com/@{username}, youtube.com/@{handle}, threads.net atau threads.com/@{username}, x.com atau twitter.com/{username}. Parameter seperti `?igsh=` atau `?_r=` dibuang.
+   - Bila username tidak bisa diekstrak (mis. youtube.com/channel/…), creator diminta mengisi handle secara manual.
+   - Satu akun sosial hanya bisa terdaftar di satu akun creator.
+   - Status: `menunggu verifikasi` → `terverifikasi` / `ditolak`. Kurator membuka link dan mencocokkan jumlah followers; tidak perlu screenshot. Kurator bisa memperbarui jumlah followers saat mengecek ulang.
+4. **FR-1.4 (P0) Persetujuan.** Creator menyetujui syarat layanan dan kebijakan privasi (UU PDP) sebelum bisa bergabung ke job.
 
 ### M2 — Daftar dan detail job
 
@@ -157,7 +158,7 @@ Setiap kebutuhan punya ID agar bisa dirujuk di tiket dan pengujian. P0 = wajib u
    - Setiap versi tersimpan sebagai riwayat: label versi (mis. Draft, Revisi I, Revisi II), tautan atau teks, waktu kirim, keputusan, feedback, nama kurator, dan waktu review. Creator dan kurator melihat riwayat yang sama, urut dari versi terbaru.
    - Waktu persetujuan dicatat, karena isi Google Docs/Drive bisa berubah setelah disetujui.
 7. **FR-3.7 (P0) Timeline status.** Bergabung → Produk diterima / Visit selesai → Storyline disetujui → Draft disetujui → Caption disetujui → Diposting → Pencairan diajukan → Dibayar, dengan tanggal di tiap langkah dan jumlah revisi.
-8. **FR-3.8 (P0) Posting.** Setelah draft dan caption disetujui, creator memposting lalu mengirim URL postingan dan tanggal posting; tim Tali mengonfirmasi postingan tayang. Tanggal konfirmasi ini menjadi awal hitungan TOP.
+8. **FR-3.8 (P0) Posting.** Setelah draft dan caption disetujui, creator memposting lalu mengirim URL postingan dan tanggal posting; sistem mengecek username di URL cocok dengan akun terdaftar (untuk link pendek seperti vt.tiktok.com, kurator yang mengecek); tim Tali mengonfirmasi postingan tayang. Tanggal konfirmasi ini menjadi awal hitungan TOP.
 9. **FR-3.9 (P0) Notifikasi.** Web Push + email saat diundang, disetujui bergabung, produk dikirim, pengingat jadwal visit, storyline/draft/caption disetujui atau perlu revisi (beserta feedback), ditolak, job siap dicairkan, dan saat pencairan berubah status.
 
 ### M4 — Kurasi campaign oleh tim Tali
@@ -182,14 +183,15 @@ Setiap kebutuhan punya ID agar bisa dirujuk di tiket dan pengujian. P0 = wajib u
 ### M6 — Pencairan manual by request
 
 1. **FR-6.1 (P0) Jatuh tempo TOP.** Setelah postingan dikonfirmasi, fee job berstatus `menunggu TOP` lalu otomatis menjadi `siap dicairkan` pada tanggal TOP.
-2. **FR-6.2 (P0) Ajukan pencairan.** Creator memilih satu atau beberapa job yang `siap dicairkan` dan mengirim pengajuan ke rekening terdaftar; status `diajukan` dan tenggat transfer (tanggal pengajuan + 1 hari) langsung tampil.
-   - Tombol tidak aktif bila belum ada job siap dicairkan atau rekening belum lengkap, dengan penjelasan.
+2. **FR-6.2 (P0) Ajukan pencairan.** Creator memilih satu atau beberapa job yang `siap dicairkan` dan mengirim pengajuan ke rekening tujuan; status `diajukan` dan tenggat transfer (tanggal pengajuan + 1 hari) langsung tampil.
+   - Tombol tidak aktif bila belum ada job siap dicairkan, dengan penjelasan. Bila rekening belum pernah diisi, creator diminta mengisinya dulu (FR-6.7) sebelum pengajuan terkirim.
 3. **FR-6.3 (P0) Antrean admin.** Admin keuangan melihat pengajuan diurutkan dari tenggat terdekat, dengan nominal, nama bank, nomor rekening lengkap, dan nama pemilik; pengajuan yang mendekati atau melewati H+1 ditandai.
 4. **FR-6.4 (P0) Transfer dan update status.** Admin menandai `diproses`, mentransfer manual dari rekening Tali, lalu mengisi tanggal transfer dan catatan opsional (mis. nomor referensi bank); status menjadi `ditransfer`.
    - Status `ditransfer` hanya bisa diubah admin keuangan dan wajib disertai tanggal transfer; tidak ada unggah bukti transfer.
    - Creator menerima notifikasi berisi nominal, rekening tujuan tersamar, dan tanggal transfer; kendala transfer diselesaikan admin lewat kontak creator (nomor HP).
 5. **FR-6.5 (P0) Pencairan gagal.** Admin menandai `gagal` dengan alasan (mis. nama rekening tidak cocok); creator memperbaiki rekening dan mengajukan ulang.
 6. **FR-6.6 (P0) Jejak audit.** Setiap perubahan status pencairan tercatat dengan waktu dan admin yang mengubahnya; status dibayar hanya bisa dibatalkan admin dengan alasan.
+7. **FR-6.7 (P0) Data rekening saat pencairan.** Pada pengajuan pertama, creator mengisi bank atau e-wallet, nomor rekening, dan nama pemilik. Pengajuan berikutnya memakai rekening tersimpan dan bisa diganti sebelum dikirim. Nomor rekening dienkripsi dan selalu ditampilkan tersamar (BCA •••4417). Admin mencocokkan nama pemilik saat transfer; jika tidak cocok, pencairan ditandai gagal dan creator memperbaiki rekening.
 
 ## Kebutuhan non-fungsional
 
@@ -219,7 +221,7 @@ Stack mengikuti keputusan di scope: Next.js (App Router) + TypeScript, Tailwind 
 | --- | --- | --- |
 | Supabase Auth | Daftar dan masuk creator serta tim Tali | M1, M4 |
 | Supabase Postgres + RLS | Data utama dan kontrol akses per peran | Semua |
-| Supabase Storage (bucket privat) | Foto konten, bukti akun sosial, dan bukti pembelian visit (video draft lewat tautan Google Drive) | M1, M3 |
+| Supabase Storage (bucket privat) | Foto konten dan bukti pembelian visit (video draft lewat tautan Google Drive) | M3 |
 | Resend | Email transaksional | M3, M6 |
 | Web Push | Notifikasi status | M3, M6 |
 | Sentry, PostHog | Error dan analytics | Semua |
@@ -233,7 +235,7 @@ Stack mengikuti keputusan di scope: Next.js (App Router) + TypeScript, Tailwind 
 | --- | --- |
 | `profiles` | Pengguna dan perannya (creator, kurator, admin keuangan) |
 | `creator_profiles` | Kota, kategori, status onboarding |
-| `social_accounts` | Platform, username, followers, bukti, status verifikasi |
+| `social_accounts` | Platform, link profil, username (diekstrak dari link), followers (manual), status verifikasi |
 | `payout_accounts` | Bank/e-wallet, nomor terenkripsi, 4 digit terakhir, nama pemilik |
 | `clients` | Brand klien (data internal, tanpa akun) |
 | `jobs` | Klien, produk, tipe (visit/non-visit), fase campaign, platform, brief, syarat (tier, persona), fee (integer rupiah), kuota, maks. revisi, deadline, TOP (hari), lokasi visit, status |
@@ -272,6 +274,7 @@ Rilis MVP dibagi empat tahap, ditambah satu tahap setelah MVP; tanggal belum dit
 | Nama "Tali" belum terdaftar merek (kelas 9 dan 42; mirip "TALLY") | Risiko rebranding | Selesaikan cek PDKI sebelum materi dicetak massal |
 | Batas paket gratis Supabase (project di-pause bila tidak aktif sekitar seminggu, kuota database dan storage kecil) | Aplikasi tidak bisa diakses atau upload gagal | Video lewat Google Drive agar storage hemat; pantau kuota; upgrade ke Pro sebelum pilot dengan transfer sungguhan |
 | Tautan Google Docs/Drive privat, dihapus, atau isinya diubah setelah disetujui | Kurator tidak bisa mereview, atau versi yang disetujui hilang | Validasi URL dan instruksi akses; waktu persetujuan dicatat dan riwayat versi Google Docs dicek bila ada sengketa; kurator minta revisi bila tidak bisa dibuka; postingan final tetap dicek lewat URL platform |
+| Creator mendaftarkan akun sosial milik orang lain atau mengisi followers tidak sesuai | Brand mendapat creator yang tidak sesuai syarat | Kurator mengecek followers lewat link; satu akun sosial hanya untuk satu creator; URL postingan final harus dari akun terdaftar |
 
 **Pertanyaan terbuka**
 

@@ -49,16 +49,18 @@ MVP berhasil jika satu campaign bisa berjalan ujung ke ujung, dari kurasi job sa
 
 **Metrik sukses**
 
-Target angka belum ditetapkan di scope; diisi bersama tim sebelum pilot.
+Target di bawah berlaku untuk pilot dan ditinjau ulang setelah 1–2 campaign.
 
-| Metrik | Definisi | Target |
+| Metrik | Definisi | Target pilot |
 | --- | --- | --- |
-| Pencairan tepat SLA (north star) | % pencairan berstatus `ditransfer` maksimal H+3 hari kerja setelah diajukan | Ditentukan |
-| Pencairan gagal | % pencairan berstatus `gagal` dari total pengajuan | Ditentukan |
-| Aktivasi creator | % pendaftar yang menyelesaikan onboarding (profil + minimal satu akun sosial terverifikasi) | Ditentukan |
-| Job terisi | % slot creator yang terisi sebelum deadline pendaftaran | Ditentukan |
-| Waktu review konten | Median jam dari konten dikirim sampai disetujui/ditolak tim Tali | Ditentukan |
-| Creator aktif berulang | % creator yang menyelesaikan job kedua dalam 90 hari | Ditentukan |
+| Pencairan tepat SLA (north star) | % pencairan berstatus `ditransfer` maksimal H+3 hari kerja setelah diajukan, plus median waktu transfer | ≥ 95%; median ≤ 1 hari kerja |
+| Pencairan gagal | % pencairan berstatus `gagal` dari total pengajuan | ≤ 3% |
+| Aktivasi creator | % pendaftar yang menyelesaikan onboarding (profil + minimal satu akun sosial terverifikasi) dalam 7 hari | ≥ 60% |
+| Job terisi | % slot creator yang terisi sebelum deadline pendaftaran | ≥ 90% |
+| Review tepat waktu | % review storyline, draft, dan caption yang selesai dalam batas waktu job | ≥ 90% |
+| Putaran revisi draft | Rata-rata jumlah revisi draft per partisipasi | ≤ 2 |
+| Konten tayang tepat waktu | % postingan tayang sesuai jadwal campaign | ≥ 90% |
+| Creator aktif berulang | % creator yang menyelesaikan job kedua dalam 90 hari | ≥ 40% |
 
 ## Persona dan peran pengguna
 
@@ -142,7 +144,7 @@ Setiap kebutuhan punya ID agar bisa dirujuk di tiket dan pengujian. P0 = wajib u
 2. **FR-2.2 (P1) Filter.** Platform (Instagram, TikTok, YouTube, Threads, X) dan kategori.
 3. **FR-2.3 (P0) Detail job.** Brief, deliverable, syarat (min. followers, kategori), fee, kuota creator, deadline kirim konten, dan TOP (mis. "Bisa dicairkan 7 hari setelah postingan tayang").
    - Fee dan TOP terlihat tanpa scroll di layar 360 px sebelum tombol bergabung.
-4. **FR-2.4 (P0) Bergabung.** Creator yang punya akun terverifikasi di platform job dan memenuhi syarat menekan "Gabung job"; status menjadi `Menunggu kurasi` sampai tim Tali menyetujui atau menolak. Untuk job open rate, creator mengisi rate yang diajukan (Rp) saat bergabung; kurator menyetujui dengan fee yang disepakati, dan fee itulah yang dipakai untuk pencairan.
+4. **FR-2.4 (P0) Bergabung.** Creator yang punya akun terverifikasi di platform job dan memenuhi syarat menekan "Gabung job"; status menjadi `Menunggu kurasi` sampai tim Tali menyetujui atau menolak. Untuk job open rate, creator mengisi rate yang diajukan (Rp) saat bergabung (bila job punya batas atas rate, batas itu ditampilkan dan rate di atasnya tidak bisa dikirim); kurator menyetujui dengan fee yang disepakati, dan fee itulah yang dipakai untuk pencairan.
    - Creator yang belum menyelesaikan onboarding diarahkan ke langkah yang kurang.
 
 ### M3 — Eksekusi job: produk/visit, storyline, draft, caption
@@ -168,7 +170,7 @@ Setiap kebutuhan punya ID agar bisa dirujuk di tiket dan pengujian. P0 = wajib u
 ### M4 — Kurasi campaign oleh tim Tali
 
 1. **FR-4.1 (P0) Data klien brand.** Kurator mencatat klien (nama brand, PIC, catatan) sebagai data internal; klien tidak punya akun.
-2. **FR-4.2 (P0) Buat job.** Judul, brand klien, produk, tipe job (visit atau non-visit), fase campaign (mis. awareness, amplification), brief, platform dan format deliverable (mis. Instagram Reels, video TikTok, YouTube Shorts, post Threads, post X; satu job bisa mencakup beberapa platform dengan satu fee gabungan), syarat creator (tier nano/micro, persona, min. followers), tipe fee (fix rate: fee ditetapkan tim Tali; open rate: creator mengajukan rate saat bergabung), fee per creator untuk fix rate, batas waktu review (sesuai terms klien), opsi produk (dikirim klien, beli sendiri dan sudah termasuk fee, atau tanpa produk), kuota, deadline, dan TOP (H+7, H+14, atau H+30 setelah postingan dikonfirmasi tayang).
+2. **FR-4.2 (P0) Buat job.** Judul, brand klien, produk, tipe job (visit atau non-visit), fase campaign (mis. awareness, amplification), brief, platform dan format deliverable (mis. Instagram Reels, video TikTok, YouTube Shorts, post Threads, post X; satu job bisa mencakup beberapa platform dengan satu fee gabungan), syarat creator (tier nano/micro, persona, min. followers), tipe fee (fix rate: fee ditetapkan tim Tali; open rate: creator mengajukan rate saat bergabung, dengan batas atas rate opsional), fee per creator untuk fix rate, batas waktu review (sesuai terms klien), opsi produk (dikirim klien, beli sendiri dan sudah termasuk fee, atau tanpa produk), kuota, deadline, dan TOP (H+7, H+14, atau H+30 setelah postingan dikonfirmasi tayang).
    - Job bisa disimpan sebagai draft dan baru tayang setelah dipublikasikan kurator.
 3. **FR-4.3 (P0) Kurasi creator.** Kurator melihat pelamar (profil, followers, kategori) dan menyetujui/menolak, atau mengundang creator langsung.
 4. **FR-4.4 (P0) Review storyline dan konten.** Kurator mereview internal, meneruskan ke brand klien di luar aplikasi, lalu mencatat keputusan akhir (setujui, minta revisi, atau tolak) beserta feedback tim Tali dan feedback brand secara terpisah. Lihat FR-3.6.
@@ -187,8 +189,8 @@ Setiap kebutuhan punya ID agar bisa dirujuk di tiket dan pengujian. P0 = wajib u
 ### M6 — Pencairan manual by request
 
 1. **FR-6.1 (P0) Jatuh tempo TOP.** Setelah postingan dikonfirmasi, fee job berstatus `menunggu TOP` lalu otomatis menjadi `siap dicairkan` pada tanggal TOP.
-2. **FR-6.2 (P0) Ajukan pencairan.** Creator memilih satu atau beberapa job yang `siap dicairkan` dan mengirim pengajuan ke rekening tujuan; status `diajukan` dan tenggat transfer (tanggal pengajuan + 3 hari kerja, tidak termasuk Sabtu, Minggu, dan libur nasional) langsung tampil. Biaya transfer ditanggung creator: layar pengajuan menampilkan total fee, biaya transfer, dan jumlah bersih yang diterima.
-   - Tombol tidak aktif bila belum ada job siap dicairkan, dengan penjelasan. Bila rekening belum pernah diisi, creator diminta mengisinya dulu (FR-6.7) sebelum pengajuan terkirim.
+2. **FR-6.2 (P0) Ajukan pencairan.** Creator memilih satu atau beberapa job yang `siap dicairkan` dan mengirim pengajuan ke rekening tujuan; status `diajukan` dan tenggat transfer (tanggal pengajuan + 3 hari kerja, tidak termasuk Sabtu, Minggu, dan libur nasional) langsung tampil. Biaya transfer ditanggung creator: Rp 2.500 per pengajuan untuk rekening selain BCA dan Mandiri, gratis untuk BCA dan Mandiri. Layar pengajuan menampilkan total fee, biaya transfer, dan jumlah bersih yang diterima.
+   - Minimal pencairan Rp 10.000. Tombol tidak aktif bila total siap dicairkan di bawah Rp 10.000, dengan penjelasan. Bila rekening belum pernah diisi, creator diminta mengisinya dulu (FR-6.7) sebelum pengajuan terkirim.
 3. **FR-6.3 (P0) Antrean admin.** Admin keuangan melihat pengajuan diurutkan dari tenggat terdekat, dengan nominal, nama bank, nomor rekening lengkap, dan nama pemilik; pengajuan yang mendekati atau melewati tenggat (H+3 hari kerja) ditandai.
 4. **FR-6.4 (P0) Transfer dan update status.** Admin menandai `diproses`, mentransfer manual dari rekening Tali, lalu mengisi tanggal transfer dan catatan opsional (mis. nomor referensi bank); status menjadi `ditransfer`.
    - Status `ditransfer` hanya bisa diubah admin keuangan dan wajib disertai tanggal transfer; tidak ada unggah bukti transfer.
@@ -242,7 +244,7 @@ Stack mengikuti keputusan di scope: Next.js (App Router) + TypeScript, Tailwind 
 | `social_accounts` | Platform, link profil, username (diekstrak dari link), followers (manual), status verifikasi |
 | `payout_accounts` | Bank/e-wallet, nomor terenkripsi, 4 digit terakhir, nama pemilik |
 | `clients` | Brand klien (data internal, tanpa akun) |
-| `jobs` | Klien, produk, tipe (visit/non-visit), fase campaign, platform, brief, syarat (tier, persona), fee (integer rupiah), kuota, tipe fee (fix rate/open rate), batas waktu review, opsi produk, deadline, TOP (H+7/H+14/H+30), lokasi visit, status |
+| `jobs` | Klien, produk, tipe (visit/non-visit), fase campaign, platform, brief, syarat (tier, persona), fee (integer rupiah), kuota, tipe fee (fix rate/open rate), batas atas rate (opsional), batas waktu review, opsi produk, deadline, TOP (H+7/H+14/H+30), lokasi visit, status |
 | `participations` | Creator × job, fee yang disepakati (dan rate yang diajukan untuk open rate), status timeline beserta tanggalnya, tanggal postingan dikonfirmasi, tanggal siap dicairkan, alamat pengiriman (snapshot), status produk dan resi, jadwal visit, bukti pembelian |
 | `content_submissions` | Tipe (storyline, draft konten, atau caption), nomor versi, tautan Google Docs/Drive atau foto, tautan postingan final; setiap versi menyimpan keputusan review, feedback tim Tali, feedback brand, kurator, dan waktunya |
 | `payout_requests` | Creator, job yang dicairkan, nominal (total fee, biaya transfer, jumlah bersih), rekening tujuan, status, tanggal pengajuan, tenggat (H+3 hari kerja), tanggal transfer, catatan opsional, admin |
@@ -283,7 +285,7 @@ Rilis MVP dibagi empat tahap, ditambah satu tahap setelah MVP; tanggal belum dit
 **Pertanyaan terbuka**
 
 - [x] H+1 dihitung hari kalender atau hari kerja? Bagaimana pengajuan di hari Sabtu, Minggu, dan libur nasional? Maks H+3 Hari Kerja. tapi pasti secepat mmungkin
-- [ ] Apakah ada nominal minimum pencairan, dan siapa yang menanggung biaya transfer antarbank atau e-wallet? user
+- [x] Apakah ada nominal minimum pencairan, dan siapa yang menanggung biaya transfer antarbank atau e-wallet? user
 - [x] Apakah creator boleh menggabungkan beberapa job dalam satu pengajuan? boleh
 - [x] Pilihan TOP apa saja yang dipakai (mis. 0, 7, 14, 30 hari setelah tayang)? H+7, H+14, H+30
 - [x] Pajak: apakah Tali memotong PPh atas fee creator dan menerbitkan bukti potong? belum, tidak dulu
@@ -291,10 +293,10 @@ Rilis MVP dibagi empat tahap, ditambah satu tahap setelah MVP; tanggal belum dit
 - [x] Apakah creator wajib eKYC (KTP) sebelum pencairan pertama? tidak
 - [x] Apakah klien perlu laporan atau akses baca di aplikasi setelah MVP? tidak
 - [ ] Domain final: tali.id, tali.app, taliapp.id, atau gettali.com? menyusul
-- [ ] Target angka untuk metrik sukses dan target performa.
+- [x] Target angka untuk metrik sukses dan target performa.
 - [x] Apakah satu job bisa mencakup lebih dari satu platform (mis. Instagram + TikTok), dan apakah fee-nya dihitung per platform? bisa, feenya gabung. ada 2 opsi kita kasih fix rate atau pengajuan dari creator/bidding/open rate
 - [x] Job visit: apakah pembelian produk di toko diganti (reimburse) di luar fee, dan bagaimana bukti pembelian diverifikasi? skip dulu,
 - [x] Job non-visit: siapa yang mengirim produk (brand atau tim Tali), dan siapa yang menanggung ongkos kirim? kasi info status aja, ini yg kirim dan tidak kirim produk opsional tergantung SOW ya, sama beli produk atau dikirim client, kalo sama beli biasanya fee langsung include
 - [x] Apa yang terjadi bila draft belum disetujui setelah Revisi II (ditolak, revisi tambahan, atau fee dikurangi), revisi bisa nambah terus.
-- [ ] Berapa biaya transfer yang dipotong dari creator (flat per transfer, mis. mengikuti biaya BI-FAST), dan apakah gratis bila bank sama dengan rekening Tali?
-- [ ] Untuk job open rate, apakah kurator memasang batas atas rate (budget per creator) yang terlihat oleh creator?
+- [x] Berapa biaya transfer yang dipotong dari creator (flat per transfer, mis. mengikuti biaya BI-FAST), dan apakah gratis bila bank sama dengan rekening Tali?
+- [x] Untuk job open rate, apakah kurator memasang batas atas rate (budget per creator) yang terlihat oleh creator?

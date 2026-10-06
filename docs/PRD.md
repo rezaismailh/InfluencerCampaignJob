@@ -13,7 +13,7 @@ MVP Tali adalah PWA mobile-first tempat tim Tali mengkurasi job campaign dari kl
 
 **Janji brand yang harus dibuktikan setiap fitur:** *Trusted. Dibayar tepat waktu. Membantu creator menghasilkan.* Status pembayaran harus selalu jelas, transparan, dan mudah ditemukan.
 
-**Scope MVP (6 modul):** onboarding creator, daftar dan detail job, kirim konten dengan timeline status, kurasi campaign oleh tim Tali, saldo dan riwayat pencairan creator, serta pencairan manual by request.
+**Scope MVP (6 modul):** onboarding creator, daftar dan detail job, kirim konten dengan timeline status, kurasi campaign oleh tim Tali, saldo dan riwayat pencairan creator, serta pencairan manual by request. Platform yang didukung: Instagram, TikTok, YouTube, Threads, dan X.
 
 **Dua keputusan yang mengubah scope awal:**
 
@@ -38,7 +38,7 @@ MVP berhasil jika satu campaign bisa berjalan ujung ke ujung, dari kurasi job sa
 - Akun dan dashboard self-serve untuk brand. Klien brand ditangani tim Tali di luar aplikasi.
 - Pencairan otomatis via Xendit Disbursement. MVP memakai transfer manual oleh admin.
 - Pembayaran brand di dalam aplikasi (invoice, VA, QRIS).
-- Integrasi API Instagram/TikTok otomatis (verifikasi akun dan metrik konten). MVP memakai input manual.
+- Integrasi API platform sosial otomatis (verifikasi akun dan metrik konten). MVP memakai input manual.
 - Aplikasi native iOS/Android. MVP hanya PWA.
 - Chat real-time tim Tali–creator.
 - Multi-mata uang dan pasar di luar Indonesia (i18n `en` disiapkan, transaksi hanya rupiah).
@@ -62,7 +62,7 @@ Aplikasi punya dua peran pengguna: creator dan tim Tali (admin). Brand adalah kl
 
 | Peran | Siapa | Kebutuhan utama | Sapaan di copy |
 | --- | --- | --- | --- |
-| Creator | Nano dan micro creator Instagram/TikTok (ribuan–puluhan ribu followers), banyak memakai HP entry-level | Menemukan job yang jelas fee dan TOP-nya, mengirim konten dengan mudah, mencairkan fee tepat waktu ke bank atau e-wallet | "kamu" |
+| Creator | Nano dan micro creator Instagram, TikTok, YouTube, Threads, dan X (ribuan–puluhan ribu followers), banyak memakai HP entry-level | Menemukan job yang jelas fee dan TOP-nya, mengirim konten dengan mudah, mencairkan fee tepat waktu ke bank atau e-wallet | "kamu" |
 | Tim Tali — kurator campaign | Tim internal yang menerima brief dari klien brand | Membuat dan mengkurasi job, memilih creator, mereview konten sesuai brief klien | Internal |
 | Tim Tali — admin keuangan | Tim internal yang memegang rekening Tali | Melihat antrean pencairan, mentransfer manual maksimal H+1, mengunggah bukti transfer | Internal |
 | Brand / agensi (bukan pengguna) | Klien yang memberi brief dan dana ke Tali di luar aplikasi | Menerima laporan konten dari tim Tali (di luar aplikasi pada MVP) | — |
@@ -75,7 +75,7 @@ Enam modul MVP mengikuti urutan di scope. Kolom "Di luar MVP" adalah batas yang 
 
 | # | Modul | Pengguna | Termasuk MVP | Di luar MVP |
 | --- | --- | --- | --- | --- |
-| M1 | Onboarding creator | Creator | Daftar (email/Google/OTP), profil, hubungkan akun Instagram/TikTok secara manual (username + bukti), data rekening bank/e-wallet, persetujuan syarat dan privasi | Verifikasi akun via API resmi, eKYC otomatis |
+| M1 | Onboarding creator | Creator | Daftar (email/Google/OTP), profil, hubungkan akun Instagram, TikTok, YouTube, Threads, dan X secara manual (username + bukti), data rekening bank/e-wallet, persetujuan syarat dan privasi | Verifikasi akun via API resmi, eKYC otomatis |
 | M2 | Daftar dan detail job | Creator | Daftar job yang buka, filter dasar (platform, kategori), detail berisi fee, syarat, deadline, TOP; tombol bergabung | Rekomendasi personal, pencarian lanjutan |
 | M3 | Kirim konten + timeline status | Creator, Tim Tali | Unggah draft (foto/video) atau tautan, revisi, kirim tautan postingan final, timeline status dari Diundang sampai Dibayar | Tarik metrik postingan otomatis |
 | M4 | Kurasi campaign oleh tim Tali | Tim Tali | Buat job dari brief klien (fee, kuota, syarat, deadline, TOP), undang/setujui creator, review konten (setujui, minta revisi, tolak), konfirmasi postingan tayang | Akun brand, portal laporan untuk klien |
@@ -120,7 +120,7 @@ Setiap kebutuhan punya ID agar bisa dirujuk di tiket dan pengujian. P0 = wajib u
 1. **FR-1.1 (P0) Daftar dan masuk.** Creator mendaftar dengan email + OTP atau Google via Supabase Auth.
    - Akun baru langsung masuk ke langkah onboarding; sesi bertahan setelah PWA ditutup.
 2. **FR-1.2 (P0) Profil creator.** Nama, kota, kategori konten (maks. 3), nomor HP.
-3. **FR-1.3 (P0) Hubungkan akun sosial (manual).** Creator mengisi username Instagram/TikTok, jumlah followers, dan screenshot profil sebagai bukti.
+3. **FR-1.3 (P0) Hubungkan akun sosial (manual).** Creator menghubungkan satu atau lebih akun Instagram, TikTok, YouTube, Threads, dan X: username/handle, jumlah followers (subscribers untuk YouTube), dan screenshot profil sebagai bukti.
    - Status akun: `menunggu verifikasi` → `terverifikasi` / `ditolak` oleh admin, dengan alasan bila ditolak.
 4. **FR-1.4 (P0) Data rekening.** Bank atau e-wallet, nomor rekening, nama pemilik.
    - Nomor rekening dienkripsi dan selalu ditampilkan tersamar (`BCA •••4417`).
@@ -131,10 +131,10 @@ Setiap kebutuhan punya ID agar bisa dirujuk di tiket dan pengujian. P0 = wajib u
 
 1. **FR-2.1 (P0) Daftar job.** Kartu job menampilkan nama brand klien, fee (`Rp 750.000`), platform, deadline, dan TOP.
    - Daftar kosong menampilkan copy yang mengarahkan, bukan "Tidak ada data".
-2. **FR-2.2 (P1) Filter.** Platform (Instagram/TikTok) dan kategori.
+2. **FR-2.2 (P1) Filter.** Platform (Instagram, TikTok, YouTube, Threads, X) dan kategori.
 3. **FR-2.3 (P0) Detail job.** Brief, deliverable, syarat (min. followers, kategori), fee, kuota creator, deadline kirim konten, dan TOP (mis. "Bisa dicairkan 7 hari setelah postingan tayang").
    - Fee dan TOP terlihat tanpa scroll di layar 360 px sebelum tombol bergabung.
-4. **FR-2.4 (P0) Bergabung.** Creator yang memenuhi syarat menekan "Gabung job"; status menjadi `Menunggu kurasi` sampai tim Tali menyetujui atau menolak.
+4. **FR-2.4 (P0) Bergabung.** Creator yang punya akun terverifikasi di platform job dan memenuhi syarat menekan "Gabung job"; status menjadi `Menunggu kurasi` sampai tim Tali menyetujui atau menolak.
    - Creator yang belum menyelesaikan onboarding diarahkan ke langkah yang kurang.
 
 ### M3 — Kirim konten + timeline status
@@ -149,7 +149,7 @@ Setiap kebutuhan punya ID agar bisa dirujuk di tiket dan pengujian. P0 = wajib u
 ### M4 — Kurasi campaign oleh tim Tali
 
 1. **FR-4.1 (P0) Data klien brand.** Kurator mencatat klien (nama brand, PIC, catatan) sebagai data internal; klien tidak punya akun.
-2. **FR-4.2 (P0) Buat job.** Judul, brand klien, brief, deliverable, platform, syarat creator, fee per creator, kuota, deadline, dan TOP (jumlah hari setelah postingan dikonfirmasi tayang).
+2. **FR-4.2 (P0) Buat job.** Judul, brand klien, brief, platform dan format deliverable (mis. Instagram Reels, video TikTok, YouTube Shorts, post Threads, post X), syarat creator, fee per creator, kuota, deadline, dan TOP (jumlah hari setelah postingan dikonfirmasi tayang).
    - Job bisa disimpan sebagai draft dan baru tayang setelah dipublikasikan kurator.
 3. **FR-4.3 (P0) Kurasi creator.** Kurator melihat pelamar (profil, followers, kategori) dan menyetujui/menolak, atau mengundang creator langsung.
 4. **FR-4.4 (P0) Review konten.** Setujui, minta revisi (dengan catatan), atau tolak (dengan alasan).
@@ -265,3 +265,4 @@ Rilis MVP dibagi empat tahap, ditambah satu tahap setelah MVP; tanggal belum dit
 - [ ] Apakah klien perlu laporan atau akses baca di aplikasi setelah MVP?
 - [ ] Domain final: tali.id, tali.app, taliapp.id, atau gettali.com?
 - [ ] Target angka untuk metrik sukses dan target performa.
+- [ ] Apakah satu job bisa mencakup lebih dari satu platform (mis. Instagram + TikTok), dan apakah fee-nya dihitung per platform?

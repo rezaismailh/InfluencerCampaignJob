@@ -1,0 +1,48 @@
+/* Tali design tokens — Tailwind CSS v4 (@theme). Import di app/globals.css:
+   @import "tailwindcss";
+   @import "./tokens.css";
+*/
+@theme {
+  /* Nila (primary) */
+  --color-nila-50:  #EEEDFA;
+  --color-nila-100: #D9D6F5;
+  --color-nila-200: #B6B1EC;
+  --color-nila-300: #8D86DE;
+  --color-nila-400: #6A64C4;
+  --color-nila-500: #4B44A8;
+  --color-nila-600: #3A3489;
+  --color-nila-700: #2E2A78;
+  --color-nila-800: #24206B; /* WARNA UTAMA BRAND */
+  --color-nila-900: #1A174F;
+  --color-nila-950: #110E35;
+
+  /* Limau (accent) */
+  --color-limau-300: #DDF77F;
+  --color-limau-400: #C8F03C; /* AKSEN UTAMA — hanya di atas latar gelap */
+  --color-limau-500: #AED81F;
+  --color-limau-600: #86AD0E;
+  --color-limau-700: #5E8A00; /* versi aksen untuk latar terang */
+
+  /* Netral */
+  --color-gading: #F7F5EF;   /* teks/garis terang di atas nila */
+  --color-kertas: #FFFFFF;
+  --color-latar: #F6F5FA;    /* latar aplikasi mode terang */
+  --color-garis: #E3E1EE;    /* border */
+  --color-teks: #1A174F;     /* teks utama di latar terang */
+  --color-teks-redup: #4A4870; /* teks sekunder, kontras ≥ 7:1 di putih */
+
+  /* Semantik */
+  --color-sukses: #1F8A5B;
+  --color-peringatan: #B5700A;
+  --color-bahaya: #C2362F;
+  --color-info: #4B44A8;
+
+  /* Tipografi */
+  --font-sans: "Plus Jakarta Sans Variable", "Plus Jakarta Sans", ui-sans-serif, system-ui, "Segoe UI", sans-serif;
+
+  /* Radius */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+}

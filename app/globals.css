@@ -1,0 +1,25 @@
+@import "tailwindcss";
+@import "../styles/tokens.css";
+@import "@fontsource-variable/plus-jakarta-sans";
+
+@layer base {
+  html {
+    color-scheme: light;
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    background: var(--color-latar);
+    color: var(--color-teks);
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 24px;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-nila-500);
+    outline-offset: 2px;
+  }
+}
+
+@utility tabular {
+  font-variant-numeric: tabular-nums;
+}

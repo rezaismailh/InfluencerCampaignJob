@@ -77,7 +77,7 @@ Enam modul MVP mengikuti urutan di scope. Kolom "Di luar MVP" adalah batas yang 
 | --- | --- | --- | --- | --- |
 | M1 | Onboarding creator | Creator | Daftar (email/Google/OTP), profil, hubungkan akun Instagram, TikTok, YouTube, Threads, dan X secara manual (username + bukti), data rekening bank/e-wallet, persetujuan syarat dan privasi | Verifikasi akun via API resmi, eKYC otomatis |
 | M2 | Daftar dan detail job | Creator | Daftar job yang buka, filter dasar (platform, kategori), detail berisi fee, syarat, deadline, TOP; tombol bergabung | Rekomendasi personal, pencarian lanjutan |
-| M3 | Kirim konten + timeline status | Creator, Tim Tali | Unggah draft (foto/video) atau tautan, revisi, kirim tautan postingan final, timeline status dari Diundang sampai Dibayar | Tarik metrik postingan otomatis |
+| M3 | Kirim konten + timeline status | Creator, Tim Tali | Unggah foto draft atau tautan Google Drive untuk video, revisi, kirim tautan postingan final, timeline status dari Diundang sampai Dibayar | Tarik metrik postingan otomatis |
 | M4 | Kurasi campaign oleh tim Tali | Tim Tali | Buat job dari brief klien (fee, kuota, syarat, deadline, TOP), undang/setujui creator, review konten (setujui, minta revisi, tolak), konfirmasi postingan tayang | Akun brand, portal laporan untuk klien |
 | M5 | Saldo + riwayat pencairan | Creator | Saldo per status (menunggu TOP, siap dicairkan, diajukan, ditransfer), tombol ajukan pencairan, riwayat dengan bukti transfer | Ekspor laporan pajak |
 | M6 | Pencairan manual by request | Creator, Admin keuangan | Pengajuan pencairan setelah posting sesuai TOP, antrean admin dengan SLA H+1, transfer manual, unggah bukti transfer, konfirmasi ke creator | Xendit Disbursement otomatis, pencairan instan |
@@ -139,8 +139,8 @@ Setiap kebutuhan punya ID agar bisa dirujuk di tiket dan pengujian. P0 = wajib u
 
 ### M3 — Kirim konten + timeline status
 
-1. **FR-3.1 (P0) Kirim draft konten.** Unggah foto/video ke Supabase Storage atau tempel tautan, plus caption.
-   - Batas ukuran file ditampilkan; error menyebut penyebab dan langkah berikutnya.
+1. **FR-3.1 (P0) Kirim draft konten.** Foto diunggah ke Supabase Storage; video draft dikirim sebagai tautan Google Drive; plus caption.
+   - Tautan harus berupa URL drive.google.com; creator diingatkan mengatur akses ke "Siapa saja yang memiliki link" agar tim Tali bisa membukanya. Batas ukuran foto ditampilkan; error menyebut penyebab dan langkah berikutnya.
 2. **FR-3.2 (P0) Timeline status.** Setiap partisipasi menampilkan Diundang/Bergabung → Konten dikirim → Direview → Disetujui → Diposting → Pencairan diajukan → Dibayar, dengan tanggal di tiap langkah.
 3. **FR-3.3 (P0) Revisi.** Bila tim Tali meminta revisi, creator melihat catatannya dan dapat mengirim ulang; riwayat versi tersimpan.
 4. **FR-3.4 (P0) Tautan postingan final.** Setelah disetujui, creator memposting lalu mengirim URL postingan; tim Tali mengonfirmasi postingan tayang. Tanggal konfirmasi ini menjadi awal hitungan TOP.
@@ -191,12 +191,12 @@ Kebutuhan non-fungsional MVP dipandu tiga hal: HP spek rendah, data uang dan dat
 | i18n | Semua teks UI via next-intl (`id` default, `en`); tidak ada copy yang di-hardcode |
 | Aksesibilitas | Kontras teks min. 4.5:1 (3:1 untuk teks ≥ 24 px); touch target min. 44×44 px |
 | Brand dan UI | Warna hanya dari token Nila & Limau (`tokens.css`); font Plus Jakarta Sans; logo dari file SVG, bukan teks |
-| Infrastruktur | Vercel dan Supabase di region Singapura |
+| Infrastruktur | Railway (aplikasi + cron) dan Supabase paket gratis, keduanya di region Singapura |
 | Observabilitas | Sentry untuk error, PostHog untuk analytics funnel dan metrik sukses |
 
 ## Integrasi, data, dan asumsi
 
-Stack mengikuti keputusan di scope: Next.js (App Router) + TypeScript, Tailwind v4 + shadcn/ui, dan Supabase. Xendit (tercantum di stack awal) ditunda karena pencairan MVP dilakukan manual.
+Stack mengikuti keputusan di scope: Next.js (App Router) + TypeScript, Tailwind v4 + shadcn/ui, dan Supabase (paket gratis dulu). Aplikasi di-deploy di Railway, bukan Vercel, karena tim sudah terbiasa dan cron tersedia bawaan. Xendit (tercantum di stack awal) ditunda karena pencairan MVP dilakukan manual.
 
 **Integrasi pihak ketiga**
 
@@ -204,10 +204,12 @@ Stack mengikuti keputusan di scope: Next.js (App Router) + TypeScript, Tailwind 
 | --- | --- | --- |
 | Supabase Auth | Daftar dan masuk creator serta tim Tali | M1, M4 |
 | Supabase Postgres + RLS | Data utama dan kontrol akses per peran | Semua |
-| Supabase Storage (bucket privat) | File konten, bukti akun sosial, bukti transfer | M1, M3, M6 |
+| Supabase Storage (bucket privat) | Foto konten, bukti akun sosial, bukti transfer (video draft lewat tautan Google Drive) | M1, M3, M6 |
 | Resend | Email transaksional | M3, M6 |
 | Web Push | Notifikasi status | M3, M6 |
 | Sentry, PostHog | Error dan analytics | Semua |
+| Railway | Hosting aplikasi Next.js (region Singapura) dan cron harian: TOP jatuh tempo, pengingat SLA H+1 | Semua |
+| Google Drive (tautan saja) | Creator membagikan video draft lewat tautan; tanpa integrasi API | M3 |
 
 **Entitas data inti**
 
@@ -252,6 +254,8 @@ Rilis MVP dibagi empat tahap, ditambah satu tahap setelah MVP; tanggal belum dit
 | Arus kas: creator dibayar sebelum klien membayar Tali | Tali menalangi fee | Atur TOP job sesuai termin pembayaran klien |
 | Push notification tidak jalan di iOS tanpa install | Creator melewatkan update status | Email sebagai cadangan; ajakan install PWA |
 | Nama "Tali" belum terdaftar merek (kelas 9 dan 42; mirip "TALLY") | Risiko rebranding | Selesaikan cek PDKI sebelum materi dicetak massal |
+| Batas paket gratis Supabase (project di-pause bila tidak aktif sekitar seminggu, kuota database dan storage kecil) | Aplikasi tidak bisa diakses atau upload gagal | Video lewat Google Drive agar storage hemat; pantau kuota; upgrade ke Pro sebelum pilot dengan transfer sungguhan |
+| Tautan Google Drive privat, dihapus, atau diganti setelah review | Kurator tidak bisa mereview, atau versi yang disetujui hilang | Validasi URL dan instruksi akses; kurator minta revisi bila tidak bisa dibuka; postingan final tetap dicek lewat URL platform |
 
 **Pertanyaan terbuka**
 

@@ -292,7 +292,7 @@ Rilis MVP dibagi empat tahap, ditambah satu tahap setelah MVP; tanggal belum dit
 - [x] Berapa lama batas waktu review storyline, draft, dan caption oleh tim Tali dan brand? tergantung terms di awal
 - [x] Apakah creator wajib eKYC (KTP) sebelum pencairan pertama? tidak
 - [x] Apakah klien perlu laporan atau akses baca di aplikasi setelah MVP? tidak
-- [ ] Domain final: tali.id, tali.app, taliapp.id, atau gettali.com? menyusul
+- [x] Domain final: tali.id, tali.app, taliapp.id, atau gettali.com? menyusul. MVP memakai domain bawaan Railway (*.up.railway.app) sampai domain final dipilih.
 - [x] Target angka untuk metrik sukses dan target performa.
 - [x] Apakah satu job bisa mencakup lebih dari satu platform (mis. Instagram + TikTok), dan apakah fee-nya dihitung per platform? bisa, feenya gabung. ada 2 opsi kita kasih fix rate atau pengajuan dari creator/bidding/open rate
 - [x] Job visit: apakah pembelian produk di toko diganti (reimburse) di luar fee, dan bagaimana bukti pembelian diverifikasi? skip dulu,

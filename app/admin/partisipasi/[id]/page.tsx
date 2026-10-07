@@ -13,6 +13,7 @@ import { SubmissionHistory } from '@/components/work/submission-history';
 import { Timeline } from '@/components/work/timeline';
 import { cancelParticipation, confirmPost, setShipment, setVisit } from '@/app/admin/actions';
 import { requireStaff } from '@/lib/auth';
+import { realBrand, type BrandEmbed } from '@/lib/brand';
 import { decrypt } from '@/lib/crypto';
 import { formatDate, formatDateTime } from '@/lib/dates';
 import { formatRupiah } from '@/lib/money';
@@ -43,8 +44,8 @@ export default async function AdminWork({ params }: { params: Promise<{ id: stri
   const locale = await getLocale();
 
   const { data: part } = await viewer.supabase
-    .from('participations').select('*, jobs(*), profiles!participations_creator_id_fkey(*)').eq('id', id)
-    .maybeSingle<Participation & { jobs: Job; profiles: Profile }>();
+    .from('participations').select('*, jobs(*, job_brands(real_name)), profiles!participations_creator_id_fkey(*)').eq('id', id)
+    .maybeSingle<Participation & { jobs: Job & { job_brands: BrandEmbed }; profiles: Profile }>();
   if (!part) notFound();
   const job = part.jobs;
   const creator = part.profiles;
@@ -59,7 +60,7 @@ export default async function AdminWork({ params }: { params: Promise<{ id: stri
 
   return (
     <div className="space-y-5">
-      <PageHeader back={{ href: `/admin/job/${job.id}`, label: job.title }} title={creator.full_name ?? creator.email ?? ''} subtitle={`${job.brand_name} · ${job.title}`} />
+      <PageHeader back={{ href: `/admin/job/${job.id}`, label: job.title }} title={creator.full_name ?? creator.email ?? ''} subtitle={`${realBrand(job) ?? job.brand_name} · ${job.title}`} />
 
       <div className="grid gap-5 lg:grid-cols-[1fr_340px]">
         <div className="space-y-5">

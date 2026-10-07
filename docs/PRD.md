@@ -144,7 +144,7 @@ Setiap kebutuhan punya ID agar bisa dirujuk di tiket dan pengujian. P0 = wajib u
 2. **FR-2.2 (P1) Filter.** Platform (Instagram, TikTok, YouTube, Threads, X) dan kategori.
 3. **FR-2.3 (P0) Detail job.** Brief, deliverable, syarat (min. followers, kategori), fee, kuota creator, deadline kirim konten, dan TOP (mis. "Bisa dicairkan 7 hari setelah postingan tayang").
    - Fee dan TOP terlihat tanpa scroll di layar 360 px sebelum tombol bergabung.
-4. **FR-2.4 (P0) Bergabung.** Creator yang punya akun terverifikasi di platform job dan memenuhi syarat menekan "Gabung job"; status menjadi `Menunggu kurasi` sampai tim Tali menyetujui atau menolak. Untuk job open rate, creator mengisi rate yang diajukan (Rp) saat bergabung (bila job punya batas atas rate, batas itu ditampilkan dan rate di atasnya tidak bisa dikirim); kurator menyetujui dengan fee yang disepakati, dan fee itulah yang dipakai untuk pencairan.
+4. **FR-2.4 (P0) Bergabung.** Daftar job dan ringkasannya bisa dilihat tanpa login (brief lengkap dan alamat lokasi hanya setelah login); login diminta saat menekan "Gabung job". Creator yang punya akun di platform job (boleh masih menunggu verifikasi) dan memenuhi syarat menekan "Gabung job"; kurator memverifikasi akun sebelum menerima pelamar; status menjadi `Menunggu kurasi` sampai tim Tali menyetujui atau menolak. Untuk job open rate, creator mengisi rate yang diajukan (Rp) saat bergabung (bila job punya batas atas rate, batas itu ditampilkan dan rate di atasnya tidak bisa dikirim); kurator menyetujui dengan fee yang disepakati, dan fee itulah yang dipakai untuk pencairan.
    - Creator yang belum menyelesaikan onboarding diarahkan ke langkah yang kurang.
 
 ### M3 — Eksekusi job: produk/visit, storyline, draft, caption

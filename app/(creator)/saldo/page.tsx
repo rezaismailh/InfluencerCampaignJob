@@ -11,6 +11,7 @@ import { PayoutPicker } from '@/components/creator/payout-picker';
 import { requestPayout } from '@/app/(creator)/actions';
 import { requireCreator } from '@/lib/auth';
 import { loadCreatorWork } from '@/lib/creator-data';
+import { visibleBrand } from '@/lib/brand';
 import { formatDate, todayWib } from '@/lib/dates';
 import { formatRupiah } from '@/lib/money';
 import { maskAccount } from '@/lib/payout';
@@ -36,7 +37,7 @@ export default async function Balance() {
   const bal = balance(parts, requests, todayWib());
   const readyItems = parts
     .filter((p) => bal.readyIds.includes(p.id))
-    .map((p) => ({ id: p.id, title: p.jobs.title, brand: p.jobs.brand_name, fee: p.agreed_fee ?? 0 }));
+    .map((p) => ({ id: p.id, title: p.jobs.title, brand: visibleBrand(p.jobs), fee: p.agreed_fee ?? 0 }));
   const nextTransfer = requests.find((r) => r.status === 'requested' || r.status === 'processing') ?? null;
   const jobsByRequest = new Map<string, number>();
   for (const p of parts) if (p.payout_request_id) jobsByRequest.set(p.payout_request_id, (jobsByRequest.get(p.payout_request_id) ?? 0) + 1);

@@ -13,7 +13,7 @@ export const initialState: ActionState = {};
 // Exception messages raised by the database functions; anything else is "generic".
 const KNOWN = [
   'not_authenticated', 'forbidden', 'not_found', 'invalid_state', 'job_not_open', 'job_closed',
-  'onboarding_incomplete', 'no_verified_account', 'followers_below_minimum', 'rate_required',
+  'onboarding_incomplete', 'no_verified_account', 'no_social_account', 'account_not_verified', 'followers_below_minimum', 'rate_required',
   'rate_above_cap', 'already_applied', 'quota_full', 'fee_required', 'storyline_not_approved',
   'submission_locked', 'invalid_docs_url', 'invalid_drive_url', 'invalid_path', 'caption_required',
   'already_posted', 'content_not_approved', 'invalid_url', 'invalid_date', 'payout_account_required',

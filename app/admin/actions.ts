@@ -8,6 +8,7 @@ import { requireStaff } from '@/lib/auth';
 import { parseRupiah } from '@/lib/money';
 import { deliverPending } from '@/lib/notify';
 import { PLATFORMS } from '@/lib/social';
+import { mentionsBrand } from '@/lib/brand';
 import { dbErrorKey, type ActionState } from '@/lib/action-state';
 import type { VisitLocation } from '@/lib/types';
 
@@ -113,13 +114,34 @@ export async function saveJob(_prev: ActionState, formData: FormData): Promise<A
     for (const issue of parsed.error.issues) fields[String(issue.path[0])] = issue.message === 'required' ? 'required' : 'invalid';
     return { error: 'invalid', fields };
   }
-  const row = { ...parsed.data, fee: parsed.data.fee_type === 'fixed' ? parsed.data.fee : null,
+  // Disguised brand: creators (and guests) see the alias until they are invited or approved.
+  const realName = parsed.data.brand_name;
+  const alias = text(formData.get('brand_display')) === 'alias' ? text(formData.get('brand_alias')) : '';
+  if (text(formData.get('brand_display')) === 'alias') {
+    if (!alias) return { error: 'invalid', fields: { brand_alias: 'required' } };
+    if (mentionsBrand(alias, realName)) return { error: 'brand_in_text', fields: { brand_alias: 'brand_in_text' } };
+    const d = parsed.data;
+    const publicText: Record<string, string | null> = {
+      title: d.title, product: d.product, deliverables: d.deliverables, brief: d.brief, requirements: d.requirements,
+      visit_locations: d.visit_locations.map((l) => `${l.name} ${l.address ?? ''}`).join('\n'),
+    };
+    const fields: Record<string, string> = {};
+    for (const [key, value] of Object.entries(publicText)) if (mentionsBrand(value, realName)) fields[key] = 'brand_in_text';
+    if (Object.keys(fields).length) return { error: 'brand_in_text', fields };
+  }
+
+  const row = { ...parsed.data, brand_name: alias || realName,
+    fee: parsed.data.fee_type === 'fixed' ? parsed.data.fee : null,
     rate_cap: parsed.data.fee_type === 'open' ? parsed.data.rate_cap : null };
 
   const result = id
     ? await viewer.supabase.from('jobs').update(row).eq('id', id).select('id').single()
     : await viewer.supabase.from('jobs').insert({ ...row, created_by: viewer.id }).select('id').single();
   if (result.error) return { error: dbErrorKey(result.error) };
+  const brand = alias
+    ? await viewer.supabase.from('job_brands').upsert({ job_id: result.data.id, real_name: realName })
+    : await viewer.supabase.from('job_brands').delete().eq('job_id', result.data.id);
+  if (brand.error) return { error: dbErrorKey(brand.error) };
   revalidatePath('/admin/job');
   revalidatePath('/job');
   redirect(`/admin/job/${result.data.id}`);

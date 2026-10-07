@@ -105,7 +105,9 @@ Teksnya ada di `messages/*.json` (`legal.privacy`, `legal.terms`), tanggal berla
 
 Semua penulisan data penting lewat fungsi `security definer` yang memvalidasi peran dan tahap:
 
-- Creator hanya bisa gabung job bila profil lengkap dan punya akun terverifikasi di platform job (open rate: rate wajib, tidak boleh melebihi batas atas).
+- Creator bisa gabung job bila profil lengkap dan punya akun di platform job, boleh yang masih menunggu verifikasi (open rate: rate wajib, tidak boleh melebihi batas atas). Kurator baru bisa menerima pelamar setelah akunnya terverifikasi dan followers memenuhi syarat.
+- Brand bisa disamarkan per job: `jobs.brand_name` berisi label yang dilihat publik dan pelamar, nama asli di tabel `job_brands` yang hanya bisa dibaca staf serta creator yang diundang/diterima. Form job menolak simpan bila nama asli masih tertulis di teks publik job.
+- Pengunjung tanpa login melihat ringkasan job yang buka lewat `public_open_jobs()` (tanpa brief); tabel `jobs` tidak bisa dibaca anon.
 - Storyline harus disetujui sebelum draft/caption; versi baru hanya bila diminta revisi; revisi tidak dibatasi.
 - Posting hanya setelah draft dan caption disetujui; `ready_at` = tanggal konfirmasi + TOP.
 - Pencairan: minimal Rp 10.000, biaya Rp 2.500 kecuali BCA/Mandiri, tenggat 3 hari kerja (melewati Sabtu, Minggu, tabel `holidays`), jejak audit di `payout_events`. Pencairan gagal melepas job agar bisa diajukan ulang.

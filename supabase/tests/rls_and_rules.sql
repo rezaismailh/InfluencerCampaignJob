@@ -87,16 +87,27 @@ select tests.act_as('00000000-0000-0000-0000-00000000000a');
 select tests.check((select count(*) = 1 from public.jobs), 'creator sees open job');
 select tests.expect_error($$select public.apply_to_job('20000000-0000-0000-0000-000000000001')$$, 'onboarding_incomplete');
 update public.profiles set onboarded_at = now() where id = auth.uid();
-select tests.expect_error($$select public.apply_to_job('20000000-0000-0000-0000-000000000001')$$, 'no_verified_account');
+-- a pending (not yet verified) account is enough to apply
+select tests.check((select status = 'pending' from public.social_accounts), 'account still pending');
+select public.apply_to_job('20000000-0000-0000-0000-000000000001');
+select tests.expect_error($$select public.apply_to_job('20000000-0000-0000-0000-000000000001')$$, 'already_applied');
 select tests.expect_error($$select public.verify_social_account((select id from public.social_accounts limit 1), true)$$, 'forbidden');
 
+-- ...but the curator must verify before approving
 select tests.act_as('00000000-0000-0000-0000-000000000002');
+select tests.expect_error($$select public.decide_application((select id from public.participations
+  where creator_id = '00000000-0000-0000-0000-00000000000a'), true)$$, 'account_not_verified');
 select public.verify_social_account(id, true, 12500) from public.social_accounts;
+insert into public.jobs (id, brand_name, title, platforms, deliverables, brief, fee_type, fee, quota, top_days, status)
+values ('20000000-0000-0000-0000-0000000000f1', 'Uji', 'Job YouTube', '{youtube}', '1 video', 'Brief', 'fixed', 100000, 1, 7, 'open');
 
 select tests.act_as('00000000-0000-0000-0000-00000000000a');
 select tests.check((select followers = 12500 and status = 'verified' from public.social_accounts), 'verified with updated followers');
-select public.apply_to_job('20000000-0000-0000-0000-000000000001');
-select tests.expect_error($$select public.apply_to_job('20000000-0000-0000-0000-000000000001')$$, 'already_applied');
+select tests.expect_error($$select public.apply_to_job('20000000-0000-0000-0000-0000000000f1')$$, 'no_social_account');
+
+select tests.act_as('00000000-0000-0000-0000-000000000002');
+update public.jobs set status = 'closed' where id = '20000000-0000-0000-0000-0000000000f1';
+select tests.act_as('00000000-0000-0000-0000-00000000000a');
 -- direct writes are blocked
 update public.participations set status = 'approved';
 select tests.check((select status = 'applied' from public.participations), 'direct update changes nothing');
@@ -112,6 +123,22 @@ select tests.expect_error($$select public.decide_application((select id from pub
   where creator_id = '00000000-0000-0000-0000-00000000000b'), true)$$, 'quota_full');
 select tests.check((select agreed_fee = 150000 and shipment_status = 'pending' from public.participations
   where creator_id = '00000000-0000-0000-0000-00000000000a'), 'fixed fee applied, shipment pending');
+
+-- Disguised brand: real name only for staff and approved/invited creators
+insert into public.job_brands (job_id, real_name) values ('20000000-0000-0000-0000-000000000001', 'Nissin');
+update public.jobs set brand_name = 'Brand snack nasional' where id = '20000000-0000-0000-0000-000000000001';
+select tests.act_as('00000000-0000-0000-0000-00000000000a');
+select tests.check((select real_name = 'Nissin' from public.job_brands), 'approved creator sees real brand');
+select tests.expect_error($$insert into public.job_brands (job_id, real_name) values ('20000000-0000-0000-0000-0000000000f1', 'X')$$, 'row-level security');
+select tests.act_as('00000000-0000-0000-0000-00000000000b');
+select tests.check((select count(*) = 0 from public.job_brands), 'applicant does not see real brand');
+select tests.check((select brand_name = 'Brand snack nasional' from public.jobs where id = '20000000-0000-0000-0000-000000000001'), 'applicant sees alias');
+reset role;
+set role anon;
+select tests.expect_error($$select count(*) from public.job_brands$$, 'permission denied');
+select tests.check((select brand_name = 'Brand snack nasional' from public.public_open_jobs('20000000-0000-0000-0000-000000000001')), 'guest sees alias');
+reset role;
+set role authenticated;
 
 -- Submissions: storyline first, versions, feedback --------------------------
 select tests.act_as('00000000-0000-0000-0000-00000000000a');

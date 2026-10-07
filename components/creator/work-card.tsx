@@ -6,6 +6,7 @@ import { participationTone } from '@/components/status';
 import { formatRupiah } from '@/lib/money';
 import type { PartWithJob } from '@/lib/creator-data';
 import type { Step } from '@/lib/work';
+import { visibleBrand } from '@/lib/brand';
 
 export async function WorkCard({ part, steps }: { part: PartWithJob; steps: Step[] }) {
   const t = await getTranslations('work');
@@ -16,7 +17,7 @@ export async function WorkCard({ part, steps }: { part: PartWithJob; steps: Step
     <Link href={`/partisipasi/${part.id}`} className="block rounded-2xl border border-garis bg-kertas p-4 hover:border-nila-300">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="text-[13px] font-medium text-teks-redup">{part.jobs.brand_name}</p>
+          <p className="text-[13px] font-medium text-teks-redup">{visibleBrand(part.jobs)}</p>
           <p className="font-bold">{part.jobs.title}</p>
         </div>
         <ChevronRight className="mt-1 size-5 shrink-0 text-teks-redup" aria-hidden />

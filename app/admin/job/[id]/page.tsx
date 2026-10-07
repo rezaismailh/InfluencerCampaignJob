@@ -12,6 +12,7 @@ import { participationTone, verificationTone } from '@/components/status';
 import { feeLabel } from '@/components/creator/job-card';
 import { decideApplication, inviteCreator, verifySocial } from '@/app/admin/actions';
 import { requireStaff } from '@/lib/auth';
+import { realBrand, type BrandEmbed } from '@/lib/brand';
 import { formatRupiah } from '@/lib/money';
 import { latestByKind, timeline } from '@/lib/work';
 import type { Job, Participation, Profile, SocialAccount, Submission } from '@/lib/types';
@@ -29,7 +30,7 @@ export default async function AdminJob({ params }: { params: Promise<{ id: strin
   const tv = await getTranslations('verification');
   const tw = await getTranslations('work');
 
-  const { data: job } = await viewer.supabase.from('jobs').select('*').eq('id', id).maybeSingle<Job>();
+  const { data: job } = await viewer.supabase.from('jobs').select('*, job_brands(real_name)').eq('id', id).maybeSingle<Job & { job_brands: BrandEmbed }>();
   if (!job) notFound();
   const { data: rows } = await viewer.supabase
     .from('participations').select('*, profiles!participations_creator_id_fkey(full_name, city, email, persona, categories)')
@@ -48,7 +49,7 @@ export default async function AdminJob({ params }: { params: Promise<{ id: strin
 
   return (
     <div className="space-y-5">
-      <PageHeader back={{ href: '/admin/job', label: tn('adminJobs') }} title={job.title} subtitle={job.brand_name}
+      <PageHeader back={{ href: '/admin/job', label: tn('adminJobs') }} title={job.title} subtitle={realBrand(job) ? t('brandShownAs', { real: realBrand(job)!, alias: job.brand_name }) : job.brand_name}
         action={<ButtonLink href={`/admin/job/${id}/ubah`} variant="outline" size="sm">{t('editJob')}</ButtonLink>} />
 
       <Card className="flex flex-wrap items-center gap-3">

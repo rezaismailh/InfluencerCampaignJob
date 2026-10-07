@@ -5,6 +5,7 @@ import { ButtonLink } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { EmptyState, PageHeader } from '@/components/ui/page';
 import { requireStaff } from '@/lib/auth';
+import { realBrand, type BrandEmbed } from '@/lib/brand';
 import { formatDate } from '@/lib/dates';
 import type { Job } from '@/lib/types';
 
@@ -16,7 +17,7 @@ export default async function AdminJobs() {
   const tj = await getTranslations('jobs');
   const locale = await getLocale();
   const [{ data: jobs }, { data: parts }] = await Promise.all([
-    viewer.supabase.from('jobs').select('*').order('created_at', { ascending: false }).returns<Job[]>(),
+    viewer.supabase.from('jobs').select('*, job_brands(real_name)').order('created_at', { ascending: false }).returns<(Job & { job_brands: BrandEmbed })[]>(),
     viewer.supabase.from('participations').select('job_id, status'),
   ]);
   const count = (jobId: string, status: string) => (parts ?? []).filter((p) => p.job_id === jobId && p.status === status).length;
@@ -33,7 +34,7 @@ export default async function AdminJobs() {
               <Card className="hover:border-nila-300">
                 <div className="flex flex-wrap items-start justify-between gap-2">
                   <div>
-                    <p className="text-[13px] text-teks-redup">{job.brand_name}</p>
+                    <p className="text-[13px] text-teks-redup">{realBrand(job) ? t('brandShownAs', { real: realBrand(job)!, alias: job.brand_name }) : job.brand_name}</p>
                     <p className="font-bold">{job.title}</p>
                   </div>
                   <div className="flex flex-wrap gap-1.5">

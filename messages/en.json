@@ -419,7 +419,7 @@
     "jobForm": {
       "client": "Client",
       "noClient": "Choose a client",
-      "brandName": "Brand name (shown to creators)",
+      "brandName": "Brand name (real)",
       "title": "Job title",
       "product": "Product",
       "jobType": "Job type",
@@ -449,7 +449,13 @@
       "top": "Payment term",
       "topOption": "D+{days} after posting",
       "status": "Status",
-      "save": "Save job"
+      "save": "Save job",
+      "brandDisplay": "Brand name for creators",
+      "brandDisplayAlias": "Disguise until the creator is accepted",
+      "brandDisplayReal": "Show the real name",
+      "brandAlias": "Alias",
+      "brandAliasHint": "Shown publicly and to applicants. The real name appears once a creator is invited or accepted. Don't write the brand name in the title, product, deliverables, brief, requirements or locations.",
+      "brandAliasPlaceholder": "National snack brand"
     },
     "applicants": "Applicants",
     "participants": "Joined creators",
@@ -522,7 +528,8 @@
     "onlyFinance": "This page is for finance admins.",
     "onlyCurator": "This page is for curators.",
     "verifyNow": "Verify",
-    "verifyBeforeApprove": "Verify the applicant's account on this job's platform (and check the follower minimum) before accepting."
+    "verifyBeforeApprove": "Verify the applicant's account on this job's platform (and check the follower minimum) before accepting.",
+    "brandShownAs": "{real} · shown as “{alias}”"
   },
   "errors": {
     "generic": "Something didn't work. Try again in a moment.",
@@ -574,7 +581,8 @@
     "needSocial": "Add at least one social media account.",
     "inviteNotFound": "No creator is registered with that email.",
     "no_social_account": "Add a social media account on this job's platform first, from your Profile.",
-    "account_not_verified": "The applicant's account on this job's platform isn't verified or is below the follower minimum. Verify it, then accept."
+    "account_not_verified": "The applicant's account on this job's platform isn't verified or is below the follower minimum. Verify it, then accept.",
+    "brand_in_text": "The real brand name is still written here. Remove it so the alias doesn't leak."
   },
   "success": {
     "saved": "Saved.",
@@ -753,7 +761,7 @@
           "Using fake or paid followers, likes, views or comments.",
           "Registering someone else's social media account, or using someone else's Tali account.",
           "Submitting content that breaks the law, copyright or social media platform rules.",
-          "Copying or sharing confidential campaign briefs and information."
+          "Sharing fee amounts, unannounced brand names, briefs or other confidential campaign information."
         ]
       },
       {

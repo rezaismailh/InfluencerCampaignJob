@@ -25,7 +25,7 @@ function Chips({ name, options, checked, label }: { name: string; options: { val
   );
 }
 
-export async function JobForm({ job, clients }: { job?: Job; clients: { id: string; name: string }[] }) {
+export async function JobForm({ job, realBrand, clients }: { job?: Job; realBrand?: string | null; clients: { id: string; name: string }[] }) {
   const t = await getTranslations('admin.jobForm');
   const tp = await getTranslations('platform');
   const tt = await getTranslations('jobType');
@@ -34,6 +34,8 @@ export async function JobForm({ job, clients }: { job?: Job; clients: { id: stri
   const ttier = await getTranslations('tier');
   const tper = await getTranslations('persona');
   const c = await getTranslations('common');
+  // New jobs are disguised by default; an existing job is disguised when it has a real name stored separately.
+  const disguised = job ? !!realBrand : true;
   const locations = (job?.visit_locations ?? []).map((l) => [l.name, l.address ?? '', l.maps_url ?? ''].join(' | ')).join('\n');
 
   return (
@@ -47,12 +49,22 @@ export async function JobForm({ job, clients }: { job?: Job; clients: { id: stri
           </Select>
         </Field>
         <Field label={t('brandName')} htmlFor="brand_name">
-          <Input id="brand_name" name="brand_name" defaultValue={job?.brand_name ?? ''} required /><FieldError name="brand_name" />
+          <Input id="brand_name" name="brand_name" defaultValue={realBrand ?? job?.brand_name ?? ''} required /><FieldError name="brand_name" />
+        </Field>
+        <Field label={t('brandDisplay')} htmlFor="brand_display">
+          <Select id="brand_display" name="brand_display" defaultValue={disguised ? 'alias' : 'real'}>
+            <option value="alias">{t('brandDisplayAlias')}</option>
+            <option value="real">{t('brandDisplayReal')}</option>
+          </Select>
+        </Field>
+        <Field label={t('brandAlias')} hint={t('brandAliasHint')} htmlFor="brand_alias">
+          <Input id="brand_alias" name="brand_alias" defaultValue={realBrand ? job?.brand_name : ''} placeholder={t('brandAliasPlaceholder')} />
+          <FieldError name="brand_alias" />
         </Field>
         <Field label={t('title')} htmlFor="title">
           <Input id="title" name="title" defaultValue={job?.title ?? ''} required /><FieldError name="title" />
         </Field>
-        <Field label={t('product')} htmlFor="product"><Input id="product" name="product" defaultValue={job?.product ?? ''} /></Field>
+        <Field label={t('product')} htmlFor="product"><Input id="product" name="product" defaultValue={job?.product ?? ''} /><FieldError name="product" /></Field>
         <Field label={t('jobType')} htmlFor="job_type">
           <Select id="job_type" name="job_type" defaultValue={job?.job_type ?? 'non_visit'}>
             <option value="non_visit">{tt('non_visit')}</option>
@@ -70,7 +82,7 @@ export async function JobForm({ job, clients }: { job?: Job; clients: { id: stri
       <Field label={t('brief')} htmlFor="brief">
         <Textarea id="brief" name="brief" rows={6} defaultValue={job?.brief ?? ''} required /><FieldError name="brief" />
       </Field>
-      <Field label={t('requirements')} htmlFor="requirements"><Textarea id="requirements" name="requirements" defaultValue={job?.requirements ?? ''} /></Field>
+      <Field label={t('requirements')} htmlFor="requirements"><Textarea id="requirements" name="requirements" defaultValue={job?.requirements ?? ''} /><FieldError name="requirements" /></Field>
 
       <div className="grid gap-4 md:grid-cols-2">
         <Chips name="tiers" label={t('tiers')} checked={job?.tiers ?? []} options={['nano', 'micro'].map((v) => ({ value: v, label: ttier(v) }))} />
@@ -119,6 +131,7 @@ export async function JobForm({ job, clients }: { job?: Job; clients: { id: stri
       </div>
       <Field label={t('visitLocations')} hint={t('visitLocationsHint')} htmlFor="visit_locations">
         <Textarea id="visit_locations" name="visit_locations" defaultValue={locations} placeholder="Indomaret Lontar | Jl. Raya Lontar No.42, Surabaya | https://maps.google.com/?cid=…" />
+        <FieldError name="visit_locations" />
       </Field>
 
       <div className="grid gap-4 md:grid-cols-3">

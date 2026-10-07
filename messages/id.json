@@ -419,7 +419,7 @@
     "jobForm": {
       "client": "Klien",
       "noClient": "Pilih klien",
-      "brandName": "Nama brand (tampil ke creator)",
+      "brandName": "Nama brand (asli)",
       "title": "Judul job",
       "product": "Produk",
       "jobType": "Tipe job",
@@ -449,7 +449,13 @@
       "top": "Term of payment",
       "topOption": "H+{days} setelah tayang",
       "status": "Status",
-      "save": "Simpan job"
+      "save": "Simpan job",
+      "brandDisplay": "Nama brand untuk creator",
+      "brandDisplayAlias": "Samarkan sampai creator diterima",
+      "brandDisplayReal": "Tampilkan nama asli",
+      "brandAlias": "Label samaran",
+      "brandAliasHint": "Tampil ke publik dan pelamar. Nama asli terlihat setelah creator diundang atau diterima. Jangan tulis nama brand di judul, produk, deliverable, brief, syarat, atau lokasi.",
+      "brandAliasPlaceholder": "Brand snack nasional"
     },
     "applicants": "Pelamar",
     "participants": "Creator bergabung",
@@ -522,7 +528,8 @@
     "onlyFinance": "Halaman ini khusus admin keuangan.",
     "onlyCurator": "Halaman ini khusus kurator.",
     "verifyNow": "Verifikasi",
-    "verifyBeforeApprove": "Verifikasi akun di platform job ini (dan pastikan followers memenuhi syarat) sebelum menerima pelamar."
+    "verifyBeforeApprove": "Verifikasi akun di platform job ini (dan pastikan followers memenuhi syarat) sebelum menerima pelamar.",
+    "brandShownAs": "{real} · tampil sebagai “{alias}”"
   },
   "errors": {
     "generic": "Ada yang belum berhasil. Coba lagi sebentar lagi.",
@@ -574,7 +581,8 @@
     "needSocial": "Tambahkan minimal satu akun media sosial.",
     "inviteNotFound": "Creator dengan email itu belum terdaftar.",
     "no_social_account": "Tambahkan akun media sosial di platform job ini dulu, lewat halaman Profil.",
-    "account_not_verified": "Akun pelamar di platform job ini belum terverifikasi atau followers-nya di bawah syarat. Verifikasi dulu, lalu terima."
+    "account_not_verified": "Akun pelamar di platform job ini belum terverifikasi atau followers-nya di bawah syarat. Verifikasi dulu, lalu terima.",
+    "brand_in_text": "Nama brand asli masih tertulis di sini. Hapus dulu supaya samarannya tidak bocor."
   },
   "success": {
     "saved": "Tersimpan.",
@@ -753,7 +761,7 @@
           "Memakai followers, likes, views, atau komentar palsu atau berbayar.",
           "Mendaftarkan akun media sosial milik orang lain, atau memakai akun Tali orang lain.",
           "Mengirim konten yang melanggar hukum, hak cipta, atau aturan platform media sosial.",
-          "Menyalin atau menyebarkan brief dan informasi campaign yang bersifat rahasia."
+          "Menyebarkan nominal fee, nama brand yang belum diumumkan, brief, atau informasi campaign lain yang bersifat rahasia."
         ]
       },
       {

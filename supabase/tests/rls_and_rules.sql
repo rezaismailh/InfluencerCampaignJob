@@ -124,6 +124,22 @@ select tests.expect_error($$select public.decide_application((select id from pub
 select tests.check((select agreed_fee = 150000 and shipment_status = 'pending' from public.participations
   where creator_id = '00000000-0000-0000-0000-00000000000a'), 'fixed fee applied, shipment pending');
 
+-- Disguised brand: real name only for staff and approved/invited creators
+insert into public.job_brands (job_id, real_name) values ('20000000-0000-0000-0000-000000000001', 'Nissin');
+update public.jobs set brand_name = 'Brand snack nasional' where id = '20000000-0000-0000-0000-000000000001';
+select tests.act_as('00000000-0000-0000-0000-00000000000a');
+select tests.check((select real_name = 'Nissin' from public.job_brands), 'approved creator sees real brand');
+select tests.expect_error($$insert into public.job_brands (job_id, real_name) values ('20000000-0000-0000-0000-0000000000f1', 'X')$$, 'row-level security');
+select tests.act_as('00000000-0000-0000-0000-00000000000b');
+select tests.check((select count(*) = 0 from public.job_brands), 'applicant does not see real brand');
+select tests.check((select brand_name = 'Brand snack nasional' from public.jobs where id = '20000000-0000-0000-0000-000000000001'), 'applicant sees alias');
+reset role;
+set role anon;
+select tests.expect_error($$select count(*) from public.job_brands$$, 'permission denied');
+select tests.check((select brand_name = 'Brand snack nasional' from public.public_open_jobs('20000000-0000-0000-0000-000000000001')), 'guest sees alias');
+reset role;
+set role authenticated;
+
 -- Submissions: storyline first, versions, feedback --------------------------
 select tests.act_as('00000000-0000-0000-0000-00000000000a');
 select tests.check((select count(*) = 1 from public.participations), 'A sees only own participation');

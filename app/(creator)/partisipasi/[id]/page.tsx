@@ -20,6 +20,7 @@ import { formatRupiah } from '@/lib/money';
 import { signedUrls } from '@/lib/storage';
 import { latestByKind, revisionCount, timeline } from '@/lib/work';
 import type { Job, Participation, PayoutRequest, Submission, SubmissionKind } from '@/lib/types';
+import { visibleBrand, type BrandEmbed } from '@/lib/brand';
 
 export default async function Work({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -31,8 +32,8 @@ export default async function Work({ params }: { params: Promise<{ id: string }>
   const locale = await getLocale();
 
   const { data: part } = await viewer.supabase
-    .from('participations').select('*, jobs(*)').eq('id', id).eq('creator_id', viewer.id)
-    .maybeSingle<Participation & { jobs: Job }>();
+    .from('participations').select('*, jobs(*, job_brands(real_name))').eq('id', id).eq('creator_id', viewer.id)
+    .maybeSingle<Participation & { jobs: Job & { job_brands: BrandEmbed } }>();
   if (!part) notFound();
   const job = part.jobs;
 
@@ -52,7 +53,7 @@ export default async function Work({ params }: { params: Promise<{ id: string }>
 
   return (
     <div className="space-y-5">
-      <PageHeader back={{ href: '/beranda', label: tn('home') }} title={job.title} subtitle={job.brand_name} />
+      <PageHeader back={{ href: '/beranda', label: tn('home') }} title={job.title} subtitle={visibleBrand(job)} />
 
       <Card className="flex items-center justify-between gap-3">
         <div>

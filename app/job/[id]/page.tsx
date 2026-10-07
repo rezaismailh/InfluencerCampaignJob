@@ -17,6 +17,7 @@ import { createClient } from '@/lib/supabase/server';
 import { formatDate } from '@/lib/dates';
 import { formatRupiah } from '@/lib/money';
 import type { Job, Participation, PublicJob, SocialAccount } from '@/lib/types';
+import { visibleBrand, type BrandEmbed } from '@/lib/brand';
 
 async function publicJob(id: string) {
   const supabase = await createClient();
@@ -49,14 +50,14 @@ export default async function JobDetail({ params }: { params: Promise<{ id: stri
   const locale = await getLocale();
 
   // Signed-in users read the job through RLS (full brief); guests get the teaser.
-  const full = viewer ? (await viewer.supabase.from('jobs').select('*').eq('id', id).maybeSingle<Job>()).data : null;
+  const full = viewer ? (await viewer.supabase.from('jobs').select('*, job_brands(real_name)').eq('id', id).maybeSingle<Job & { job_brands: BrandEmbed }>()).data : null;
   const job: Job | PublicJob | null = full ?? await publicJob(id);
   if (!job) notFound();
   const locations = full ? full.visit_locations : (job as PublicJob).visit_location_names.map((name) => ({ name }));
 
   return (
     <div className="space-y-5">
-      <PageHeader back={{ href: '/job', label: tn('jobs') }} title={job.title} subtitle={job.brand_name} />
+      <PageHeader back={{ href: '/job', label: tn('jobs') }} title={job.title} subtitle={full ? visibleBrand(full) : job.brand_name} />
 
       <Card className="space-y-3">
         <p className="text-[13px] font-medium text-teks-redup">{t('fee')}</p>

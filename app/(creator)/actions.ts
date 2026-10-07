@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { after } from 'next/server';
 import { z } from 'zod';
-import { requireCreator } from '@/lib/auth';
+import { requireCreator, safeNext } from '@/lib/auth';
 import { encrypt } from '@/lib/crypto';
 import { parseRupiah } from '@/lib/money';
 import { deliverPending } from '@/lib/notify';
@@ -91,7 +91,7 @@ export async function removeSocialAccount(formData: FormData) {
   revalidatePath('/', 'layout');
 }
 
-export async function finishOnboarding(): Promise<ActionState> {
+export async function finishOnboarding(_prev: ActionState, formData: FormData): Promise<ActionState> {
   const viewer = await requireCreator({ allowIncomplete: true });
   const p = viewer.profile;
   if (!p.full_name || !p.phone_enc || !p.city) return { error: 'onboarding_incomplete' };
@@ -99,7 +99,7 @@ export async function finishOnboarding(): Promise<ActionState> {
   if (!count) return { error: 'needSocial' };
   const { error } = await viewer.supabase.from('profiles').update({ onboarded_at: new Date().toISOString() }).eq('id', viewer.id);
   if (error) return { error: dbErrorKey(error) };
-  redirect('/beranda');
+  redirect(safeNext(text(formData.get('next'))) ?? '/beranda');
 }
 
 // ---------------------------------------------------------------------------

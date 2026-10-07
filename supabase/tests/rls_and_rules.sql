@@ -72,6 +72,16 @@ insert into public.jobs (id, client_id, brand_name, title, platforms, deliverabl
 values ('20000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-000000000001', 'Nissin',
   'Review wafer', '{tiktok}', '1 video TikTok', 'Brief', 'fixed', 150000, 1, 7, 'open', 'shipped');
 
+-- Guests: teaser via function only, no direct table read
+reset role;
+set role anon;
+select tests.act_as(null);
+select tests.expect_error($$select count(*) from public.jobs$$, 'permission denied');
+select tests.check((select count(*) = 1 from public.public_open_jobs()), 'guest sees open job teaser');
+select tests.check((select title = 'Review wafer' from public.public_open_jobs('20000000-0000-0000-0000-000000000001')), 'guest sees one job');
+reset role;
+set role authenticated;
+
 -- Creator A applies: onboarding and verification gates
 select tests.act_as('00000000-0000-0000-0000-00000000000a');
 select tests.check((select count(*) = 1 from public.jobs), 'creator sees open job');

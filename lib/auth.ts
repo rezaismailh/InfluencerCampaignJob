@@ -20,6 +20,11 @@ export const isStaffRole = (role: Role) => role !== 'creator';
 export const canCurate = (role: Role) => role === 'curator' || role === 'owner';
 export const canFinance = (role: Role) => role === 'finance' || role === 'owner';
 
+/** A same-site path to continue to after login or onboarding, or null. */
+export function safeNext(next: string | null | undefined): string | null {
+  return next && next.startsWith('/') && !next.startsWith('//') ? next : null;
+}
+
 export function homeFor(role: Role) {
   return isStaffRole(role) ? '/admin' : '/beranda';
 }

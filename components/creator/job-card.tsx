@@ -3,7 +3,7 @@ import { getLocale, getTranslations } from 'next-intl/server';
 import { Badge } from '@/components/ui/badge';
 import { formatDate } from '@/lib/dates';
 import { formatRupiah } from '@/lib/money';
-import type { Job } from '@/lib/types';
+import type { Job, PublicJob } from '@/lib/types';
 
 export async function feeLabel(job: Pick<Job, 'fee_type' | 'fee' | 'rate_cap'>) {
   const t = await getTranslations('jobs');
@@ -11,7 +11,7 @@ export async function feeLabel(job: Pick<Job, 'fee_type' | 'fee' | 'rate_cap'>) 
   return job.rate_cap ? t('rateCapLabel', { amount: formatRupiah(job.rate_cap) }) : t('openRate');
 }
 
-export async function JobCard({ job }: { job: Job }) {
+export async function JobCard({ job }: { job: Job | PublicJob }) {
   const t = await getTranslations('jobs');
   const tp = await getTranslations('platform');
   const tt = await getTranslations('jobType');

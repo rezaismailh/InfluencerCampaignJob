@@ -128,7 +128,8 @@
     "brandWhatsapp": "WhatsApp",
     "brandEmail": "Email",
     "brandWhatsappMessage": "Hi Tali, I'm from a brand/agency and I'd like to run a campaign with Tali creators.",
-    "brandEmailSubject": "Campaign with Tali creators"
+    "brandEmailSubject": "Campaign with Tali creators",
+    "browseJobs": "See open campaigns"
   },
   "auth": {
     "title": "Log in to Tali",
@@ -254,7 +255,16 @@
     "needVerified": "You need a verified {platforms} account to join this job.",
     "acceptInvite": "Accept invitation",
     "declineInvite": "Decline",
-    "inviteFee": "Offered fee: {amount}"
+    "inviteFee": "Offered fee: {amount}",
+    "signIn": "Log in",
+    "toAdmin": "Go to admin",
+    "signInTitle": "Interested in this campaign?",
+    "signInBody": "Log in or sign up with your email or Google account. Your account is created automatically, free.",
+    "signInCta": "Log in to apply",
+    "completeProfileTitle": "Complete your profile to apply",
+    "completeProfileBody": "Fill in your details and social media accounts once, then you can apply to this campaign.",
+    "completeProfileCta": "Complete profile",
+    "briefLocked": "The full brief and location addresses are visible after you log in."
   },
   "work": {
     "title": "Work",

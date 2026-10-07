@@ -128,7 +128,8 @@
     "brandWhatsapp": "WhatsApp",
     "brandEmail": "Email",
     "brandWhatsappMessage": "Halo Tali, saya dari brand/agensi dan tertarik menjalankan campaign bersama creator Tali.",
-    "brandEmailSubject": "Campaign bersama creator Tali"
+    "brandEmailSubject": "Campaign bersama creator Tali",
+    "browseJobs": "Lihat campaign yang buka"
   },
   "auth": {
     "title": "Masuk ke Tali",
@@ -254,7 +255,16 @@
     "needVerified": "Kamu perlu akun {platforms} yang sudah terverifikasi untuk gabung job ini.",
     "acceptInvite": "Terima undangan",
     "declineInvite": "Tolak",
-    "inviteFee": "Fee yang ditawarkan: {amount}"
+    "inviteFee": "Fee yang ditawarkan: {amount}",
+    "signIn": "Masuk",
+    "toAdmin": "Ke admin",
+    "signInTitle": "Tertarik ikut campaign ini?",
+    "signInBody": "Masuk atau daftar dulu dengan email atau akun Google. Akun dibuat otomatis, gratis.",
+    "signInCta": "Masuk untuk daftar",
+    "completeProfileTitle": "Lengkapi profil untuk daftar",
+    "completeProfileBody": "Isi data diri dan akun media sosialmu sekali saja, lalu kamu bisa daftar ke campaign ini.",
+    "completeProfileCta": "Lengkapi profil",
+    "briefLocked": "Brief lengkap dan alamat lokasi terlihat setelah kamu masuk."
   },
   "work": {
     "title": "Kerjaan",

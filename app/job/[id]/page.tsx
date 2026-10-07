@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import { getLocale, getTranslations } from 'next-intl/server';
-import { MapPin } from 'lucide-react';
+import { Lock, MapPin } from 'lucide-react';
 import { ActionForm, FieldError } from '@/components/action-form';
 import { Alert } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
@@ -11,14 +11,32 @@ import { PageHeader } from '@/components/ui/page';
 import { SubmitButton } from '@/components/ui/submit-button';
 import { feeLabel } from '@/components/creator/job-card';
 import { applyToJob, respondInvite } from '@/app/(creator)/actions';
-import { requireCreator } from '@/lib/auth';
+import { getViewer, type Viewer } from '@/lib/auth';
+import { createClient } from '@/lib/supabase/server';
 import { formatDate } from '@/lib/dates';
 import { formatRupiah } from '@/lib/money';
-import type { Job, Participation, SocialAccount } from '@/lib/types';
+import type { Job, Participation, PublicJob, SocialAccount } from '@/lib/types';
+
+async function publicJob(id: string) {
+  const supabase = await createClient();
+  const { data } = await supabase.rpc('public_open_jobs', { p_id: id });
+  return ((data ?? []) as PublicJob[])[0] ?? null;
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const job = /^[0-9a-f-]{36}$/i.test(id) ? await publicJob(id) : null;
+  if (!job) return {};
+  const title = `${job.title} · ${job.brand_name}`;
+  const description = `${await feeLabel(job)} · ${job.deliverables}`.slice(0, 200);
+  return { title, description, openGraph: { title, description } };
+}
 
 export default async function JobDetail({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const viewer = await requireCreator();
+  if (!/^[0-9a-f-]{36}$/i.test(id)) notFound();
+  const viewer = await getViewer();
+  const creator = viewer?.profile.role === 'creator' && viewer.profile.onboarded_at ? viewer : null;
   const t = await getTranslations('jobs');
   const tp = await getTranslations('platform');
   const tt = await getTranslations('jobType');
@@ -29,13 +47,11 @@ export default async function JobDetail({ params }: { params: Promise<{ id: stri
   const tper = await getTranslations('persona');
   const locale = await getLocale();
 
-  const { data: job } = await viewer.supabase.from('jobs').select('*').eq('id', id).maybeSingle<Job>();
+  // Signed-in users read the job through RLS (full brief); guests get the teaser.
+  const full = viewer ? (await viewer.supabase.from('jobs').select('*').eq('id', id).maybeSingle<Job>()).data : null;
+  const job: Job | PublicJob | null = full ?? await publicJob(id);
   if (!job) notFound();
-  const [{ data: part }, { data: accounts }] = await Promise.all([
-    viewer.supabase.from('participations').select('*').eq('job_id', id).eq('creator_id', viewer.id).maybeSingle<Participation>(),
-    viewer.supabase.from('social_accounts').select('*').eq('creator_id', viewer.id).eq('status', 'verified').returns<SocialAccount[]>(),
-  ]);
-  const eligible = (accounts ?? []).some((a) => job.platforms.includes(a.platform));
+  const locations = full ? full.visit_locations : (job as PublicJob).visit_location_names.map((name) => ({ name }));
 
   return (
     <div className="space-y-5">
@@ -61,11 +77,16 @@ export default async function JobDetail({ params }: { params: Promise<{ id: stri
         </ul>
       </Card>
 
-      <JoinBlock job={job} part={part} eligible={eligible} />
+      {creator && full ? <JoinBlock job={full} viewer={creator} /> : <SignInBlock viewer={viewer} jobId={job.id} />}
 
       <Card className="space-y-4">
         <InfoRow title={t('deliverables')} body={job.deliverables} />
-        <InfoRow title={t('brief')} body={job.brief} />
+        {full ? <InfoRow title={t('brief')} body={full.brief} /> : (
+          <div className="flex gap-2 rounded-xl bg-latar p-3 text-[15px] text-teks-redup">
+            <Lock className="mt-0.5 size-5 shrink-0" aria-hidden />
+            <p>{t('briefLocked')}</p>
+          </div>
+        )}
         {(job.requirements || job.min_followers > 0 || job.tiers.length > 0 || job.personas.length > 0) && (
           <div>
             <h2 className="font-bold">{t('requirements')}</h2>
@@ -79,11 +100,11 @@ export default async function JobDetail({ params }: { params: Promise<{ id: stri
         )}
         <InfoRow title={t('product')} body={[job.product, tpo(job.product_option)].filter(Boolean).join(' · ')} />
         {job.require_purchase_proof && <p className="text-[15px]">{t('purchaseProof')}</p>}
-        {job.job_type === 'visit' && job.visit_locations.length > 0 && (
+        {job.job_type === 'visit' && locations.length > 0 && (
           <div>
             <h2 className="font-bold">{t('visitLocations')}</h2>
             <ul className="mt-1 space-y-2">
-              {job.visit_locations.map((loc, i) => (
+              {locations.map((loc: { name: string; address?: string; maps_url?: string }, i) => (
                 <li key={i} className="flex gap-2 text-[15px]">
                   <MapPin className="mt-0.5 size-5 shrink-0 text-nila-800" aria-hidden />
                   <div>
@@ -100,7 +121,26 @@ export default async function JobDetail({ params }: { params: Promise<{ id: stri
     </div>
   );
 
-  async function JoinBlock({ job, part, eligible }: { job: Job; part: Participation | null; eligible: boolean }) {
+  async function SignInBlock({ viewer, jobId }: { viewer: Viewer | null; jobId: string }) {
+    if (viewer && viewer.profile.role !== 'creator') return null;
+    const next = encodeURIComponent(`/job/${jobId}`);
+    return (
+      <Card className="space-y-3">
+        <p className="font-bold">{viewer ? t('completeProfileTitle') : t('signInTitle')}</p>
+        <p className="text-[15px] text-teks-redup">{viewer ? t('completeProfileBody') : t('signInBody')}</p>
+        <ButtonLink href={viewer ? `/onboarding?next=${next}` : `/masuk?next=${next}`} className="w-full">
+          {viewer ? t('completeProfileCta') : t('signInCta')}
+        </ButtonLink>
+      </Card>
+    );
+  }
+
+  async function JoinBlock({ job, viewer }: { job: Job; viewer: Viewer }) {
+    const [{ data: part }, { data: accounts }] = await Promise.all([
+      viewer.supabase.from('participations').select('*').eq('job_id', job.id).eq('creator_id', viewer.id).maybeSingle<Participation>(),
+      viewer.supabase.from('social_accounts').select('*').eq('creator_id', viewer.id).eq('status', 'verified').returns<SocialAccount[]>(),
+    ]);
+    const eligible = (accounts ?? []).some((a) => job.platforms.includes(a.platform));
     if (part) {
       if (part.status === 'invited') {
         return (

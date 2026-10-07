@@ -31,7 +31,7 @@ npm run db:test   # migrasi + tes RLS/aturan bisnis di PostgreSQL lokal (butuh i
 ## Setup Supabase (sekali)
 
 1. Buat project baru, region **Singapore**. Paket gratis cukup untuk pilot (lihat batasnya di PRD).
-2. **Database**: jalankan isi `supabase/migrations/20261006000000_init.sql` di SQL Editor, atau `npx supabase link` lalu `npx supabase db push`.
+2. **Database**: jalankan semua file di `supabase/migrations/` **berurutan sesuai nama** di SQL Editor (setiap file sekali saja), atau `npx supabase link` lalu `npx supabase db push`. Setiap ada file migrasi baru, jalankan file itu saja.
 3. **Auth → Providers**
    - Email: aktif. Di **Authentication → Emails → Templates**, isi dua template dengan file di `supabase/templates/` (aplikasi login pakai kode 6 digit `{{ .Token }}`, tanpa link):
 

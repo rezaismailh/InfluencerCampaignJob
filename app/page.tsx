@@ -44,6 +44,7 @@ export default async function Splash() {
 
         <div className="mt-auto space-y-3 pt-10">
           <ButtonLink href="/masuk" variant="accent" className="w-full">{t('creatorCta')}</ButtonLink>
+          <ButtonLink href="/job" variant="outlineLight" className="w-full">{t('browseJobs')}</ButtonLink>
           <ButtonLink href="/masuk" variant="ghostLight" className="w-full">{t('login')}</ButtonLink>
         </div>
         {(wa || email) && (

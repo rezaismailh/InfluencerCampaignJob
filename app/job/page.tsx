@@ -2,10 +2,10 @@ import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 import { EmptyState, PageHeader } from '@/components/ui/page';
 import { JobCard } from '@/components/creator/job-card';
-import { requireCreator } from '@/lib/auth';
+import { createClient } from '@/lib/supabase/server';
 import { PLATFORMS, type Platform } from '@/lib/social';
 import { cn } from '@/lib/cn';
-import type { Job } from '@/lib/types';
+import type { PublicJob } from '@/lib/types';
 
 export async function generateMetadata() {
   const tm = await getTranslations('jobs');
@@ -13,15 +13,17 @@ export async function generateMetadata() {
 }
 
 export default async function Jobs({ searchParams }: { searchParams: Promise<{ platform?: string }> }) {
-  const viewer = await requireCreator();
+  const supabase = await createClient();
   const t = await getTranslations('jobs');
   const tp = await getTranslations('platform');
   const { platform } = await searchParams;
   const active = (PLATFORMS as readonly string[]).includes(platform ?? '') ? (platform as Platform) : null;
 
-  let query = viewer.supabase.from('jobs').select('*').eq('status', 'open').order('created_at', { ascending: false });
+  // Same teaser for everyone, so the list works signed out.
+  let query = supabase.rpc('public_open_jobs');
   if (active) query = query.contains('platforms', [active]);
-  const { data: jobs } = await query.returns<Job[]>();
+  const { data } = await query;
+  const jobs = (data ?? []) as PublicJob[];
 
   const chip = (href: string, label: string, on: boolean) => (
     <Link key={href} href={href} className={cn('inline-flex min-h-11 items-center rounded-full border px-4 text-[15px] font-medium',
@@ -35,7 +37,7 @@ export default async function Jobs({ searchParams }: { searchParams: Promise<{ p
         {chip('/job', t('filterAll'), !active)}
         {PLATFORMS.map((p) => chip(`/job?platform=${p}`, tp(p), active === p))}
       </div>
-      {jobs?.length ? (
+      {jobs.length ? (
         <div className="space-y-3">{jobs.map((j) => <JobCard key={j.id} job={j} />)}</div>
       ) : (
         <EmptyState title={t('empty')} body={t('emptyBody')} />

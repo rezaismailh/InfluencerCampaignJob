@@ -7,7 +7,7 @@ import { SocialList } from '@/components/creator/social-list';
 import { SubmitButton } from '@/components/ui/submit-button';
 import { Wordmark } from '@/components/wordmark';
 import { finishOnboarding } from '@/app/(creator)/actions';
-import { requireCreator } from '@/lib/auth';
+import { requireCreator, safeNext } from '@/lib/auth';
 import type { SocialAccount } from '@/lib/types';
 
 export async function generateMetadata() {
@@ -15,9 +15,10 @@ export async function generateMetadata() {
   return { title: tm('title') };
 }
 
-export default async function Onboarding() {
+export default async function Onboarding({ searchParams }: { searchParams: Promise<{ next?: string }> }) {
   const viewer = await requireCreator({ allowIncomplete: true });
-  if (viewer.profile.onboarded_at) redirect('/beranda');
+  const next = safeNext((await searchParams).next);
+  if (viewer.profile.onboarded_at) redirect(next ?? '/beranda');
   const t = await getTranslations('onboarding');
   const { data: accounts } = await viewer.supabase
     .from('social_accounts').select('*').eq('creator_id', viewer.id).order('created_at').returns<SocialAccount[]>();
@@ -44,6 +45,7 @@ export default async function Onboarding() {
       <section className="mt-10 space-y-3">
         <p className="text-[15px] text-teks-redup">{t('finishHint')}</p>
         <ActionForm action={finishOnboarding}>
+          {next && <input type="hidden" name="next" value={next} />}
           <SubmitButton className="w-full" disabled={!profileDone || !accounts?.length}>{t('finish')}</SubmitButton>
         </ActionForm>
       </section>

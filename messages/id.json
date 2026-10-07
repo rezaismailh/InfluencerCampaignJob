@@ -566,5 +566,198 @@
     "applied": "Pendaftaran terkirim.",
     "reviewed": "Review tersimpan.",
     "updated": "Status diperbarui."
+  },
+  "legal": {
+    "privacyTitle": "Kebijakan Privasi",
+    "termsTitle": "Syarat & Ketentuan",
+    "updated": "Terakhir diperbarui {date}",
+    "contactTitle": "Hubungi kami",
+    "contactBody": "Untuk pertanyaan, permintaan salinan data, atau penghapusan akun, hubungi tim Tali:",
+    "privacyLink": "Privasi",
+    "termsLink": "Ketentuan",
+    "loginConsent": "Dengan masuk, kamu menyetujui <terms>Syarat & Ketentuan</terms> dan <privacy>Kebijakan Privasi</privacy> Tali.",
+    "privacy": [
+      {
+        "title": "Siapa kami",
+        "body": [
+          "Tali adalah aplikasi campaign untuk nano dan micro creator yang dijalankan oleh tim Tali. Kebijakan ini menjelaskan data apa yang kami kumpulkan saat kamu memakai Tali, untuk apa, dan bagaimana kamu bisa mengaturnya."
+        ]
+      },
+      {
+        "title": "Data yang kami kumpulkan",
+        "body": [
+          "Kami hanya mengumpulkan data yang dibutuhkan untuk menjalankan campaign dan membayar fee-mu:"
+        ],
+        "items": [
+          "Akun: alamat email. Kalau masuk dengan Google, kami menerima nama, email, dan foto profil dari Google.",
+          "Profil: nama lengkap, nomor HP, kota, kategori konten, dan persona.",
+          "Alamat pengiriman, kalau job mengharuskan produk dikirim ke kamu.",
+          "Akun media sosial: link profil, username, dan jumlah followers yang kamu isi.",
+          "Pekerjaan campaign: link storyline (Google Docs), link atau foto draft, caption, link postingan, foto bukti pembelian, serta catatan revisi.",
+          "Rekening pencairan: nama bank, nomor rekening, dan nama pemilik rekening, diminta saat kamu mengajukan pencairan pertama.",
+          "Teknis: cookie sesi login, cookie pilihan bahasa, dan (kalau kamu mengaktifkan) data langganan notifikasi push dari browser."
+        ]
+      },
+      {
+        "title": "Untuk apa data dipakai",
+        "body": [
+          "Data dipakai untuk:"
+        ],
+        "items": [
+          "Membuat dan mengamankan akunmu.",
+          "Menilai kecocokanmu dengan job, termasuk memverifikasi akun media sosial.",
+          "Menjalankan review storyline, draft, caption, dan postingan bersama brand.",
+          "Mengirim produk dan mengatur jadwal visit.",
+          "Mentransfer fee ke rekeningmu dan mencatat riwayat pencairan.",
+          "Mengirim notifikasi di aplikasi, email, dan push tentang status pekerjaanmu."
+        ]
+      },
+      {
+        "title": "Yang tidak kami lakukan",
+        "body": [
+          "Kami tidak menjual datamu, tidak memakai iklan pihak ketiga, dan tidak memasang pelacak analitik di aplikasi. Email dari Tali tidak melacak kapan dibuka atau link mana yang diklik."
+        ]
+      },
+      {
+        "title": "Siapa yang bisa melihat datamu",
+        "body": [
+          "Di dalam Tali, akses dibatasi sesuai peran. Tim kurator melihat profil, akun media sosial, dan hasil kerjamu. Nomor rekening lengkap hanya bisa dilihat tim keuangan saat memproses pencairan; di layarmu sendiri nomor rekening selalu ditampilkan tersamar.",
+          "Ke brand pemilik campaign, kami membagikan nama atau username, link dan jumlah followers akun media sosial, hasil kerja yang kamu kirim, dan link postingan. Kalau produk dikirim langsung oleh brand, nama, nomor HP, dan alamat pengirimanmu juga dibagikan untuk keperluan pengiriman. Nomor rekeningmu tidak pernah dibagikan ke brand."
+        ]
+      },
+      {
+        "title": "Penyedia layanan",
+        "body": [
+          "Kami memakai penyedia layanan berikut untuk menjalankan Tali. Sebagian server mereka berada di luar Indonesia, dan kami memilih penyedia yang menerapkan standar keamanan yang memadai:"
+        ],
+        "items": [
+          "Supabase: database, login, dan penyimpanan file (server di Singapura).",
+          "Railway: server aplikasi.",
+          "Resend: pengiriman email (server di Jepang).",
+          "Google: login dengan akun Google, kalau kamu memilihnya.",
+          "Layanan push bawaan browser (misalnya Google atau Apple), kalau kamu mengaktifkan notifikasi push."
+        ]
+      },
+      {
+        "title": "Keamanan",
+        "body": [
+          "Nomor HP, alamat, dan nomor rekening dienkripsi sebelum disimpan. Semua koneksi memakai HTTPS. File yang kamu unggah disimpan di penyimpanan privat dan hanya bisa dibuka lewat link sementara oleh pihak yang berhak. Akses ke database dibatasi per pengguna dan per peran."
+        ]
+      },
+      {
+        "title": "Berapa lama data disimpan",
+        "body": [
+          "Data akun disimpan selama akunmu aktif. Kalau kamu meminta akun dihapus, kami menghapus atau menganonimkan datamu paling lambat 30 hari setelah permintaan diterima. Catatan pencairan dan transaksi tetap kami simpan selama diwajibkan peraturan, misalnya untuk keperluan akuntansi dan perpajakan."
+        ]
+      },
+      {
+        "title": "Hak kamu",
+        "body": [
+          "Sesuai Undang-Undang Pelindungan Data Pribadi, kamu berhak:"
+        ],
+        "items": [
+          "Melihat dan mendapatkan salinan data pribadimu.",
+          "Memperbaiki data yang salah. Sebagian besar bisa langsung kamu ubah di halaman Profil.",
+          "Meminta akun dan datamu dihapus.",
+          "Menarik persetujuan dan berhenti memakai Tali kapan saja."
+        ]
+      },
+      {
+        "title": "Anak di bawah 18 tahun",
+        "body": [
+          "Tali ditujukan untuk pengguna berusia 18 tahun ke atas. Pengguna di bawah 18 tahun hanya boleh mendaftar dengan persetujuan orang tua atau wali."
+        ]
+      },
+      {
+        "title": "Perubahan kebijakan",
+        "body": [
+          "Kalau kebijakan ini berubah, kami memperbarui tanggal di atas dan memberi tahu lewat aplikasi atau email untuk perubahan yang penting."
+        ]
+      }
+    ],
+    "terms": [
+      {
+        "title": "Tentang ketentuan ini",
+        "body": [
+          "Dengan membuat akun atau memakai Tali, kamu setuju dengan ketentuan ini dan Kebijakan Privasi Tali. Kalau tidak setuju, mohon jangan memakai Tali."
+        ]
+      },
+      {
+        "title": "Akun",
+        "body": [],
+        "items": [
+          "Kamu berusia minimal 18 tahun, atau mendapat persetujuan orang tua atau wali.",
+          "Satu orang hanya boleh punya satu akun, dan data yang kamu isi harus benar.",
+          "Akun media sosial yang kamu daftarkan harus milikmu sendiri dan kamu kelola sendiri.",
+          "Kamu bertanggung jawab menjaga akses ke email atau akun Google yang dipakai untuk masuk."
+        ]
+      },
+      {
+        "title": "Job dan partisipasi",
+        "body": [
+          "Semua job di Tali dikurasi tim Tali. Detail fee, term of payment (TOP), syarat, dan brief terlihat sebelum kamu bergabung. Untuk job dengan fee terbuka, kamu mengajukan rate sendiri sesuai batas atas yang tertera, kalau ada.",
+          "Tim Tali berhak menerima atau menolak lamaran, dan dapat membatalkan partisipasi kalau kamu tidak memenuhi syarat atau tidak menjalankan pekerjaan sesuai brief. Alasan pembatalan dicatat di aplikasi."
+        ]
+      },
+      {
+        "title": "Pengerjaan konten",
+        "body": [
+          "Urutan kerja untuk setiap job:"
+        ],
+        "items": [
+          "Storyline (link Google Docs) harus disetujui sebelum kamu membuat draft.",
+          "Draft dan caption harus disetujui sebelum kamu memposting.",
+          "Revisi tidak dibatasi. Setiap feedback dari tim Tali dan brand dicatat terpisah di aplikasi.",
+          "Postingan tayang sesuai brief dan dari akun yang terdaftar di Tali, lalu link-nya dikirim lewat aplikasi untuk dikonfirmasi.",
+          "Postingan tidak boleh dihapus, diarsipkan, atau diubah selama periode yang ditentukan di brief."
+        ]
+      },
+      {
+        "title": "Hak atas konten",
+        "body": [
+          "Kamu tetap pemilik konten yang kamu buat. Dengan mengikuti job, kamu memberi izin kepada Tali dan brand pemilik campaign untuk memakai konten tersebut sesuai ruang lingkup dan periode yang tertulis di brief job. Pemakaian di luar brief memerlukan persetujuanmu."
+        ]
+      },
+      {
+        "title": "Fee dan pencairan",
+        "body": [],
+        "items": [
+          "Fee bisa dicairkan setelah postingan dikonfirmasi dan TOP job terlewati (H+7, H+14, atau H+30 sejak konfirmasi, sesuai job).",
+          "Pencairan diajukan sendiri lewat aplikasi, minimal Rp 10.000. Beberapa job boleh digabung dalam satu pengajuan.",
+          "Biaya transfer Rp 2.500 per pengajuan dipotong dari jumlah yang dicairkan, kecuali untuk rekening BCA dan Mandiri.",
+          "Kami mentransfer paling lambat 3 hari kerja setelah pengajuan, tidak termasuk akhir pekan dan hari libur nasional. Tanggal tenggat dan status pencairan selalu terlihat di aplikasi.",
+          "Pastikan data rekening benar. Kalau transfer gagal karena data rekening salah, pencairan ditandai gagal dan kamu bisa mengajukan ulang setelah memperbaiki data.",
+          "Kamu bertanggung jawab atas kewajiban pajak atas penghasilanmu sendiri, kecuali Tali memberi tahu lain."
+        ]
+      },
+      {
+        "title": "Yang tidak boleh dilakukan",
+        "body": [],
+        "items": [
+          "Memakai followers, likes, views, atau komentar palsu atau berbayar.",
+          "Mendaftarkan akun media sosial milik orang lain, atau memakai akun Tali orang lain.",
+          "Mengirim konten yang melanggar hukum, hak cipta, atau aturan platform media sosial.",
+          "Menyalin atau menyebarkan brief dan informasi campaign yang bersifat rahasia."
+        ]
+      },
+      {
+        "title": "Penangguhan akun",
+        "body": [
+          "Kalau kamu melanggar ketentuan ini, tim Tali dapat menangguhkan atau menutup akunmu. Fee untuk pekerjaan yang sudah dikonfirmasi tetap dibayarkan, kecuali pekerjaan itu sendiri melanggar ketentuan."
+        ]
+      },
+      {
+        "title": "Batasan tanggung jawab",
+        "body": [
+          "Tali menghubungkan creator dengan campaign brand dan mengelola prosesnya. Kami berusaha agar aplikasi selalu tersedia dan datanya akurat, tetapi tidak menjamin aplikasi bebas gangguan. Kami tidak bertanggung jawab atas perubahan atau gangguan di platform media sosial pihak ketiga."
+        ]
+      },
+      {
+        "title": "Perubahan dan hukum yang berlaku",
+        "body": [
+          "Kami dapat memperbarui ketentuan ini dan akan memberi tahu lewat aplikasi atau email untuk perubahan yang penting. Ketentuan ini tunduk pada hukum Republik Indonesia. Kalau ada perselisihan, kita selesaikan dulu secara musyawarah."
+        ]
+      }
+    ]
   }
 }

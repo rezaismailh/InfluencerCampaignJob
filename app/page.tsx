@@ -1,9 +1,11 @@
+import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 import { CalendarClock, Mail, MessageCircle, MessageSquareText, Wallet } from 'lucide-react';
 import { ButtonLink } from '@/components/ui/button';
 import { Wordmark } from '@/components/wordmark';
 import { getViewer, homeFor } from '@/lib/auth';
+import { contact } from '@/lib/contact';
 
 export default async function Splash() {
   const viewer = await getViewer();
@@ -14,9 +16,8 @@ export default async function Splash() {
     { icon: CalendarClock, title: t('point2Title'), body: t('point2Body') },
     { icon: Wallet, title: t('point3Title'), body: t('point3Body') },
   ];
-  // Brand contact comes from env so the number/address can change without a code change.
-  const wa = process.env.CONTACT_WA?.replace(/\D/g, '');
-  const email = process.env.CONTACT_EMAIL?.trim();
+  const tl = await getTranslations('legal');
+  const { wa, email } = contact();
 
   return (
     <main className="min-h-dvh bg-nila-800 text-gading">
@@ -70,6 +71,10 @@ export default async function Splash() {
             )}
           </p>
         )}
+        <p className="mt-6 flex justify-center gap-4 text-[13px] text-gading/60">
+          <Link href="/privasi" className="inline-flex min-h-11 items-center underline-offset-4 hover:underline">{tl('privacyLink')}</Link>
+          <Link href="/ketentuan" className="inline-flex min-h-11 items-center underline-offset-4 hover:underline">{tl('termsLink')}</Link>
+        </p>
       </div>
     </main>
   );

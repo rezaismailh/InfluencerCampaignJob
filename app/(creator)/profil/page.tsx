@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 import { Button } from '@/components/ui/button';
 import { Card, CardTitle } from '@/components/ui/card';
@@ -20,6 +21,7 @@ export default async function ProfilePage() {
   const t = await getTranslations('profile');
   const ts = await getTranslations('social');
   const c = await getTranslations('common');
+  const tl = await getTranslations('legal');
   const { data: accounts } = await viewer.supabase
     .from('social_accounts').select('*').eq('creator_id', viewer.id).order('created_at').returns<SocialAccount[]>();
 
@@ -51,6 +53,10 @@ export default async function ProfilePage() {
           <p className="text-[15px] font-bold">{t('push')}</p>
           <PushToggle />
           <p className="text-[13px] text-teks-redup">{t('installHint')}</p>
+        </div>
+        <div className="flex gap-4 text-[15px]">
+          <Link href="/privasi" className="inline-flex min-h-11 items-center font-bold text-nila-800 underline underline-offset-4">{tl('privacyTitle')}</Link>
+          <Link href="/ketentuan" className="inline-flex min-h-11 items-center font-bold text-nila-800 underline underline-offset-4">{tl('termsTitle')}</Link>
         </div>
         <form action="/auth/keluar" method="post">
           <Button variant="outline" className="w-full">{c('logout')}</Button>

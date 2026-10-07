@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
+import { publicOrigin } from '@/lib/public-origin';
 
 const PUBLIC_PATHS = ['/', '/masuk', '/auth', '/offline', '/privasi', '/ketentuan', '/job', '/api/cron'];
 
@@ -31,9 +32,7 @@ export async function proxy(request: NextRequest) {
   const signedIn = !!data?.claims;
 
   if (!signedIn && !isPublic(request.nextUrl.pathname)) {
-    const url = request.nextUrl.clone();
-    url.pathname = '/masuk';
-    url.search = '';
+    const url = new URL('/masuk', publicOrigin(request));
     url.searchParams.set('next', request.nextUrl.pathname);
     return NextResponse.redirect(url);
   }

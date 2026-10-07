@@ -114,18 +114,21 @@
     "failed": "Failed"
   },
   "splash": {
-    "title": "Join campaigns, get paid on time.",
-    "body": "Tali connects nano and micro creators with brand campaigns. Fee, requirements and payout date are shown before you join.",
+    "title": "Clear campaigns, from brief to transfer.",
+    "body": "Join brand campaigns curated by the Tali team. Briefs, revisions and payout dates are all on record, so you always know what comes next without guessing or chasing.",
     "creatorCta": "Sign up as a Creator",
-    "brandCta": "I'm a brand / agency",
+    "brandCta": "Brand or agency?",
     "login": "Already have an account? Log in",
-    "brandNote": "Brand campaigns are run directly by the Tali team. Contact us to run a campaign with Tali creators.",
-    "point1Title": "Clear fee up front",
-    "point1Body": "Amount, requirements and payment terms are shown before you join.",
+    "point1Title": "Written briefs and feedback",
+    "point1Body": "Storylines, drafts and captions keep a saved revision history. No more revisions by voice note.",
     "point2Title": "Status always visible",
-    "point2Body": "From storyline to transfer, every step has a date.",
-    "point3Title": "Paid within 3 working days",
-    "point3Body": "Request a payout once the payment term is due; we transfer within 3 working days."
+    "point2Body": "Every step has a date, from acceptance to post confirmation.",
+    "point3Title": "Payout date shown up front",
+    "point3Body": "Payment terms are shown before you join, and every payout request has a transfer deadline you can track.",
+    "brandWhatsapp": "WhatsApp",
+    "brandEmail": "Email",
+    "brandWhatsappMessage": "Hi Tali, I'm from a brand/agency and I'd like to run a campaign with Tali creators.",
+    "brandEmailSubject": "Campaign with Tali creators"
   },
   "auth": {
     "title": "Log in to Tali",

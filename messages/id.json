@@ -114,18 +114,21 @@
     "failed": "Gagal"
   },
   "splash": {
-    "title": "Ikut campaign, dibayar tepat waktu.",
-    "body": "Tali menghubungkan nano dan micro creator dengan campaign brand. Fee, syarat, dan tanggal cair terlihat sebelum kamu bergabung.",
+    "title": "Campaign yang jelas, dari brief sampai transfer.",
+    "body": "Ikut campaign brand yang dikurasi tim Tali. Brief, revisi, dan tanggal cair tercatat rapi, jadi kamu selalu tahu langkah berikutnya tanpa perlu menebak atau menagih.",
     "creatorCta": "Daftar sebagai Creator",
-    "brandCta": "Saya brand / agensi",
+    "brandCta": "Brand atau agensi?",
     "login": "Sudah punya akun? Masuk",
-    "brandNote": "Campaign brand dikelola langsung oleh tim Tali. Hubungi kami untuk menjalankan campaign bersama creator Tali.",
-    "point1Title": "Fee jelas di depan",
-    "point1Body": "Nominal, syarat, dan term of payment terlihat sebelum kamu gabung.",
+    "point1Title": "Brief dan feedback tertulis",
+    "point1Body": "Storyline, draft, dan caption punya catatan revisi yang tersimpan. Tidak ada lagi revisi lewat voice note.",
     "point2Title": "Status selalu terlihat",
-    "point2Body": "Dari storyline sampai transfer, setiap langkah ada tanggalnya.",
-    "point3Title": "Cair paling lambat 3 hari kerja",
-    "point3Body": "Ajukan pencairan setelah TOP jatuh tempo, kami transfer maksimal H+3 hari kerja."
+    "point2Body": "Setiap langkah ada tanggalnya, dari diterima sampai postingan dikonfirmasi.",
+    "point3Title": "Tanggal cair terlihat dari awal",
+    "point3Body": "Term of payment tertera sebelum kamu gabung, dan setiap pengajuan pencairan punya tenggat transfer yang bisa kamu pantau.",
+    "brandWhatsapp": "WhatsApp",
+    "brandEmail": "Email",
+    "brandWhatsappMessage": "Halo Tali, saya dari brand/agensi dan tertarik menjalankan campaign bersama creator Tali.",
+    "brandEmailSubject": "Campaign bersama creator Tali"
   },
   "auth": {
     "title": "Masuk ke Tali",

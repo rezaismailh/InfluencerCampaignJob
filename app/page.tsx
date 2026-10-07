@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
-import { BadgeCheck, CalendarClock, Wallet } from 'lucide-react';
+import { CalendarClock, Mail, MessageCircle, MessageSquareText, Wallet } from 'lucide-react';
 import { ButtonLink } from '@/components/ui/button';
 import { Wordmark } from '@/components/wordmark';
 import { getViewer, homeFor } from '@/lib/auth';
@@ -10,10 +10,13 @@ export default async function Splash() {
   if (viewer) redirect(viewer.profile.onboarded_at || viewer.profile.role !== 'creator' ? homeFor(viewer.profile.role) : '/onboarding');
   const t = await getTranslations('splash');
   const points = [
-    { icon: Wallet, title: t('point1Title'), body: t('point1Body') },
+    { icon: MessageSquareText, title: t('point1Title'), body: t('point1Body') },
     { icon: CalendarClock, title: t('point2Title'), body: t('point2Body') },
-    { icon: BadgeCheck, title: t('point3Title'), body: t('point3Body') },
+    { icon: Wallet, title: t('point3Title'), body: t('point3Body') },
   ];
+  // Brand contact comes from env so the number/address can change without a code change.
+  const wa = process.env.CONTACT_WA?.replace(/\D/g, '');
+  const email = process.env.CONTACT_EMAIL?.trim();
 
   return (
     <main className="min-h-dvh bg-nila-800 text-gading">
@@ -40,10 +43,33 @@ export default async function Splash() {
 
         <div className="mt-auto space-y-3 pt-10">
           <ButtonLink href="/masuk" variant="accent" className="w-full">{t('creatorCta')}</ButtonLink>
-          <ButtonLink href="#brand" variant="outlineLight" className="w-full">{t('brandCta')}</ButtonLink>
           <ButtonLink href="/masuk" variant="ghostLight" className="w-full">{t('login')}</ButtonLink>
         </div>
-        <p id="brand" className="mt-6 rounded-2xl border border-nila-600 p-4 text-[15px] text-gading/90">{t('brandNote')}</p>
+        {(wa || email) && (
+          <p id="brand" className="mt-8 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-sm text-gading/70">
+            <span>{t('brandCta')}</span>
+            {wa && (
+              <a
+                href={`https://wa.me/${wa}?text=${encodeURIComponent(t('brandWhatsappMessage'))}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex min-h-11 items-center gap-1.5 font-bold text-gading underline underline-offset-4"
+              >
+                <MessageCircle className="size-4" aria-hidden />
+                {t('brandWhatsapp')}
+              </a>
+            )}
+            {email && (
+              <a
+                href={`mailto:${email}?subject=${encodeURIComponent(t('brandEmailSubject'))}`}
+                className="inline-flex min-h-11 items-center gap-1.5 font-bold text-gading underline underline-offset-4"
+              >
+                <Mail className="size-4" aria-hidden />
+                {t('brandEmail')}
+              </a>
+            )}
+          </p>
+        )}
       </div>
     </main>
   );

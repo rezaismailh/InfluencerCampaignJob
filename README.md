@@ -33,7 +33,12 @@ npm run db:test   # migrasi + tes RLS/aturan bisnis di PostgreSQL lokal (butuh i
 1. Buat project baru, region **Singapore**. Paket gratis cukup untuk pilot (lihat batasnya di PRD).
 2. **Database**: jalankan isi `supabase/migrations/20261006000000_init.sql` di SQL Editor, atau `npx supabase link` lalu `npx supabase db push`.
 3. **Auth → Providers**
-   - Email: aktif. Di **Auth → Email Templates → Magic Link**, pakai kode 6 digit, contoh isi: `Kode masuk Tali kamu: {{ .Token }}`.
+   - Email: aktif. Di **Authentication → Emails → Templates**, isi dua template dengan file di `supabase/templates/` (aplikasi login pakai kode 6 digit `{{ .Token }}`, tanpa link):
+
+     | Template | Subject | Body |
+     | --- | --- | --- |
+     | Magic Link | `{{ .Token }} adalah kode masuk Tali kamu` | `supabase/templates/magic-link.html` |
+     | Confirm signup | `Selamat datang di Tali, ini kode verifikasimu` | `supabase/templates/confirm-signup.html` |
    - Google: aktifkan dan isi Client ID/Secret dari Google Cloud Console.
 4. **Auth → URL Configuration**: Site URL = URL Railway, tambahkan `https://<domain>/auth/callback` ke Redirect URLs.
 5. **Project Settings → API**: salin URL, `anon` key, dan `service_role` key ke environment variable.
@@ -61,6 +66,7 @@ npm run db:test   # migrasi + tes RLS/aturan bisnis di PostgreSQL lokal (butuh i
    | `CRON_SECRET` | String acak panjang untuk endpoint cron |
    | `RESEND_API_KEY`, `EMAIL_FROM` | Opsional, untuk email notifikasi |
    | `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` | Opsional, untuk Web Push (`npx web-push generate-vapid-keys`) |
+   | `CONTACT_WA`, `CONTACT_EMAIL` | Opsional, kontak brand di halaman pembuka. WA format internasional tanpa `+` (mis. `62812...`). Tombol tidak tampil kalau kosong |
 
 3. Generate domain di Settings → Networking.
 4. **Cron**: tambahkan dua service Cron di project yang sama (image `curlimages/curl` atau repo ini), dengan variable `APP_URL` dan `CRON_SECRET`:

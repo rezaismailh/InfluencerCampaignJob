@@ -566,5 +566,198 @@
     "applied": "Application sent.",
     "reviewed": "Review saved.",
     "updated": "Status updated."
+  },
+  "legal": {
+    "privacyTitle": "Privacy Policy",
+    "termsTitle": "Terms & Conditions",
+    "updated": "Last updated {date}",
+    "contactTitle": "Contact us",
+    "contactBody": "For questions, data copy requests or account deletion, contact the Tali team:",
+    "privacyLink": "Privacy",
+    "termsLink": "Terms",
+    "loginConsent": "By signing in, you agree to Tali's <terms>Terms & Conditions</terms> and <privacy>Privacy Policy</privacy>.",
+    "privacy": [
+      {
+        "title": "Who we are",
+        "body": [
+          "Tali is a campaign app for nano and micro creators, run by the Tali team. This policy explains what data we collect when you use Tali, why, and how you can control it."
+        ]
+      },
+      {
+        "title": "Data we collect",
+        "body": [
+          "We only collect what we need to run campaigns and pay your fees:"
+        ],
+        "items": [
+          "Account: your email address. If you sign in with Google, we receive your name, email and profile photo from Google.",
+          "Profile: full name, phone number, city, content categories and persona.",
+          "Shipping address, when a job requires a product to be sent to you.",
+          "Social media accounts: profile link, username and the follower count you enter.",
+          "Campaign work: storyline links (Google Docs), draft links or photos, captions, post links, purchase proof photos and revision notes.",
+          "Payout account: bank name, account number and account holder name, requested when you make your first payout request.",
+          "Technical: a login session cookie, a language cookie and (if you turn it on) your browser's push notification subscription."
+        ]
+      },
+      {
+        "title": "How we use it",
+        "body": [
+          "We use your data to:"
+        ],
+        "items": [
+          "Create and secure your account.",
+          "Match you with jobs, including verifying your social media accounts.",
+          "Run storyline, draft, caption and post reviews with the brand.",
+          "Ship products and schedule visits.",
+          "Transfer fees to your bank account and keep a payout history.",
+          "Send in-app, email and push notifications about your work."
+        ]
+      },
+      {
+        "title": "What we don't do",
+        "body": [
+          "We don't sell your data, we don't use third-party ads, and we don't put analytics trackers in the app. Tali emails don't track opens or clicks."
+        ]
+      },
+      {
+        "title": "Who can see your data",
+        "body": [
+          "Inside Tali, access is limited by role. Curators see your profile, social accounts and work. Your full account number is visible only to the finance team while processing a payout; on your own screen it is always masked.",
+          "With the brand running a campaign, we share your name or username, social media links and follower counts, the work you submit and your post links. If the brand ships the product directly, your name, phone number and shipping address are shared for delivery. Your bank account number is never shared with brands."
+        ]
+      },
+      {
+        "title": "Service providers",
+        "body": [
+          "We use the following providers to run Tali. Some of their servers are outside Indonesia, and we choose providers with adequate security standards:"
+        ],
+        "items": [
+          "Supabase: database, login and file storage (servers in Singapore).",
+          "Railway: application servers.",
+          "Resend: email delivery (servers in Japan).",
+          "Google: sign-in with Google, if you choose it.",
+          "Your browser's push service (for example Google or Apple), if you turn on push notifications."
+        ]
+      },
+      {
+        "title": "Security",
+        "body": [
+          "Phone numbers, addresses and account numbers are encrypted before storage. All connections use HTTPS. Uploaded files are kept in private storage and can only be opened through temporary links by authorised people. Database access is restricted per user and per role."
+        ]
+      },
+      {
+        "title": "How long we keep data",
+        "body": [
+          "Account data is kept while your account is active. If you ask us to delete your account, we delete or anonymise your data within 30 days of receiving the request. Payout and transaction records are kept for as long as the law requires, for example for accounting and tax purposes."
+        ]
+      },
+      {
+        "title": "Your rights",
+        "body": [
+          "Under Indonesia's Personal Data Protection Law, you have the right to:"
+        ],
+        "items": [
+          "See and get a copy of your personal data.",
+          "Correct inaccurate data. Most of it you can change yourself on the Profile page.",
+          "Ask for your account and data to be deleted.",
+          "Withdraw consent and stop using Tali at any time."
+        ]
+      },
+      {
+        "title": "Under 18",
+        "body": [
+          "Tali is meant for users aged 18 and over. Users under 18 may only sign up with the consent of a parent or guardian."
+        ]
+      },
+      {
+        "title": "Changes",
+        "body": [
+          "If this policy changes, we update the date above and let you know in the app or by email for significant changes."
+        ]
+      }
+    ],
+    "terms": [
+      {
+        "title": "About these terms",
+        "body": [
+          "By creating an account or using Tali, you agree to these terms and Tali's Privacy Policy. If you don't agree, please don't use Tali."
+        ]
+      },
+      {
+        "title": "Your account",
+        "body": [],
+        "items": [
+          "You are at least 18 years old, or have consent from a parent or guardian.",
+          "One person may hold only one account, and the information you provide must be accurate.",
+          "The social media accounts you register must be your own and managed by you.",
+          "You are responsible for keeping access to the email or Google account you sign in with secure."
+        ]
+      },
+      {
+        "title": "Jobs and participation",
+        "body": [
+          "All jobs on Tali are curated by the Tali team. Fee, payment terms, requirements and brief are shown before you join. For open-rate jobs, you propose your own rate within the stated cap, if any.",
+          "The Tali team may accept or decline applications, and may cancel a participation if you don't meet the requirements or don't follow the brief. The reason is recorded in the app."
+        ]
+      },
+      {
+        "title": "Content workflow",
+        "body": [
+          "Every job follows this order:"
+        ],
+        "items": [
+          "The storyline (a Google Docs link) must be approved before you make a draft.",
+          "Draft and caption must be approved before you post.",
+          "Revisions are unlimited. Feedback from the Tali team and the brand is recorded separately in the app.",
+          "The post goes live as briefed, from the account registered on Tali, and you submit its link in the app for confirmation.",
+          "The post must not be deleted, archived or edited during the period set in the brief."
+        ]
+      },
+      {
+        "title": "Content rights",
+        "body": [
+          "You remain the owner of the content you create. By joining a job, you allow Tali and the brand running the campaign to use that content within the scope and period stated in the job brief. Any use beyond the brief requires your consent."
+        ]
+      },
+      {
+        "title": "Fees and payouts",
+        "body": [],
+        "items": [
+          "Fees can be withdrawn once your post is confirmed and the job's payment term has passed (7, 14 or 30 days after confirmation, depending on the job).",
+          "You request payouts yourself in the app, with a minimum of Rp 10,000. Several jobs can be combined in one request.",
+          "A Rp 2,500 transfer fee per request is deducted from the amount, except for BCA and Mandiri accounts.",
+          "We transfer within 3 working days of your request, excluding weekends and national holidays. The deadline and payout status are always visible in the app.",
+          "Make sure your bank details are correct. If a transfer fails because of incorrect details, the payout is marked failed and you can request it again after fixing them.",
+          "You are responsible for the taxes on your own income, unless Tali tells you otherwise."
+        ]
+      },
+      {
+        "title": "What's not allowed",
+        "body": [],
+        "items": [
+          "Using fake or paid followers, likes, views or comments.",
+          "Registering someone else's social media account, or using someone else's Tali account.",
+          "Submitting content that breaks the law, copyright or social media platform rules.",
+          "Copying or sharing confidential campaign briefs and information."
+        ]
+      },
+      {
+        "title": "Account suspension",
+        "body": [
+          "If you break these terms, the Tali team may suspend or close your account. Fees for work that has already been confirmed are still paid, unless that work itself breaks these terms."
+        ]
+      },
+      {
+        "title": "Limitation of liability",
+        "body": [
+          "Tali connects creators with brand campaigns and manages the process. We work to keep the app available and its data accurate, but we can't guarantee it will be free of interruptions. We are not responsible for changes or outages on third-party social media platforms."
+        ]
+      },
+      {
+        "title": "Changes and governing law",
+        "body": [
+          "We may update these terms and will let you know in the app or by email about significant changes. These terms are governed by the laws of the Republic of Indonesia. Any dispute will first be resolved through good-faith discussion."
+        ]
+      }
+    ]
   }
 }

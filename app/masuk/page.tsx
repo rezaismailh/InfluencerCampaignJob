@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 import { Wordmark } from '@/components/wordmark';
 import { LoginForm } from './login-form';
@@ -10,6 +11,7 @@ export async function generateMetadata() {
 export default async function LoginPage({ searchParams }: { searchParams: Promise<{ next?: string; error?: string }> }) {
   const { next, error } = await searchParams;
   const t = await getTranslations('auth');
+  const tl = await getTranslations('legal');
   const safeNext = next && next.startsWith('/') && !next.startsWith('//') ? next : '/lanjut';
   return (
     <main className="mx-auto flex min-h-dvh max-w-md flex-col px-4 pt-12 pb-10">
@@ -19,6 +21,12 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
       <div className="mt-8">
         <LoginForm next={safeNext} callbackError={error === 'callback'} />
       </div>
+      <p className="mt-8 text-[13px] leading-5 text-teks-redup">
+        {tl.rich('loginConsent', {
+          terms: (chunks) => <Link href="/ketentuan" className="font-bold text-nila-800 underline underline-offset-2">{chunks}</Link>,
+          privacy: (chunks) => <Link href="/privasi" className="font-bold text-nila-800 underline underline-offset-2">{chunks}</Link>,
+        })}
+      </p>
     </main>
   );
 }

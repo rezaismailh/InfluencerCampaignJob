@@ -252,7 +252,6 @@
     "applied": "Application sent. The Tali team will let you know the result.",
     "yourStatus": "Your status: {status}",
     "openParticipation": "Open work",
-    "needVerified": "You need a verified {platforms} account to join this job.",
     "acceptInvite": "Accept invitation",
     "declineInvite": "Decline",
     "inviteFee": "Offered fee: {amount}",
@@ -264,7 +263,10 @@
     "completeProfileTitle": "Complete your profile to apply",
     "completeProfileBody": "Fill in your details and social media accounts once, then you can apply to this campaign.",
     "completeProfileCta": "Complete profile",
-    "briefLocked": "The full brief and location addresses are visible after you log in."
+    "briefLocked": "The full brief and location addresses are visible after you log in.",
+    "needAccount": "Add your {platforms} account first to join this job.",
+    "addAccount": "Add in Profile",
+    "pendingAccountNote": "Your social media account is being verified. You can still apply now; the Tali team verifies it while reviewing applicants."
   },
   "work": {
     "title": "Work",
@@ -518,7 +520,9 @@
     "addHoliday": "Add holiday",
     "holidaysEmpty": "No holidays yet.",
     "onlyFinance": "This page is for finance admins.",
-    "onlyCurator": "This page is for curators."
+    "onlyCurator": "This page is for curators.",
+    "verifyNow": "Verify",
+    "verifyBeforeApprove": "Verify the applicant's account on this job's platform (and check the follower minimum) before accepting."
   },
   "errors": {
     "generic": "Something didn't work. Try again in a moment.",
@@ -568,7 +572,9 @@
     "offlineTitle": "You're offline",
     "offlineBody": "Reconnect to the internet and open it again. Your latest data is safe.",
     "needSocial": "Add at least one social media account.",
-    "inviteNotFound": "No creator is registered with that email."
+    "inviteNotFound": "No creator is registered with that email.",
+    "no_social_account": "Add a social media account on this job's platform first, from your Profile.",
+    "account_not_verified": "The applicant's account on this job's platform isn't verified or is below the follower minimum. Verify it, then accept."
   },
   "success": {
     "saved": "Saved.",

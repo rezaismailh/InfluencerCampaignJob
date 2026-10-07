@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { Lock, MapPin } from 'lucide-react';
@@ -138,9 +139,12 @@ export default async function JobDetail({ params }: { params: Promise<{ id: stri
   async function JoinBlock({ job, viewer }: { job: Job; viewer: Viewer }) {
     const [{ data: part }, { data: accounts }] = await Promise.all([
       viewer.supabase.from('participations').select('*').eq('job_id', job.id).eq('creator_id', viewer.id).maybeSingle<Participation>(),
-      viewer.supabase.from('social_accounts').select('*').eq('creator_id', viewer.id).eq('status', 'verified').returns<SocialAccount[]>(),
+      viewer.supabase.from('social_accounts').select('*').eq('creator_id', viewer.id).in('status', ['verified', 'pending']).returns<SocialAccount[]>(),
     ]);
-    const eligible = (accounts ?? []).some((a) => job.platforms.includes(a.platform));
+    // A pending account is enough to apply; the curator verifies it before approving.
+    const matching = (accounts ?? []).filter((a) => job.platforms.includes(a.platform));
+    const eligible = matching.length > 0;
+    const pendingOnly = eligible && matching.every((a) => a.status === 'pending');
     if (part) {
       if (part.status === 'invited') {
         return (
@@ -171,11 +175,17 @@ export default async function JobDetail({ params }: { params: Promise<{ id: stri
     }
     if (job.status !== 'open') return null;
     if (!eligible) {
-      return <Alert tone="warning">{t('needVerified', { platforms: job.platforms.map((p) => tp(p)).join(' / ') })}</Alert>;
+      return (
+        <Alert tone="warning">
+          {t('needAccount', { platforms: job.platforms.map((p) => tp(p)).join(' / ') })}{' '}
+          <Link href="/profil" className="font-bold underline underline-offset-4">{t('addAccount')}</Link>
+        </Alert>
+      );
     }
     return (
       <ActionForm action={applyToJob} className="space-y-4 rounded-2xl border border-garis bg-kertas p-4">
         <input type="hidden" name="job_id" value={job.id} />
+        {pendingOnly && <p className="text-[15px] text-teks-redup">{t('pendingAccountNote')}</p>}
         {job.fee_type === 'open' && (
           <Field label={t('rate')} hint={job.rate_cap ? `${t('rateHint')} ${t('rateCapHint', { amount: formatRupiah(job.rate_cap) })}` : t('rateHint')} htmlFor="rate">
             <Input id="rate" name="rate" inputMode="numeric" placeholder="250000" required className="tabular" />

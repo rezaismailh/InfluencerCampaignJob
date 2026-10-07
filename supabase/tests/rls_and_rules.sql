@@ -87,16 +87,27 @@ select tests.act_as('00000000-0000-0000-0000-00000000000a');
 select tests.check((select count(*) = 1 from public.jobs), 'creator sees open job');
 select tests.expect_error($$select public.apply_to_job('20000000-0000-0000-0000-000000000001')$$, 'onboarding_incomplete');
 update public.profiles set onboarded_at = now() where id = auth.uid();
-select tests.expect_error($$select public.apply_to_job('20000000-0000-0000-0000-000000000001')$$, 'no_verified_account');
+-- a pending (not yet verified) account is enough to apply
+select tests.check((select status = 'pending' from public.social_accounts), 'account still pending');
+select public.apply_to_job('20000000-0000-0000-0000-000000000001');
+select tests.expect_error($$select public.apply_to_job('20000000-0000-0000-0000-000000000001')$$, 'already_applied');
 select tests.expect_error($$select public.verify_social_account((select id from public.social_accounts limit 1), true)$$, 'forbidden');
 
+-- ...but the curator must verify before approving
 select tests.act_as('00000000-0000-0000-0000-000000000002');
+select tests.expect_error($$select public.decide_application((select id from public.participations
+  where creator_id = '00000000-0000-0000-0000-00000000000a'), true)$$, 'account_not_verified');
 select public.verify_social_account(id, true, 12500) from public.social_accounts;
+insert into public.jobs (id, brand_name, title, platforms, deliverables, brief, fee_type, fee, quota, top_days, status)
+values ('20000000-0000-0000-0000-0000000000f1', 'Uji', 'Job YouTube', '{youtube}', '1 video', 'Brief', 'fixed', 100000, 1, 7, 'open');
 
 select tests.act_as('00000000-0000-0000-0000-00000000000a');
 select tests.check((select followers = 12500 and status = 'verified' from public.social_accounts), 'verified with updated followers');
-select public.apply_to_job('20000000-0000-0000-0000-000000000001');
-select tests.expect_error($$select public.apply_to_job('20000000-0000-0000-0000-000000000001')$$, 'already_applied');
+select tests.expect_error($$select public.apply_to_job('20000000-0000-0000-0000-0000000000f1')$$, 'no_social_account');
+
+select tests.act_as('00000000-0000-0000-0000-000000000002');
+update public.jobs set status = 'closed' where id = '20000000-0000-0000-0000-0000000000f1';
+select tests.act_as('00000000-0000-0000-0000-00000000000a');
 -- direct writes are blocked
 update public.participations set status = 'approved';
 select tests.check((select status = 'applied' from public.participations), 'direct update changes nothing');

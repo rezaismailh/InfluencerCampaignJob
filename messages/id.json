@@ -252,7 +252,6 @@
     "applied": "Pendaftaranmu terkirim. Tim Tali akan mengabari hasil kurasi.",
     "yourStatus": "Status kamu: {status}",
     "openParticipation": "Buka kerjaan",
-    "needVerified": "Kamu perlu akun {platforms} yang sudah terverifikasi untuk gabung job ini.",
     "acceptInvite": "Terima undangan",
     "declineInvite": "Tolak",
     "inviteFee": "Fee yang ditawarkan: {amount}",
@@ -264,7 +263,10 @@
     "completeProfileTitle": "Lengkapi profil untuk daftar",
     "completeProfileBody": "Isi data diri dan akun media sosialmu sekali saja, lalu kamu bisa daftar ke campaign ini.",
     "completeProfileCta": "Lengkapi profil",
-    "briefLocked": "Brief lengkap dan alamat lokasi terlihat setelah kamu masuk."
+    "briefLocked": "Brief lengkap dan alamat lokasi terlihat setelah kamu masuk.",
+    "needAccount": "Tambahkan akun {platforms} kamu dulu untuk gabung job ini.",
+    "addAccount": "Tambah di Profil",
+    "pendingAccountNote": "Akun media sosialmu sedang diverifikasi. Kamu tetap bisa daftar sekarang; tim Tali memverifikasinya saat menyeleksi pelamar."
   },
   "work": {
     "title": "Kerjaan",
@@ -518,7 +520,9 @@
     "addHoliday": "Tambah hari libur",
     "holidaysEmpty": "Belum ada hari libur.",
     "onlyFinance": "Halaman ini khusus admin keuangan.",
-    "onlyCurator": "Halaman ini khusus kurator."
+    "onlyCurator": "Halaman ini khusus kurator.",
+    "verifyNow": "Verifikasi",
+    "verifyBeforeApprove": "Verifikasi akun di platform job ini (dan pastikan followers memenuhi syarat) sebelum menerima pelamar."
   },
   "errors": {
     "generic": "Ada yang belum berhasil. Coba lagi sebentar lagi.",
@@ -568,7 +572,9 @@
     "offlineTitle": "Kamu sedang offline",
     "offlineBody": "Sambungkan internet, lalu buka lagi. Data terakhir tetap aman.",
     "needSocial": "Tambahkan minimal satu akun media sosial.",
-    "inviteNotFound": "Creator dengan email itu belum terdaftar."
+    "inviteNotFound": "Creator dengan email itu belum terdaftar.",
+    "no_social_account": "Tambahkan akun media sosial di platform job ini dulu, lewat halaman Profil.",
+    "account_not_verified": "Akun pelamar di platform job ini belum terverifikasi atau followers-nya di bawah syarat. Verifikasi dulu, lalu terima."
   },
   "success": {
     "saved": "Tersimpan.",

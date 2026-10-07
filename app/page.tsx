@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 import { CalendarClock, Mail, MessageCircle, MessageSquareText, Wallet } from 'lucide-react';
-import { ButtonLink, buttonClass } from '@/components/ui/button';
+import { ButtonLink } from '@/components/ui/button';
 import { Wordmark } from '@/components/wordmark';
 import { getViewer, homeFor } from '@/lib/auth';
 
@@ -43,32 +43,33 @@ export default async function Splash() {
 
         <div className="mt-auto space-y-3 pt-10">
           <ButtonLink href="/masuk" variant="accent" className="w-full">{t('creatorCta')}</ButtonLink>
-          <ButtonLink href="#brand" variant="outlineLight" className="w-full">{t('brandCta')}</ButtonLink>
           <ButtonLink href="/masuk" variant="ghostLight" className="w-full">{t('login')}</ButtonLink>
         </div>
-        <section id="brand" className="mt-6 rounded-2xl border border-nila-600 p-4">
-          <p className="text-[15px] text-gading/90">{t('brandNote')}</p>
-          {wa && (
-            <a
-              href={`https://wa.me/${wa}?text=${encodeURIComponent(t('brandWhatsappMessage'))}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={buttonClass('outlineLight', 'md', 'mt-4 w-full')}
-            >
-              <MessageCircle className="size-5" aria-hidden />
-              {t('brandWhatsapp')}
-            </a>
-          )}
-          {email && (
-            <a
-              href={`mailto:${email}?subject=${encodeURIComponent(t('brandEmailSubject'))}`}
-              className="mt-3 flex items-center justify-center gap-2 text-sm text-gading/90 underline underline-offset-4"
-            >
-              <Mail className="size-4" aria-hidden />
-              {t('brandEmail', { email })}
-            </a>
-          )}
-        </section>
+        {(wa || email) && (
+          <p id="brand" className="mt-8 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-sm text-gading/70">
+            <span>{t('brandCta')}</span>
+            {wa && (
+              <a
+                href={`https://wa.me/${wa}?text=${encodeURIComponent(t('brandWhatsappMessage'))}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex min-h-11 items-center gap-1.5 font-bold text-gading underline underline-offset-4"
+              >
+                <MessageCircle className="size-4" aria-hidden />
+                {t('brandWhatsapp')}
+              </a>
+            )}
+            {email && (
+              <a
+                href={`mailto:${email}?subject=${encodeURIComponent(t('brandEmailSubject'))}`}
+                className="inline-flex min-h-11 items-center gap-1.5 font-bold text-gading underline underline-offset-4"
+              >
+                <Mail className="size-4" aria-hidden />
+                {t('brandEmail')}
+              </a>
+            )}
+          </p>
+        )}
       </div>
     </main>
   );

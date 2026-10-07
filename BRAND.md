@@ -171,7 +171,7 @@ Skala lengkap ada di `tokens.css` (Tailwind v4) dan `tokens.json`.
 }
 ```
 
-Splash / layar sambutan: latar nila, wordmark gading di tengah, tagline "Tied to trust." di bawahnya, tombol "Daftar sebagai Creator" (limau) dan "Saya brand / agensi" (outline).
+Splash / layar sambutan: latar nila, wordmark gading di tengah, tagline "Tied to trust." di bawahnya, tombol "Daftar sebagai Creator" (limau), lalu tautan kecil "Brand atau agensi? WhatsApp · Email" di bagian bawah.
 
 ## 11. Catatan terbuka
 

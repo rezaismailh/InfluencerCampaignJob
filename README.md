@@ -61,6 +61,7 @@ npm run db:test   # migrasi + tes RLS/aturan bisnis di PostgreSQL lokal (butuh i
    | `CRON_SECRET` | String acak panjang untuk endpoint cron |
    | `RESEND_API_KEY`, `EMAIL_FROM` | Opsional, untuk email notifikasi |
    | `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` | Opsional, untuk Web Push (`npx web-push generate-vapid-keys`) |
+   | `CONTACT_WA`, `CONTACT_EMAIL` | Opsional, kontak brand di halaman pembuka. WA format internasional tanpa `+` (mis. `62812...`). Tombol tidak tampil kalau kosong |
 
 3. Generate domain di Settings → Networking.
 4. **Cron**: tambahkan dua service Cron di project yang sama (image `curlimages/curl` atau repo ini), dengan variable `APP_URL` dan `CRON_SECRET`:

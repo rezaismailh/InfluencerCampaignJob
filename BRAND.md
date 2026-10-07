@@ -21,6 +21,10 @@ Dokumen ini adalah sumber kebenaran untuk identitas brand Tali. Semua keputusan 
 
 Tiga hal ini adalah alasan creator memilih Tali dibanding platform lain. Setiap fitur dan setiap kalimat di aplikasi harus memperkuat setidaknya satu dari ketiganya. Khususnya, **status pembayaran harus selalu jelas, transparan, dan mudah ditemukan.**
 
+**Janji vs. copy publik.** "Dibayar tepat waktu" adalah standar kerja internal (target transfer H+1, batas publik 3 hari kerja), bukan headline. Di copy publik, tunjukkan mekanismenya: tanggal cair terlihat sebelum gabung, setiap pengajuan punya tenggat yang bisa dipantau. Hindari klaim kata sifat ("tepat waktu", "terpercaya", "tercepat") dan klaim yang tidak sepenuhnya di tangan Tali.
+
+**Positioning.** Untuk nano dan micro creator Indonesia, Tali adalah tempat ikut campaign terkurasi yang setiap langkahnya jelas dan tercatat, dari brief sampai transfer. Platform lain dibangun untuk brand; Tali dibangun dari sisi creator. Headline creator: *"Campaign yang jelas, dari brief sampai transfer."* Pesan untuk brand dipisah (campaign dikelola penuh, creator dikurasi, konten direview sebelum tayang).
+
 ## 3. Nama & filosofi
 
 **Tali** berarti ikatan. Platform ini adalah tali yang mengikat kepercayaan antara brand dan creator: brand yakin kontennya dikerjakan, creator yakin dibayar. Ada juga makna *tali rezeki* — tali yang mengantarkan penghasilan ke creator.

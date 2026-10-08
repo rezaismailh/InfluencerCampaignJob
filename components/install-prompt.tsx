@@ -1,8 +1,9 @@
 'use client';
 
-import { useSyncExternalStore } from 'react';
+import { useEffect, useSyncExternalStore } from 'react';
 import { useTranslations } from 'next-intl';
 import { Download, Share, X } from 'lucide-react';
+import { markAppInstalled } from '@/app/(creator)/actions';
 import { Button } from '@/components/ui/button';
 
 // "Add to home screen" banner. Android/Chrome gets a real install button (beforeinstallprompt);
@@ -30,6 +31,11 @@ if (typeof window !== 'undefined') {
   });
 }
 
+function isStandalone() {
+  const nav = navigator as Navigator & { standalone?: boolean };
+  return window.matchMedia('(display-mode: standalone)').matches || !!nav.standalone;
+}
+
 function dismissedRecently() {
   try {
     const at = Number(localStorage.getItem(DISMISS_KEY));
@@ -40,8 +46,7 @@ function dismissedRecently() {
 }
 
 function snapshot(ignoreDismiss: boolean): Mode {
-  const nav = navigator as Navigator & { standalone?: boolean };
-  if (window.matchMedia('(display-mode: standalone)').matches || nav.standalone) return 'hidden';
+  if (isStandalone()) return 'hidden';
   if (!ignoreDismiss && dismissedRecently()) return 'hidden';
   const ua = navigator.userAgent;
   if (/Instagram|FBAN|FBAV|Line\/|musical_ly|BytedanceWebview|TikTok/i.test(ua)) return 'inapp';
@@ -59,10 +64,10 @@ function subscribe(cb: () => void) {
  * `dismissible` (Beranda): closable, stays hidden for 30 days once closed.
  * Not dismissible (Profile): always there as the "how to install" reference.
  */
-export function InstallPrompt({ dismissible = true }: { dismissible?: boolean }) {
+export function InstallPrompt({ dismissible = true, installed = false }: { dismissible?: boolean; installed?: boolean }) {
   const t = useTranslations('install');
   const mode = useSyncExternalStore(subscribe, () => snapshot(!dismissible), () => 'hidden' as Mode);
-  if (mode === 'hidden') return null;
+  if (installed || mode === 'hidden') return null;
 
   const dismiss = () => {
     try {
@@ -105,4 +110,19 @@ export function InstallPrompt({ dismissible = true }: { dismissible?: boolean })
       </button>}
     </div>
   );
+}
+
+/**
+ * Mounted in the creator app chrome: when Tali runs from the home screen (or Android
+ * reports the install), record it on the profile so the banner never shows again.
+ */
+export function AppInstalledMarker({ installed }: { installed: boolean }) {
+  useEffect(() => {
+    if (installed) return;
+    const mark = () => { markAppInstalled().catch(() => {}); };
+    if (isStandalone()) mark();
+    window.addEventListener('appinstalled', mark);
+    return () => window.removeEventListener('appinstalled', mark);
+  }, [installed]);
+  return null;
 }

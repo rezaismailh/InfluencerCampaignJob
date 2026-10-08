@@ -32,7 +32,7 @@ export default async function Home() {
       <h1 className="text-2xl font-bold leading-8">{t('greeting', { name })}</h1>
       <BalanceCard balance={bal} nextTransfer={nextTransfer} />
       {!verified && <Alert tone="warning">{t('socialPending')}</Alert>}
-      <InstallPrompt />
+      <InstallPrompt installed={!!viewer.profile.app_installed_at} />
 
       <Section title={t('activeTitle')}>
         {active.length ? (

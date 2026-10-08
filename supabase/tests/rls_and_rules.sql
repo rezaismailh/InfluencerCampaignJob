@@ -323,3 +323,10 @@ set role service_role;
 select tests.check((public.run_daily() ->> 'followers_reminded')::int = 1, 'stale followers reminded');
 select tests.check((public.run_daily() ->> 'followers_reminded')::int = 0, 'reminder not repeated');
 reset role;
+
+-- Creators can record that they installed the app --------------------------------
+set role authenticated;
+select tests.act_as('00000000-0000-0000-0000-00000000000a');
+update public.profiles set app_installed_at = now() where id = auth.uid();
+select tests.check((select app_installed_at is not null from public.profiles where id = auth.uid()), 'app install recorded');
+reset role;

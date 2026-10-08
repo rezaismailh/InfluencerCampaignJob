@@ -24,6 +24,7 @@ export type Profile = {
   persona: string | null;
   address_enc: string | null;
   onboarded_at: string | null;
+  app_installed_at: string | null;
   created_at: string;
 };
 

@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 import { BottomNav } from '@/components/bottom-nav';
+import { AppInstalledMarker } from '@/components/install-prompt';
 import { NotificationBell } from '@/components/notification-bell';
 import { ButtonLink } from '@/components/ui/button';
 import { Wordmark } from '@/components/wordmark';
@@ -18,6 +19,7 @@ export function CreatorShell({ viewer, children }: { viewer: Viewer; children: R
       </header>
       <main className="mx-auto max-w-md px-4 py-5">{children}</main>
       <BottomNav />
+      <AppInstalledMarker installed={!!viewer.profile.app_installed_at} />
     </div>
   );
 }

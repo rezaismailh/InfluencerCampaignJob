@@ -42,7 +42,7 @@ export default async function ProfilePage() {
           <p className="text-[15px] font-bold">{t('push')}</p>
           <PushToggle />
         </div>
-        <InstallPrompt dismissible={false} />
+        <InstallPrompt dismissible={false} installed={!!viewer.profile.app_installed_at} />
         <div className="flex gap-4 text-[15px]">
           <Link href="/privasi" className="inline-flex min-h-11 items-center font-bold text-nila-800 underline underline-offset-4">{tl('privacyTitle')}</Link>
           <Link href="/ketentuan" className="inline-flex min-h-11 items-center font-bold text-nila-800 underline underline-offset-4">{tl('termsTitle')}</Link>

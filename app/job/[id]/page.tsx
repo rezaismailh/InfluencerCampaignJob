@@ -16,6 +16,7 @@ import { applyToJob, respondInvite } from '@/app/(creator)/actions';
 import { getViewer, type Viewer } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
 import { loadTaxonomy } from '@/lib/taxonomy';
+import { creatorTier, tierFeeList } from '@/lib/tiers';
 import { formatDate } from '@/lib/dates';
 import { formatRupiah } from '@/lib/money';
 import type { Job, Participation, PublicJob, SocialAccount } from '@/lib/types';
@@ -68,6 +69,23 @@ export default async function JobDetail({ params }: { params: Promise<{ id: stri
         <p className="text-[13px] font-medium text-teks-redup">{t('fee')}</p>
         <p className="text-[32px] font-extrabold leading-10 tabular">{await feeLabel(job)}</p>
         {job.platforms.length > 1 && <p className="text-[13px] text-teks-redup">{t('feeCombined')}</p>}
+        {job.fee_type === 'tier' && (
+          <div className="space-y-2">
+            <ul className="divide-y divide-garis rounded-xl border border-garis">
+              {tierFeeList(job.tier_fees).map(({ tier, fee }) => (
+                <li key={tier} className="flex items-center justify-between gap-3 px-3 py-2 text-[15px]">
+                  <span>{ttier(tier)}</span>
+                  <span className="font-bold tabular">{formatRupiah(fee)}</span>
+                </li>
+              ))}
+            </ul>
+            <p className="text-[13px] text-teks-redup">
+              {job.tier_basis === 'primary' && job.primary_platform
+                ? t('tierBasisPrimaryNote', { platform: tp(job.primary_platform) })
+                : t('tierBasisLargestNote')}
+            </p>
+          </div>
+        )}
         <div className="flex flex-wrap gap-1.5">
           <Badge tone="info">{tt(job.job_type)}</Badge>
           {job.platforms.map((p) => <Badge key={p}>{tp(p)}</Badge>)}
@@ -190,6 +208,19 @@ export default async function JobDetail({ params }: { params: Promise<{ id: stri
         </Alert>
       );
     }
+    // Per-tier fee: show the creator their own fee, or why their tier can't join.
+    const tier = job.fee_type === 'tier' ? creatorTier(job, matching) : null;
+    if (job.fee_type === 'tier' && !tier && job.tier_basis === 'primary' && job.primary_platform) {
+      return (
+        <Alert tone="warning">
+          {t('needPrimaryAccount', { platform: tp(job.primary_platform) })}{' '}
+          <Link href="/profil#field-social" className="font-bold underline underline-offset-4">{t('addAccount')}</Link>
+        </Alert>
+      );
+    }
+    if (tier && !(tier in (job.tier_fees ?? {}))) {
+      return <Alert tone="warning">{t('tierNotOffered', { tier: ttier(tier) })}</Alert>;
+    }
     if (best && best.followers < job.min_followers) {
       return (
         <Alert tone="warning">
@@ -205,6 +236,7 @@ export default async function JobDetail({ params }: { params: Promise<{ id: stri
     return (
       <ActionForm action={applyToJob} className="space-y-4 rounded-2xl border border-garis bg-kertas p-4">
         <input type="hidden" name="job_id" value={job.id} />
+        {tier && <p className="text-[15px]">{t.rich('yourTierFee', { fee: formatRupiah(job.tier_fees[tier]), tier: ttier(tier), b: (c) => <b className="tabular">{c}</b> })}</p>}
         {pendingOnly && <p className="text-[15px] text-teks-redup">{t('pendingAccountNote')}</p>}
         {job.fee_type === 'open' && (
           <Field label={t('rate')} hint={job.rate_cap ? `${t('rateHint')} ${t('rateCapHint', { amount: formatRupiah(job.rate_cap) })}` : t('rateHint')} htmlFor="rate">

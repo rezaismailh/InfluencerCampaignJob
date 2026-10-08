@@ -47,3 +47,16 @@ describe('notificationText counts', () => {
     expect(notificationText({ kind: 'followers_updated', params: { old: 9000, new: 15000 } }, t, (k) => k, (k) => k)).toBe('9.000 → 15.000');
   });
 });
+
+describe('tiers', () => {
+  it('maps followers to tiers and picks the right account', async () => {
+    const { tierFor, creatorTier, tierFeeList } = await import('@/lib/tiers');
+    expect([9_999, 10_000, 100_000, 1_000_000].map(tierFor)).toEqual(['nano', 'micro', 'macro', 'mega']);
+    const accounts = [{ platform: 'tiktok' as const, followers: 200_000 }, { platform: 'instagram' as const, followers: 3_000 }];
+    const job = { platforms: ['tiktok', 'instagram'] as ('tiktok' | 'instagram')[], primary_platform: null };
+    expect(creatorTier({ ...job, tier_basis: 'largest' }, accounts)).toBe('macro');
+    expect(creatorTier({ ...job, tier_basis: 'primary', primary_platform: 'instagram' }, accounts)).toBe('nano');
+    expect(creatorTier({ ...job, tier_basis: 'primary', primary_platform: 'youtube' as never }, accounts)).toBeNull();
+    expect(tierFeeList({ micro: 500000, nano: 150000, mega: 0 })).toEqual([{ tier: 'nano', fee: 150000 }, { tier: 'micro', fee: 500000 }]);
+  });
+});

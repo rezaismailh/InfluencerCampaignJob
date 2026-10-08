@@ -3,7 +3,7 @@ import type { Platform } from './social';
 export type Role = 'creator' | 'curator' | 'finance' | 'owner';
 export type VerificationStatus = 'pending' | 'verified' | 'rejected';
 export type JobType = 'non_visit' | 'visit';
-export type FeeType = 'fixed' | 'open';
+export type FeeType = 'fixed' | 'open' | 'tier';
 export type ProductOption = 'shipped' | 'self_purchase' | 'none';
 export type JobStatus = 'draft' | 'open' | 'closed' | 'completed';
 export type ParticipationStatus = 'invited' | 'applied' | 'approved' | 'rejected' | 'cancelled';
@@ -62,6 +62,9 @@ export type Job = {
   fee_type: FeeType;
   fee: number | null;
   rate_cap: number | null;
+  tier_fees: Record<string, number>;
+  tier_basis: 'largest' | 'primary';
+  primary_platform: Platform | null;
   quota: number;
   review_days: number | null;
   product_option: ProductOption;
@@ -153,6 +156,6 @@ export type Notification = {
 /** Open-job teaser returned by public_open_jobs(): no brief, visit locations by name only. */
 export type PublicJob = Pick<Job,
   'id' | 'brand_name' | 'title' | 'product' | 'job_type' | 'platforms' | 'deliverables' | 'requirements' | 'tiers' | 'niches'
-  | 'personas' | 'min_followers' | 'fee_type' | 'fee' | 'rate_cap' | 'quota' | 'review_days' | 'product_option'
+  | 'personas' | 'min_followers' | 'fee_type' | 'fee' | 'rate_cap' | 'tier_fees' | 'tier_basis' | 'primary_platform' | 'quota' | 'review_days' | 'product_option'
   | 'require_purchase_proof' | 'apply_deadline' | 'content_deadline' | 'top_days' | 'created_at'
 > & { visit_location_names: string[] };

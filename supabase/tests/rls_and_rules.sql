@@ -344,3 +344,32 @@ set role anon;
 select tests.check((select count(*) > 0 from public.taxonomy where kind = 'persona'), 'guests can read personas');
 select tests.check((select niches = '{}' from public.public_open_jobs() limit 1), 'teaser has niches');
 reset role;
+
+-- Fee per tier ------------------------------------------------------------------
+select tests.check(public.tier_for(9999) = 'nano' and public.tier_for(10000) = 'micro'
+  and public.tier_for(100000) = 'macro' and public.tier_for(1000000) = 'mega', 'tier bands');
+set role authenticated;
+select tests.act_as('00000000-0000-0000-0000-000000000002');
+insert into public.jobs (id, brand_name, title, platforms, deliverables, brief, fee_type, quota, top_days, status, tier_fees)
+values ('20000000-0000-0000-0000-0000000000a1', 'Uji', 'Job per tier', '{tiktok,instagram}', 'x', 'x', 'tier', 5, 7, 'open',
+  '{"nano": 100000}');
+-- B: TikTok 15.000 followers (micro), no Instagram account
+select tests.act_as('00000000-0000-0000-0000-00000000000b');
+select tests.expect_error($$select public.apply_to_job('20000000-0000-0000-0000-0000000000a1')$$, 'tier_not_offered');
+select tests.act_as('00000000-0000-0000-0000-000000000002');
+update public.jobs set tier_fees = '{"nano": 100000, "micro": 300000}', tier_basis = 'primary', primary_platform = 'instagram'
+  where id = '20000000-0000-0000-0000-0000000000a1';
+select tests.act_as('00000000-0000-0000-0000-00000000000b');
+select tests.expect_error($$select public.apply_to_job('20000000-0000-0000-0000-0000000000a1')$$, 'no_social_account');
+select tests.act_as('00000000-0000-0000-0000-000000000002');
+update public.jobs set tier_basis = 'largest', primary_platform = null where id = '20000000-0000-0000-0000-0000000000a1';
+select tests.act_as('00000000-0000-0000-0000-00000000000b');
+select public.apply_to_job('20000000-0000-0000-0000-0000000000a1');
+select tests.act_as('00000000-0000-0000-0000-000000000002');
+select public.decide_application(id, true) from public.participations where job_id = '20000000-0000-0000-0000-0000000000a1';
+select tests.check((select agreed_fee = 300000 from public.participations where job_id = '20000000-0000-0000-0000-0000000000a1'),
+  'accepted at the micro tier fee');
+reset role;
+set role anon;
+select tests.check((select tier_fees ->> 'micro' = '300000' from public.public_open_jobs('20000000-0000-0000-0000-0000000000a1')), 'teaser shows tier fees');
+reset role;

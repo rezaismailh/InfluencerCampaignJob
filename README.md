@@ -101,6 +101,10 @@ tests/                               tes unit (vitest)
 
 Teksnya ada di `messages/*.json` (`legal.privacy`, `legal.terms`), tanggal berlaku di `components/legal-page.tsx`. Isinya mengikuti cara aplikasi memakai data; minta orang yang paham hukum meninjau sebelum dianggap final, dan perbarui teks serta tanggalnya bila alur data berubah.
 
+## Data wilayah
+
+`lib/wilayah.json` (38 provinsi, 514 kabupaten/kota) dibuat dari paket npm [`idn-area-data`](https://www.npmjs.com/package/idn-area-data) (data berlisensi ODbL, kode wilayah Kemendagri). Perbarui bila ada pemekaran wilayah.
+
 ## Aturan yang dijaga di database
 
 Semua penulisan data penting lewat fungsi `security definer` yang memvalidasi peran dan tahap:

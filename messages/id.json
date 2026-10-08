@@ -170,7 +170,7 @@
     "fullName": "Nama lengkap",
     "phone": "Nomor HP (WhatsApp)",
     "phoneHint": "Dipakai tim Tali untuk konfirmasi job dan pencairan. Hanya terlihat oleh tim Tali.",
-    "city": "Kota domisili",
+    "city": "Kota/kabupaten",
     "categories": "Kategori konten",
     "categoriesHint": "Pilih maksimal 3.",
     "persona": "Persona",
@@ -181,7 +181,12 @@
     "socialHint": "Tempel link profil. Username terbaca otomatis dari link.",
     "needSocial": "Tambahkan minimal satu akun media sosial.",
     "finish": "Selesai, lihat job",
-    "finishHint": "Kamu bisa daftar job setelah minimal satu akun terverifikasi tim Tali."
+    "finishHint": "Akunmu akan diverifikasi tim Tali. Sambil menunggu, kamu sudah bisa lihat dan daftar job.",
+    "province": "Provinsi",
+    "provincePlaceholder": "Pilih provinsi",
+    "cityPlaceholder": "Pilih kota/kabupaten",
+    "cityPickProvince": "Pilih provinsi dulu",
+    "finishNeedProfile": "Simpan data diri di langkah 1 dulu (tombol Simpan profil), lalu tombol di bawah bisa ditekan."
   },
   "social": {
     "title": "Akun media sosial",

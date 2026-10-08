@@ -45,7 +45,7 @@ update public.profiles set role = 'finance' where id = '00000000-0000-0000-0000-
 -- Creator A: profile, role protection, social account -----------------------
 set role authenticated;
 select tests.act_as('00000000-0000-0000-0000-00000000000a');
-update public.profiles set full_name = 'Creator A', city = 'Bandung', categories = '{food}'
+update public.profiles set full_name = 'Creator A', province = 'Jawa Barat', city = 'Kota Bandung', categories = '{food}'
   where id = auth.uid();
 select tests.expect_error($$update public.profiles set role = 'owner' where id = auth.uid()$$, 'permission denied');
 select tests.check((select count(*) = 1 from public.profiles), 'creator sees only own profile');

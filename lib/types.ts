@@ -18,6 +18,7 @@ export type Profile = {
   email: string | null;
   full_name: string | null;
   phone_enc: string | null;
+  province: string | null;
   city: string | null;
   categories: string[];
   persona: string | null;

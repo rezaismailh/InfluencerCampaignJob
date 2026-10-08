@@ -521,10 +521,10 @@
       "requireInsight": "Wajib kirim insight setelah posting",
       "requireInsightHint": "Kalau aktif, tanggal cair dihitung dari tanggal insight dikirim (setelah disetujui), bukan dari konfirmasi posting.",
       "brandLogo": "Logo brand (opsional)",
-      "brandLogoHint": "PNG, JPG, atau WebP. Otomatis dikecilkan dan dikompres saat diunggah. Hanya tampil kalau nama asli ditampilkan; brand yang disamarkan memakai ikon.",
+      "brandLogoHint": "PNG, JPG, atau WebP. Otomatis dikecilkan dan dikompres saat diunggah. Kalau brand disamarkan, logo baru tampil ke creator setelah mereka diundang atau diterima; sebelum itu yang tampil ikon pengganti.",
       "brandLogoUpload": "Unggah logo",
       "brandIcon": "Ikon pengganti logo",
-      "brandIconHint": "Dipakai untuk brand yang disamarkan, atau kalau belum ada logo. Pilih yang paling dekat dengan kategori produknya.",
+      "brandIconHint": "Tampil selama brand disamarkan (sebelum creator diterima), atau kalau belum ada logo. Pilih yang paling dekat dengan kategori produknya.",
       "brandIcons": {
         "store": "Umum",
         "food": "Makanan",
@@ -714,8 +714,7 @@
     "primary_platform_required": "Pilih platform utama yang termasuk platform job ini.",
     "tier_not_offered": "Tier kamu belum termasuk di job ini.",
     "post_not_confirmed": "Insight bisa dikirim setelah postingan dikonfirmasi.",
-    "insight_photos_required": "Unggah minimal satu screenshot insight.",
-    "logo_with_alias": "Logo akan membuka nama brand yang disamarkan. Hapus logonya, atau pilih tampilkan nama asli."
+    "insight_photos_required": "Unggah minimal satu screenshot insight."
   },
   "success": {
     "saved": "Tersimpan.",

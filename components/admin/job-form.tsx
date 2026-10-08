@@ -29,7 +29,7 @@ function Chips({ name, options, checked, label }: { name: string; options: { val
   );
 }
 
-export async function JobForm({ job, realBrand, clients }: { job?: Job; realBrand?: string | null; clients: { id: string; name: string }[] }) {
+export async function JobForm({ job, realBrand, logo, clients }: { job?: Job; realBrand?: string | null; logo?: string | null; clients: { id: string; name: string }[] }) {
   const t = await getTranslations('admin.jobForm');
   const tp = await getTranslations('platform');
   const tt = await getTranslations('jobType');
@@ -66,7 +66,7 @@ export async function JobForm({ job, realBrand, clients }: { job?: Job; realBran
           <FieldError name="brand_alias" />
         </Field>
         <Field label={t('brandLogo')} hint={t('brandLogoHint')}>
-          <BrandLogoUpload initial={job?.brand_logo ?? null} label={t('brandLogoUpload')} />
+          <BrandLogoUpload initial={logo ?? job?.brand_logo ?? null} label={t('brandLogoUpload')} />
           <FieldError name="brand_logo" />
         </Field>
         <fieldset className="space-y-1.5 md:col-span-2">

@@ -521,10 +521,10 @@
       "requireInsight": "Insight required after posting",
       "requireInsightHint": "When on, the payout date counts from the day the insight is sent (once approved), not from post confirmation.",
       "brandLogo": "Brand logo (optional)",
-      "brandLogoHint": "PNG, JPG or WebP. Resized and compressed automatically on upload. Shown only when the real name is shown; disguised brands use an icon.",
+      "brandLogoHint": "PNG, JPG or WebP. Resized and compressed automatically on upload. For a disguised brand, creators see the logo only once they are invited or approved; until then they see the stand-in icon.",
       "brandLogoUpload": "Upload logo",
       "brandIcon": "Stand-in icon",
-      "brandIconHint": "Used for disguised brands, or when there is no logo. Pick the closest product category.",
+      "brandIconHint": "Shown while the brand is disguised (before a creator is accepted), or when there is no logo. Pick the closest product category.",
       "brandIcons": {
         "store": "General",
         "food": "Food",
@@ -714,8 +714,7 @@
     "primary_platform_required": "Pick a main platform that is one of the job's platforms.",
     "tier_not_offered": "Your tier isn't included in this job.",
     "post_not_confirmed": "You can send the insight once your post is confirmed.",
-    "insight_photos_required": "Upload at least one insight screenshot.",
-    "logo_with_alias": "A logo would reveal the disguised brand. Remove the logo, or choose to show the real name."
+    "insight_photos_required": "Upload at least one insight screenshot."
   },
   "success": {
     "saved": "Saved.",

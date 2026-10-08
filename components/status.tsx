@@ -5,7 +5,7 @@ export const reviewTone: Record<ReviewStatus, Tone> = {
   pending_review: 'warning',
   sent_to_brand: 'info',
   approved: 'success',
-  revision: 'warning',
+  revision: 'danger',
   rejected: 'danger',
 };
 

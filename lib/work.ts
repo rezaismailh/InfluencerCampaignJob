@@ -23,7 +23,7 @@ export function revisionNumeral(version: number): string | null {
   return ROMAN[version - 1] ?? String(version - 1);
 }
 
-export type Step = { key: string; done: boolean; date?: string | null; optional?: boolean };
+export type Step = { key: string; done: boolean; date?: string | null; optional?: boolean; attention?: boolean };
 
 export function timeline(part: Participation, job: Pick<Job, 'job_type' | 'product_option' | 'require_insight'>, latest: Latest, payout?: PayoutRequest | null): Step[] {
   const hasPrep = job.job_type === 'visit' || job.product_option === 'shipped';
@@ -31,17 +31,22 @@ export function timeline(part: Participation, job: Pick<Job, 'job_type' | 'produ
   const steps: Step[] = [{ key: 'stepJoined', done: part.status === 'approved', date: part.decided_at }];
   if (hasPrep) steps.push({ key: 'stepPrep', done: prepDone, optional: true });
   steps.push(
-    { key: 'stepStoryline', done: latest.storyline?.status === 'approved', date: latest.storyline?.approved_at },
-    { key: 'stepDraft', done: latest.draft?.status === 'approved', date: latest.draft?.approved_at },
-    { key: 'stepCaption', done: latest.caption?.status === 'approved', date: latest.caption?.approved_at },
+    { key: 'stepStoryline', done: latest.storyline?.status === 'approved', date: latest.storyline?.approved_at, attention: latest.storyline?.status === 'revision' },
+    { key: 'stepDraft', done: latest.draft?.status === 'approved', date: latest.draft?.approved_at, attention: latest.draft?.status === 'revision' },
+    { key: 'stepCaption', done: latest.caption?.status === 'approved', date: latest.caption?.approved_at, attention: latest.caption?.status === 'revision' },
     { key: 'stepPosted', done: !!part.post_confirmed_at, date: part.post_confirmed_at },
   );
-  if (job.require_insight) steps.push({ key: 'stepInsight', done: latest.insight?.status === 'approved', date: latest.insight?.approved_at });
+  if (job.require_insight) steps.push({ key: 'stepInsight', done: latest.insight?.status === 'approved', date: latest.insight?.approved_at, attention: latest.insight?.status === 'revision' });
   steps.push(
     { key: 'stepRequested', done: !!payout, date: payout?.requested_at },
-    { key: 'stepPaid', done: payout?.status === 'transferred', date: payout?.transferred_on },
+    { key: 'stepPaid', done: payout?.status === 'transferred', date: payout?.transferred_on, attention: payout?.status === 'failed' },
   );
   return steps;
+}
+
+/** Index of the step to work on next (an optional step is skipped once a later step is done), or -1 when all are done. */
+export function currentStep(steps: Step[]): number {
+  return steps.findIndex((s, i) => !s.done && !(s.optional && steps.slice(i + 1).some((x) => x.done)));
 }
 
 export type Balance = {

@@ -33,3 +33,12 @@ describe('brand look', () => {
     expect(isBrandIcon('rocket')).toBe(false);
   });
 });
+
+describe('currentStep', () => {
+  it('points at the first unfinished step and skips an optional step once later work is done', async () => {
+    const { currentStep } = await import('@/lib/work');
+    expect(currentStep([{ key: 'a', done: true }, { key: 'b', done: false }, { key: 'c', done: false }])).toBe(1);
+    expect(currentStep([{ key: 'a', done: true }, { key: 'prep', done: false, optional: true }, { key: 'c', done: true }, { key: 'd', done: false }])).toBe(3);
+    expect(currentStep([{ key: 'a', done: true }])).toBe(-1);
+  });
+});

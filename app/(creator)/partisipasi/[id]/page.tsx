@@ -1,4 +1,6 @@
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { ChartColumn, ChevronDown, ChevronLeft, CircleCheck, Clapperboard, FileText, Info, Lock, Send, TrendingUp, Type } from 'lucide-react';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { ActionForm, FieldError } from '@/components/action-form';
 import { PhotoUpload } from '@/components/photo-upload';
@@ -6,8 +8,9 @@ import { Alert } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button, ButtonLink } from '@/components/ui/button';
 import { Card, CardTitle } from '@/components/ui/card';
+import { BrandAvatar } from '@/components/brand-avatar';
+import { cn } from '@/lib/cn';
 import { Field, Input, Textarea } from '@/components/ui/field';
-import { PageHeader } from '@/components/ui/page';
 import { SubmitButton } from '@/components/ui/submit-button';
 import { participationTone, payoutTone, reviewTone } from '@/components/status';
 import { SubmissionHistory } from '@/components/work/submission-history';
@@ -18,7 +21,7 @@ import { decrypt } from '@/lib/crypto';
 import { formatDate, formatDateTime, todayWib } from '@/lib/dates';
 import { formatRupiah } from '@/lib/money';
 import { signedUrls } from '@/lib/storage';
-import { latestByKind, revisionCount, timeline } from '@/lib/work';
+import { currentStep, latestByKind, revisionCount, timeline } from '@/lib/work';
 import type { Job, Participation, PayoutRequest, Submission, SubmissionKind } from '@/lib/types';
 import { visibleBrand, type BrandEmbed } from '@/lib/brand';
 
@@ -29,6 +32,7 @@ export default async function Work({ params }: { params: Promise<{ id: string }>
   const tn = await getTranslations('nav');
   const tps = await getTranslations('participationStatus');
   const tj = await getTranslations('jobs');
+  const tk = await getTranslations('kind');
   const locale = await getLocale();
 
   const { data: part } = await viewer.supabase
@@ -51,16 +55,40 @@ export default async function Work({ params }: { params: Promise<{ id: string }>
   const contentApproved = latest.draft?.status === 'approved' && latest.caption?.status === 'approved';
   const active = part.status === 'approved';
 
-  return (
-    <div className="space-y-5">
-      <PageHeader back={{ href: '/beranda', label: tn('home') }} title={job.title} subtitle={visibleBrand(job)} />
+  // Each task is open (work on it now), done, or waiting on an earlier step.
+  type TaskKind = SubmissionKind | 'posting';
+  const stateOf = (kind: TaskKind): 'open' | 'done' | 'locked' => {
+    if (kind === 'posting') return part.post_confirmed_at ? 'done' : contentApproved ? 'open' : 'locked';
+    if (kind === 'insight') return latest.insight?.status === 'approved' ? 'done' : part.post_confirmed_at ? 'open' : 'locked';
+    if (latest[kind]?.status === 'approved') return 'done';
+    return kind === 'storyline' || storylineApproved ? 'open' : 'locked';
+  };
+  const tasks: TaskKind[] = ['storyline', 'draft', 'caption', 'posting', ...(job.require_insight ? ['insight' as const] : [])];
+  const current = currentStep(steps);
+  const lockReason: Record<TaskKind, string> = {
+    storyline: '', draft: t('lockedUntilStoryline'), caption: t('lockedUntilStoryline'),
+    posting: t('postingLocked'), insight: t('insightLocked'),
+  };
 
-      <Card className="flex items-center justify-between gap-3">
-        <div>
-          <p className="text-[13px] text-teks-redup">{t('agreedFee')}</p>
-          <p className="text-xl font-extrabold tabular">{part.agreed_fee ? formatRupiah(part.agreed_fee) : tj('openRate')}</p>
+  return (
+    <div className="space-y-4">
+      <Link href="/beranda" className="-ml-2 inline-flex min-h-11 items-center gap-1 px-2 text-[15px] font-bold text-nila-800">
+        <ChevronLeft className="size-5" strokeWidth={2} aria-hidden /> {tn('home')}
+      </Link>
+
+      <Card className="space-y-3">
+        <div className="flex items-start gap-3">
+          <BrandAvatar logo={job.brand_logo} icon={job.brand_icon} size={44} />
+          <div className="min-w-0 flex-1">
+            <p className="text-[13px] font-bold uppercase tracking-wide text-nila-800">{visibleBrand(job)}</p>
+            <h1 className="text-xl font-bold leading-7">{job.title}</h1>
+          </div>
+          <Badge tone={participationTone[part.status]} className="shrink-0">{tps(part.status)}</Badge>
         </div>
-        <Badge tone={participationTone[part.status]}>{tps(part.status)}</Badge>
+        <div className="rounded-xl bg-nila-50 p-3">
+          <p className="text-[13px] text-teks-redup">{t('agreedFee')}</p>
+          <p className="text-[28px] font-extrabold leading-9 text-nila-800 tabular">{part.agreed_fee ? formatRupiah(part.agreed_fee) : tj('openRate')}</p>
+        </div>
       </Card>
 
       {part.status === 'invited' && (
@@ -85,62 +113,114 @@ export default async function Work({ params }: { params: Promise<{ id: string }>
       {active && (
         <>
           <Card>
-            <CardTitle className="mb-3">{t('timeline')}</CardTitle>
+            <div className="mb-4 flex items-center justify-between gap-3">
+              <h2 className="flex items-center gap-2 text-lg font-bold">
+                <TrendingUp className="size-5 text-nila-800" strokeWidth={2} aria-hidden /> {t('progressTitle')}
+              </h2>
+              <Badge tone="info" className="shrink-0 whitespace-nowrap">{t('stepOf', { n: current === -1 ? steps.length : current + 1, total: steps.length })}</Badge>
+            </div>
             <Timeline steps={steps} />
           </Card>
 
           <Prep />
 
-          <SubmissionCard kind="storyline" locked={false} />
-          <SubmissionCard kind="draft" locked={!storylineApproved} />
-          <SubmissionCard kind="caption" locked={!storylineApproved} />
+          {tasks.filter((k) => stateOf(k) === 'open' || (k === 'posting' && stateOf(k) === 'done')).map((k) =>
+            k === 'posting' ? <Posting key={k} /> : <SubmissionCard key={k} kind={k} />)}
 
-          <Card className="space-y-3">
-            <CardTitle>{t('postingTitle')}</CardTitle>
-            {part.post_confirmed_at ? (
-              <>
-                <Alert tone="success">{t('postConfirmed', { date: formatDate(part.post_confirmed_at, locale) })}</Alert>
-                {job.require_insight && !part.ready_at && <p className="text-[15px]">{t('insightNeeded')}</p>}
-                {part.ready_at && (part.ready_at <= todayWib()
-                  ? <p className="text-[15px]">{t('readyNow')}</p>
-                  : <p className="text-[15px]">{t('readyOn', { date: formatDate(part.ready_at, locale) })}</p>)}
-                {payout ? (
-                  <div className="flex items-center justify-between gap-3 rounded-xl bg-latar p-3">
-                    <span className="font-bold tabular">{formatRupiah(payout.net)}</span>
-                    <PayoutBadge status={payout.status} />
+          {tasks.some((k) => stateOf(k) === 'locked') && (
+            <section className="space-y-2">
+              <h2 className="flex items-center gap-1.5 px-1 text-[13px] font-bold uppercase tracking-wide text-teks-redup">
+                <Lock className="size-4" aria-hidden /> {t('nextSteps')}
+              </h2>
+              {tasks.filter((k) => stateOf(k) === 'locked').map((k) => (
+                <div key={k} className="flex items-center gap-3 rounded-2xl border border-dashed border-garis bg-kertas/60 p-3">
+                  <TaskIcon kind={k} muted />
+                  <div className="min-w-0 flex-1">
+                    <p className="font-bold text-teks-redup">{k === 'posting' ? t('postingTitle') : tk(k)}</p>
+                    <p className="text-[13px] text-teks-redup">{lockReason[k]}</p>
                   </div>
-                ) : (
-                  <ButtonLink href="/saldo" variant="outline" className="w-full">{t('goToBalance')}</ButtonLink>
-                )}
-              </>
-            ) : !contentApproved ? (
-              <p className="text-[15px] text-teks-redup">{t('postingLocked')}</p>
-            ) : (
-              <>
-                {part.post_url && (
-                  <Alert tone={part.post_url_matches === false ? 'warning' : 'info'}>
-                    {part.post_url_matches === false ? t('postMismatch') : t('postSubmitted')}
-                  </Alert>
-                )}
-                <ActionForm action={submitPost}>
-                  <input type="hidden" name="participation_id" value={part.id} />
-                  <Field label={t('postUrl')} htmlFor="post_url">
-                    <Input id="post_url" name="post_url" type="url" inputMode="url" defaultValue={part.post_url ?? ''} required />
-                  </Field>
-                  <Field label={t('postedOn')} htmlFor="posted_on">
-                    <Input id="posted_on" name="posted_on" type="date" max={todayWib()} defaultValue={part.posted_on ?? todayWib()} required />
-                  </Field>
-                  <SubmitButton className="w-full">{t('submitPost')}</SubmitButton>
-                </ActionForm>
-              </>
-            )}
-          </Card>
+                  <Lock className="size-4 shrink-0 text-teks-redup" aria-hidden />
+                </div>
+              ))}
+            </section>
+          )}
 
-          {job.require_insight && part.post_confirmed_at && <SubmissionCard kind="insight" locked={false} />}
+          {tasks.some((k) => k !== 'posting' && stateOf(k) === 'done') && (
+            <section className="space-y-2">
+              <h2 className="flex items-center gap-1.5 px-1 text-[13px] font-bold uppercase tracking-wide text-teks-redup">
+                <CircleCheck className="size-4" aria-hidden /> {t('doneSteps')}
+              </h2>
+              {tasks.filter((k): k is SubmissionKind => k !== 'posting' && stateOf(k) === 'done').map((k) => <DoneCard key={k} kind={k} />)}
+            </section>
+          )}
         </>
       )}
     </div>
   );
+
+  async function Posting() {
+    return (
+      <Card className="space-y-3">
+        <TaskHeader kind="posting" title={t('postingTitle')} />
+        {part!.post_confirmed_at ? (
+          <>
+            <Alert tone="success">{t('postConfirmed', { date: formatDate(part!.post_confirmed_at, locale) })}</Alert>
+            {job.require_insight && !part!.ready_at && <p className="text-[15px]">{t('insightNeeded')}</p>}
+            {part!.ready_at && (part!.ready_at <= todayWib()
+              ? <p className="text-[15px]">{t('readyNow')}</p>
+              : <p className="text-[15px]">{t('readyOn', { date: formatDate(part!.ready_at, locale) })}</p>)}
+            {payout ? (
+              <div className="flex items-center justify-between gap-3 rounded-xl bg-latar p-3">
+                <span className="font-bold tabular">{formatRupiah(payout.net)}</span>
+                <PayoutBadge status={payout.status} />
+              </div>
+            ) : (
+              <ButtonLink href="/saldo" variant="outline" className="w-full">{t('goToBalance')}</ButtonLink>
+            )}
+          </>
+        ) : (
+          <>
+            {part!.post_url && (
+              <Alert tone={part!.post_url_matches === false ? 'warning' : 'info'}>
+                {part!.post_url_matches === false ? t('postMismatch') : t('postSubmitted')}
+              </Alert>
+            )}
+            <ActionForm action={submitPost}>
+              <input type="hidden" name="participation_id" value={part!.id} />
+              <Field label={t('postUrl')} htmlFor="post_url">
+                <Input id="post_url" name="post_url" type="url" inputMode="url" defaultValue={part!.post_url ?? ''} required />
+              </Field>
+              <Field label={t('postedOn')} htmlFor="posted_on">
+                <Input id="posted_on" name="posted_on" type="date" max={todayWib()} defaultValue={part!.posted_on ?? todayWib()} required />
+              </Field>
+              <SubmitButton className="w-full"><Send className="size-5" aria-hidden /> {t('submitPost')}</SubmitButton>
+            </ActionForm>
+          </>
+        )}
+      </Card>
+    );
+  }
+
+  async function DoneCard({ kind }: { kind: SubmissionKind }) {
+    const items = submissions.filter((s) => s.kind === kind);
+    const last = latest[kind];
+    return (
+      <details className="group rounded-2xl border border-garis bg-kertas">
+        <summary className="flex min-h-14 cursor-pointer list-none items-center gap-3 px-3 [&::-webkit-details-marker]:hidden">
+          <TaskIcon kind={kind} />
+          <div className="min-w-0 flex-1">
+            <p className="font-bold">{tk(kind)}</p>
+            <p className="text-[13px] text-teks-redup">
+              {last?.approved_at && t('approvedAt', { date: formatDate(last.approved_at, locale) })}
+              {items.length > 1 && ` · ${t('revisions', { count: revisionCount(submissions, kind) })}`}
+            </p>
+          </div>
+          <ChevronDown className="size-5 shrink-0 text-teks-redup transition-transform group-open:rotate-180" aria-hidden />
+        </summary>
+        <div className="border-t border-garis p-3"><SubmissionHistory items={items} photoUrls={photos} /></div>
+      </details>
+    );
+  }
 
   async function PayoutBadge({ status }: { status: PayoutRequest['status'] }) {
     const tp = await getTranslations('payout');
@@ -211,34 +291,39 @@ export default async function Work({ params }: { params: Promise<{ id: string }>
     );
   }
 
-  async function SubmissionCard({ kind, locked }: { kind: SubmissionKind; locked: boolean }) {
-    const tk = await getTranslations('kind');
+  async function SubmissionCard({ kind }: { kind: SubmissionKind }) {
     const tr = await getTranslations('review');
     const items = submissions.filter((s) => s.kind === kind);
     const last = latest[kind];
-    // Insight comes after the post is confirmed; the other items before.
-    const stageOpen = kind === 'insight' ? !!part!.post_confirmed_at : !part!.post_confirmed_at;
-    const canSubmit = !locked && stageOpen && (!last || last.status === 'revision');
+    const canSubmit = !last || last.status === 'revision';
     const hint = { storyline: t('storylineHint'), draft: t('draftHint'), caption: t('captionHint'), insight: t('insightHint') }[kind];
     const submitLabel = last?.status === 'revision' ? t('submitRevision')
       : { storyline: t('submitStoryline'), draft: t('submitDraft'), caption: t('submitCaption'), insight: t('submitInsight') }[kind];
+    const feedback = last && (last.status === 'revision' || last.status === 'rejected') ? last : null;
 
     return (
-      <Card className="space-y-3">
-        <div className="flex items-center justify-between gap-3">
-          <CardTitle>{tk(kind)}</CardTitle>
-          {last && <Badge tone={reviewTone[last.status]}>{tr(last.status)}</Badge>}
-        </div>
-        {items.length > 1 && <p className="text-[13px] text-teks-redup">{t('revisions', { count: revisionCount(submissions, kind) })}</p>}
-        {locked && <p className="text-[15px] text-teks-redup">{t('lockedUntilStoryline')}</p>}
+      <Card className={cn('space-y-3', feedback && 'ring-2 ring-bahaya/30')}>
+        <TaskHeader kind={kind} title={tk(kind)}
+          badge={last && <Badge tone={reviewTone[last.status]} className="shrink-0">{tr(last.status)}</Badge>} />
         {last && (last.status === 'pending_review' || last.status === 'sent_to_brand') && (
           <p className="text-[15px] text-teks-redup">{t('waitingReview')}</p>
+        )}
+        {feedback?.tali_feedback && (
+          <div className="rounded-xl bg-nila-50 p-3">
+            <p className="text-[13px] font-bold uppercase tracking-wide text-nila-800">{tr('taliFeedback')}</p>
+            <p className="mt-1 whitespace-pre-line text-[15px]">{feedback.tali_feedback}</p>
+          </div>
+        )}
+        {feedback?.brand_feedback && (
+          <div className="rounded-xl bg-bahaya/10 p-3">
+            <p className="text-[13px] font-bold uppercase tracking-wide text-bahaya">{tr('brandFeedback')}</p>
+            <p className="mt-1 whitespace-pre-line text-[15px]">{feedback.brand_feedback}</p>
+          </div>
         )}
         {canSubmit && (
           <ActionForm action={submitItem} resetOnSuccess>
             <input type="hidden" name="participation_id" value={part!.id} />
             <input type="hidden" name="kind" value={kind} />
-            <p className="text-[13px] text-teks-redup">{hint}</p>
             {kind === 'insight' ? (
               <>
                 <Field label={t('insightPhotos')} hint={t('insightPhotosHint')}>
@@ -264,16 +349,44 @@ export default async function Work({ params }: { params: Promise<{ id: string }>
                 <PhotoUpload userId={viewer.id} folder={`${part!.id}/draft`} label={t('photos')} />
               </Field>
             )}
-            <SubmitButton className="w-full">{submitLabel}</SubmitButton>
+            <div className="flex gap-2 rounded-xl bg-latar p-3 text-[13px] text-teks-redup">
+              <Info className="mt-0.5 size-4 shrink-0 text-nila-800" aria-hidden />
+              <p>{hint}</p>
+            </div>
+            <SubmitButton className="w-full"><Send className="size-5" aria-hidden /> {submitLabel}</SubmitButton>
           </ActionForm>
         )}
         {items.length > 0 && (
-          <details open={items.length <= 2}>
-            <summary className="min-h-11 cursor-pointer py-2 font-bold text-nila-800">{t('history')}</summary>
+          <details open={items.length <= 2} className="border-t border-garis pt-2">
+            <summary className="flex min-h-11 cursor-pointer items-center justify-between py-2 font-bold">
+              {t('history')}
+              <span className="text-[13px] font-medium text-teks-redup">{t('versions', { count: items.length })}</span>
+            </summary>
             <SubmissionHistory items={items} photoUrls={photos} />
           </details>
         )}
       </Card>
     );
   }
+}
+
+const TASK_ICONS = { storyline: FileText, draft: Clapperboard, caption: Type, posting: Send, insight: ChartColumn } as const;
+
+function TaskIcon({ kind, muted }: { kind: keyof typeof TASK_ICONS; muted?: boolean }) {
+  const Icon = TASK_ICONS[kind];
+  return (
+    <span className={cn('flex size-10 shrink-0 items-center justify-center rounded-xl', muted ? 'bg-latar text-teks-redup' : 'bg-nila-50 text-nila-800')}>
+      <Icon className="size-5" strokeWidth={2} aria-hidden />
+    </span>
+  );
+}
+
+function TaskHeader({ kind, title, badge }: { kind: keyof typeof TASK_ICONS; title: string; badge?: React.ReactNode }) {
+  return (
+    <div className="flex items-center gap-3">
+      <TaskIcon kind={kind} />
+      <h2 className="min-w-0 flex-1 text-lg font-bold leading-6">{title}</h2>
+      {badge}
+    </div>
+  );
 }

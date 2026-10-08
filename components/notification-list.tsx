@@ -7,6 +7,8 @@ import type { Viewer } from '@/lib/auth';
 import { formatDateTime } from '@/lib/dates';
 import { notificationText } from '@/lib/notification-text';
 import { cn } from '@/lib/cn';
+import { notificationTone } from '@/lib/notification-channels';
+import { Bell, CircleAlert, CircleCheck } from 'lucide-react';
 import type { Notification } from '@/lib/types';
 
 export async function NotificationList({ viewer }: { viewer: Viewer }) {
@@ -28,13 +30,22 @@ export async function NotificationList({ viewer }: { viewer: Viewer }) {
       <ul className="space-y-2">
         {items.map((n) => {
           const body = notificationText(n, t as never, (k) => tk(k as never), (k) => tp(k as never), locale);
+          const tone = notificationTone(n.kind);
+          const Icon = tone === 'urgent' ? CircleAlert : tone === 'good' ? CircleCheck : Bell;
           const inner = (
             <>
-              <p className={cn('text-[15px]', !n.read_at && 'font-bold')}>{body}</p>
-              <p className="mt-0.5 text-[13px] text-teks-redup">{formatDateTime(n.created_at, locale)}</p>
+              <span className={cn('flex size-9 shrink-0 items-center justify-center rounded-xl',
+                tone === 'urgent' ? 'bg-bahaya/10 text-bahaya' : tone === 'good' ? 'bg-sukses/10 text-sukses' : 'bg-nila-50 text-nila-800')}>
+                <Icon className="size-5" strokeWidth={2} aria-hidden />
+              </span>
+              <div className="min-w-0">
+                <p className={cn('text-[15px]', !n.read_at && 'font-bold')}>{body}</p>
+                <p className="mt-0.5 text-[13px] text-teks-redup">{formatDateTime(n.created_at, locale)}</p>
+              </div>
             </>
           );
-          const cls = cn('block rounded-2xl border bg-kertas p-3', n.read_at ? 'border-garis' : 'border-nila-300');
+          const cls = cn('flex gap-3 rounded-2xl border p-3',
+            n.read_at ? 'border-garis bg-kertas' : tone === 'urgent' ? 'border-bahaya/40 bg-bahaya/5' : 'border-nila-300 bg-kertas');
           return <li key={n.id}>{n.link ? <Link href={n.link} className={cls}>{inner}</Link> : <div className={cls}>{inner}</div>}</li>;
         })}
       </ul>

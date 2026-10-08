@@ -38,8 +38,9 @@ Versi Indonesia (opsional, untuk konteks lokal): *Ikatan yang menghasilkan.*
 
 ## 4. Logo
 
-### 4.1 Wordmark (logo utama) — "Satu Tarikan"
-Wordmark monoline "tali". Palang huruf **t** membentang melewati **a** dan **l**, lalu berakhir di **titik huruf i** yang berwarna limau. Titik itu adalah **simpul** — ujung tali yang mengikat. Satu tarikan dari awal sampai akhir = satu ikatan dari brief sampai pembayaran.
+### 4.1 Wordmark (logo utama)
+Wordmark monoline "tali". Palang huruf **t** dibuat pendek, dan huruf **l** punya ekor melengkung yang sama dengan **t**, supaya tidak terbaca "tati". Wordmark ditutup dengan **titik huruf i** berwarna limau: **simpul**, ujung tali yang mengikat dari brief sampai pembayaran.
+(Versi awal memakai palang t yang memanjang sampai titik i. Palang itu ikut menembus huruf l sehingga logo terbaca "tati", jadi diganti.)
 
 | File | Pemakaian |
 |---|---|

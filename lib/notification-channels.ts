@@ -21,3 +21,12 @@ export function channelsFor(kind: string): Channels {
   if (PUSH_ONLY.has(kind)) return { email: false, push: true };
   return { email: true, push: true };
 }
+
+/** Kinds that need the creator to act or signal a problem; shown in red. */
+export const URGENT_KINDS = ['submission_revision', 'submission_rejected', 'payout_failed', 'participation_cancelled', 'social_rejected', 'payout_due_soon'] as const;
+const GOOD_KINDS = new Set(['application_approved', 'submission_approved', 'post_confirmed', 'payout_ready', 'payout_transferred', 'social_verified', 'insight_approved']);
+
+export function notificationTone(kind: string): 'urgent' | 'good' | 'normal' {
+  if ((URGENT_KINDS as readonly string[]).includes(kind)) return 'urgent';
+  return GOOD_KINDS.has(kind) ? 'good' : 'normal';
+}

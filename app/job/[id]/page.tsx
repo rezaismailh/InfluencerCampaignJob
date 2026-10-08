@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getLocale, getTranslations } from 'next-intl/server';
-import { CalendarCheck, CalendarClock, ChevronDown, ChevronLeft, Lock, MapPin, Users, Wallet, type LucideIcon } from 'lucide-react';
+import { CalendarCheck, CalendarClock, ChevronDown, ChevronLeft, CircleCheck, Clapperboard, Clock, Info, Lock, MapPin, ShieldCheck, Users, Wallet, type LucideIcon } from 'lucide-react';
 import { ActionForm, FieldError } from '@/components/action-form';
 import { Alert } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
@@ -77,11 +77,13 @@ export default async function JobDetail({ params }: { params: Promise<{ id: stri
       </header>
 
       <Card className="space-y-3">
-        <div>
-          <p className="text-[13px] font-medium text-teks-redup">{t('fee')}</p>
-          <p className="text-[28px] font-extrabold leading-9 tabular">{job.fee_type === 'open' ? t('openRate') : fee}</p>
+        <div className="rounded-xl bg-nila-50 p-3">
+          <p className="text-[13px] font-medium text-teks-redup">
+            {job.fee_type === 'tier' ? t('feeByFollowers') : job.fee_type === 'open' ? t('feeOpen') : t('feeFixed')}
+          </p>
+          <p className="text-[28px] font-extrabold leading-9 text-nila-800 tabular">{job.fee_type === 'open' ? t('openRate') : fee}</p>
           {job.fee_type === 'open' && job.rate_cap && <p className="text-[15px] font-bold tabular">{t('rateCapShort', { amount: formatRupiah(job.rate_cap) })}</p>}
-          {job.platforms.length > 1 && <p className="text-[13px] text-teks-redup">{t('feeCombined')}</p>}
+          {job.platforms.length > 1 && <p className="mt-1 text-[13px] text-teks-redup">{t('feeCombined')}</p>}
         </div>
         {job.fee_type === 'tier' && (
           <div className="space-y-2">
@@ -101,10 +103,10 @@ export default async function JobDetail({ params }: { params: Promise<{ id: stri
           </div>
         )}
         <div className="flex flex-wrap gap-1.5">
-          <Badge tone="info">{tt(job.job_type)}</Badge>
+          <Badge tone={job.job_type === 'visit' ? 'warning' : 'success'}>{tt(job.job_type)}</Badge>
           {job.platforms.map((p) => <Badge key={p}>{tp(p)}</Badge>)}
         </div>
-        <ul className="space-y-2 border-t border-garis pt-3 text-[15px]">
+        <ul className="space-y-2.5 text-[15px]">
           <Fact icon={Wallet}>{await payoutLabel(job)}</Fact>
           {job.apply_deadline && <Fact icon={CalendarClock}>{t('applyDeadline', { date: formatDate(job.apply_deadline, locale) })}</Fact>}
           {job.content_deadline && <Fact icon={CalendarCheck}>{t('contentDeadline', { date: formatDate(job.content_deadline, locale) })}</Fact>}
@@ -113,30 +115,42 @@ export default async function JobDetail({ params }: { params: Promise<{ id: stri
       </Card>
 
       <Card className="space-y-3">
-        <h2 className="font-bold">{t('payment')}</h2>
+        <SectionTitle icon={Clock}>{t('payment')}</SectionTitle>
         <p className="text-[15px]">{pay.intro}</p>
-        <ul className="divide-y divide-garis rounded-xl bg-latar">
-          {pay.rows.map((row) => (
-            <li key={row.label} className="flex items-center justify-between gap-3 px-3 py-2 text-[15px]">
-              <span className="text-teks-redup">{row.label}</span>
-              <span className="shrink-0 font-bold">{row.value}</span>
-            </li>
-          ))}
+        <ul className="space-y-2 rounded-xl bg-latar p-2">
+          {pay.rows.map((row, i) => {
+            const Icon = i === 0 ? CircleCheck : CalendarClock;
+            return (
+              <li key={row.label} className="flex items-center gap-3 rounded-lg bg-kertas px-3 py-2.5">
+                <Icon className={cn('size-5 shrink-0', i === 0 ? 'text-sukses' : 'text-teks-redup')} strokeWidth={2} aria-hidden />
+                <div className="min-w-0">
+                  <p className="text-[13px] text-teks-redup">{row.label}</p>
+                  <p className="font-bold text-nila-800">{row.value}</p>
+                </div>
+              </li>
+            );
+          })}
         </ul>
-        <p className="text-[13px] text-teks-redup">{t('paymentTransfer')}</p>
+        <div className="flex gap-2 rounded-xl bg-nila-50 p-3 text-[13px] text-teks-redup">
+          <ShieldCheck className="size-5 shrink-0 text-nila-800" strokeWidth={2} aria-hidden />
+          <p>{t('paymentTransfer')}</p>
+        </div>
       </Card>
 
       <Card className="space-y-4">
-        <InfoRow title={t('deliverables')} body={job.deliverables} />
+        <div className="space-y-3">
+          <SectionTitle icon={Clapperboard}>{t('deliverables')}</SectionTitle>
+          <p className="whitespace-pre-line rounded-xl bg-latar p-3 text-[15px]">{job.deliverables}</p>
+        </div>
         {hasRequirements && (
           <div>
-            <h2 className="font-bold">{t('requirements')}</h2>
-            <ul className="mt-1 list-disc space-y-0.5 pl-5 text-[15px]">
-              {job.min_followers > 0 && <li>{t('minFollowers', { count: job.min_followers.toLocaleString('id-ID') })}</li>}
-              {job.tiers.length > 0 && <li>{t('tiers')}: {job.tiers.map((x) => (ttier.has(x) ? ttier(x) : x)).join(', ')}</li>}
-              {job.niches.length > 0 && <li>{t('niches')}: {job.niches.map((x) => tax.name('niche', x)).join(', ')}</li>}
-              {job.personas.length > 0 && <li>{t('personas')}: {job.personas.map((x) => tax.name('persona', x)).join(', ')}</li>}
-              {job.require_purchase_proof && <li>{t('purchaseProof')}</li>}
+            <h2 className="text-[13px] font-bold uppercase tracking-wide text-teks-redup">{t('requirements')}</h2>
+            <ul className="mt-2 space-y-1.5 text-[15px]">
+              {job.min_followers > 0 && <Check>{t('minFollowers', { count: job.min_followers.toLocaleString('id-ID') })}</Check>}
+              {job.tiers.length > 0 && <Check>{t('tiers')}: {job.tiers.map((x) => (ttier.has(x) ? ttier(x) : x)).join(', ')}</Check>}
+              {job.niches.length > 0 && <Check>{t('niches')}: {job.niches.map((x) => tax.name('niche', x)).join(', ')}</Check>}
+              {job.personas.length > 0 && <Check>{t('personas')}: {job.personas.map((x) => tax.name('persona', x)).join(', ')}</Check>}
+              {job.require_purchase_proof && <Check>{t('purchaseProof')}</Check>}
             </ul>
             {job.requirements && <p className="mt-2 whitespace-pre-line text-[15px]">{job.requirements}</p>}
           </div>
@@ -145,7 +159,7 @@ export default async function JobDetail({ params }: { params: Promise<{ id: stri
 
       <details className="group rounded-2xl border border-garis bg-kertas">
         <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 px-4 font-bold [&::-webkit-details-marker]:hidden">
-          {t('moreDetails')}
+          <span className="flex items-center gap-2"><Info className="size-5 text-nila-800" strokeWidth={2} aria-hidden /> {t('moreDetails')}</span>
           <ChevronDown className="size-5 transition-transform group-open:rotate-180" aria-hidden />
         </summary>
         <div className="space-y-4 border-t border-garis p-4">
@@ -320,8 +334,8 @@ export default async function JobDetail({ params }: { params: Promise<{ id: stri
             <>
               <label htmlFor="rate" className="block text-[15px] font-bold">{t('rate')}</label>
               <div className="flex gap-2">
-                <RupiahInput id="rate" name="rate" placeholder="250.000" required className="flex-1" />
-                <SubmitButton pendingLabel={t('joining')}>{t('join')}</SubmitButton>
+                <RupiahInput id="rate" name="rate" placeholder="250.000" required className="min-w-0 flex-1" />
+                <SubmitButton pendingLabel={t('joining')} className="shrink-0 whitespace-nowrap">{t('joinShort')}</SubmitButton>
               </div>
               <FieldError name="rate" />
               <p className="text-[13px] text-teks-redup">
@@ -345,8 +359,30 @@ export default async function JobDetail({ params }: { params: Promise<{ id: stri
 
 function Fact({ icon: Icon, children }: { icon: LucideIcon; children: React.ReactNode }) {
   return (
-    <li className="flex items-center gap-2">
-      <Icon className="size-5 shrink-0 text-nila-800" strokeWidth={2} aria-hidden />
+    <li className="flex items-center gap-3">
+      <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-latar">
+        <Icon className="size-4 text-nila-800" strokeWidth={2} aria-hidden />
+      </span>
+      <span>{children}</span>
+    </li>
+  );
+}
+
+function SectionTitle({ icon: Icon, children }: { icon: LucideIcon; children: React.ReactNode }) {
+  return (
+    <h2 className="flex items-center gap-2.5 text-lg font-bold">
+      <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-nila-50">
+        <Icon className="size-4 text-nila-800" strokeWidth={2} aria-hidden />
+      </span>
+      {children}
+    </h2>
+  );
+}
+
+function Check({ children }: { children: React.ReactNode }) {
+  return (
+    <li className="flex gap-2">
+      <CircleCheck className="mt-0.5 size-5 shrink-0 text-sukses" strokeWidth={2} aria-hidden />
       <span>{children}</span>
     </li>
   );

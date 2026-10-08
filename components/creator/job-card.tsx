@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import { getLocale, getTranslations } from 'next-intl/server';
+import { CalendarCheck, CalendarClock, Wallet, type LucideIcon } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { buttonClass } from '@/components/ui/button';
 import { BrandAvatar } from '@/components/brand-avatar';
 import { formatDate } from '@/lib/dates';
 import { formatRupiah } from '@/lib/money';
@@ -31,26 +33,40 @@ export async function JobCard({ job }: { job: Job | PublicJob }) {
   const tp = await getTranslations('platform');
   const tt = await getTranslations('jobType');
   const locale = await getLocale();
+  const feeKind = job.fee_type === 'tier' ? t('feeByFollowers') : job.fee_type === 'open' ? t('feeOpen') : t('feeFixed');
   return (
-    <Link href={`/job/${job.id}`} className="block rounded-2xl border border-garis bg-kertas p-4 hover:border-nila-300">
+    <Link href={`/job/${job.id}`} className="block space-y-3 rounded-2xl border border-garis bg-kertas p-4 hover:border-nila-300">
       <div className="flex items-start gap-3">
-        <BrandAvatar logo={job.brand_logo} icon={job.brand_icon} />
+        <BrandAvatar logo={job.brand_logo} icon={job.brand_icon} size={44} />
         <div className="min-w-0">
           <p className="text-[13px] font-medium text-teks-redup">{job.brand_name}</p>
-          <p className="font-bold">{job.title}</p>
+          <p className="font-bold leading-6">{job.title}</p>
         </div>
       </div>
-      <p className="mt-2 text-xl font-extrabold tabular">{job.fee_type === 'open' ? t('openRate') : await feeLabel(job)}</p>
-      {job.fee_type === 'open' && job.rate_cap && <p className="text-[13px] font-bold tabular">{t('rateCapShort', { amount: formatRupiah(job.rate_cap) })}</p>}
-      <div className="mt-2 flex flex-wrap gap-1.5">
-        <Badge tone="info">{tt(job.job_type)}</Badge>
+      <div className="flex flex-wrap gap-1.5">
+        <Badge tone={job.job_type === 'visit' ? 'warning' : 'success'}>{tt(job.job_type)}</Badge>
         {job.platforms.map((p) => <Badge key={p}>{tp(p)}</Badge>)}
       </div>
-      <ul className="mt-3 space-y-0.5 text-[13px] text-teks-redup">
-        <li>{await payoutLabel(job)}</li>
-        {job.apply_deadline && <li>{t('applyDeadline', { date: formatDate(job.apply_deadline, locale) })}</li>}
-        {job.content_deadline && <li>{t('contentDeadline', { date: formatDate(job.content_deadline, locale) })}</li>}
+      <div className="rounded-xl bg-latar p-3">
+        <p className="text-[13px] text-teks-redup">{feeKind}</p>
+        <p className="text-xl font-extrabold leading-7 tabular">{job.fee_type === 'open' ? t('openRate') : await feeLabel(job)}</p>
+        {job.fee_type === 'open' && job.rate_cap && <p className="text-[13px] font-bold tabular">{t('rateCapShort', { amount: formatRupiah(job.rate_cap) })}</p>}
+      </div>
+      <ul className="space-y-1 text-[13px] text-teks-redup">
+        <CardFact icon={Wallet}>{await payoutLabel(job)}</CardFact>
+        {job.apply_deadline && <CardFact icon={CalendarClock}>{t('applyDeadline', { date: formatDate(job.apply_deadline, locale) })}</CardFact>}
+        {job.content_deadline && <CardFact icon={CalendarCheck}>{t('contentDeadline', { date: formatDate(job.content_deadline, locale) })}</CardFact>}
       </ul>
+      <span className={buttonClass('primary', 'md', 'w-full')}>{t('seeDetail')}</span>
     </Link>
+  );
+}
+
+function CardFact({ icon: Icon, children }: { icon: LucideIcon; children: React.ReactNode }) {
+  return (
+    <li className="flex items-center gap-2">
+      <Icon className="size-4 shrink-0 text-nila-800" strokeWidth={2} aria-hidden />
+      <span>{children}</span>
+    </li>
   );
 }

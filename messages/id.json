@@ -285,7 +285,12 @@
     "paymentDaysPost": "Misal dikonfirmasi tayang {date}",
     "paymentDaysInsight": "Misal insight dikirim {date}",
     "feeYours": "Fee untukmu",
-    "rateCapShort": "Maksimal {amount}"
+    "rateCapShort": "Maksimal {amount}",
+    "feeFixed": "Fee",
+    "feeOpen": "Fee (kamu yang menentukan)",
+    "feeByFollowers": "Fee sesuai jumlah followers",
+    "seeDetail": "Lihat detail job",
+    "joinShort": "Daftar"
   },
   "work": {
     "title": "Kerjaan",
@@ -352,7 +357,16 @@
     "insightPhotos": "Screenshot insight",
     "insightPhotosHint": "Minimal 1 gambar.",
     "insightNote": "Catatan (opsional)",
-    "insightNotePlaceholder": "Contoh: reach 12rb, views 30rb"
+    "insightNotePlaceholder": "Contoh: reach 12rb, views 30rb",
+    "progressTitle": "Progres kerjaan",
+    "stepOf": "Langkah {n} dari {total}",
+    "nowStep": "Langkah sekarang",
+    "nextSteps": "Tahapan berikutnya",
+    "doneSteps": "Sudah selesai",
+    "insightLocked": "Bisa dikirim setelah postinganmu dikonfirmasi tayang.",
+    "versions": "{count, plural, one {# kiriman} other {# kiriman}}",
+    "needsRevision": "Perlu revisi, cek feedback di bawah",
+    "payoutFailedStep": "Transfer gagal, cek rekeningmu"
   },
   "balance": {
     "title": "Saldo",

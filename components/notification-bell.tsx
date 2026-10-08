@@ -2,6 +2,8 @@ import Link from 'next/link';
 import { Bell } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
 import type { Viewer } from '@/lib/auth';
+import { cn } from '@/lib/cn';
+import { URGENT_KINDS } from '@/lib/notification-channels';
 
 export async function NotificationBell({ viewer }: { viewer: Viewer }) {
   const t = await getTranslations('common');
@@ -9,11 +11,16 @@ export async function NotificationBell({ viewer }: { viewer: Viewer }) {
     .from('notifications')
     .select('id', { count: 'exact', head: true })
     .is('read_at', null);
+  // Red badge when something needs action (revision, failed payout); lime otherwise.
+  const { count: urgent } = count
+    ? await viewer.supabase.from('notifications').select('id', { count: 'exact', head: true }).is('read_at', null).in('kind', [...URGENT_KINDS])
+    : { count: 0 };
   return (
     <Link href="/notifikasi" className="relative inline-flex size-11 items-center justify-center rounded-full text-nila-800 hover:bg-nila-50" aria-label={t('notifications')}>
       <Bell className="size-6" strokeWidth={2} aria-hidden />
       {!!count && (
-        <span className="absolute right-1.5 top-1.5 min-w-5 rounded-full bg-limau-400 px-1 text-center text-[11px] font-bold leading-5 text-nila-800 tabular">
+        <span className={cn('absolute right-1.5 top-1.5 min-w-5 rounded-full px-1 text-center text-[11px] font-bold leading-5 tabular',
+          urgent ? 'bg-bahaya text-kertas' : 'bg-limau-400 text-nila-800')}>
           {count > 9 ? '9+' : count}
         </span>
       )}

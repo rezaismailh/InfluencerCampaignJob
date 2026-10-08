@@ -285,7 +285,12 @@
     "paymentDaysPost": "E.g. confirmed live on {date}",
     "paymentDaysInsight": "E.g. insights sent on {date}",
     "feeYours": "Your fee",
-    "rateCapShort": "Up to {amount}"
+    "rateCapShort": "Up to {amount}",
+    "feeFixed": "Fee",
+    "feeOpen": "Fee (you name it)",
+    "feeByFollowers": "Fee by follower count",
+    "seeDetail": "See job details",
+    "joinShort": "Apply"
   },
   "work": {
     "title": "Work",
@@ -352,7 +357,16 @@
     "insightPhotos": "Insight screenshots",
     "insightPhotosHint": "At least 1 image.",
     "insightNote": "Note (optional)",
-    "insightNotePlaceholder": "For example: reach 12K, views 30K"
+    "insightNotePlaceholder": "For example: reach 12K, views 30K",
+    "progressTitle": "Your progress",
+    "stepOf": "Step {n} of {total}",
+    "nowStep": "Current step",
+    "nextSteps": "Coming up",
+    "doneSteps": "Done",
+    "insightLocked": "You can send this once your post is confirmed live.",
+    "versions": "{count, plural, one {# submission} other {# submissions}}",
+    "needsRevision": "Needs a revision, see feedback below",
+    "payoutFailedStep": "Transfer failed, check your account"
   },
   "balance": {
     "title": "Balance",

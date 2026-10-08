@@ -15,6 +15,7 @@ import { ShareButton } from '@/components/share-button';
 import { applyToJob, respondInvite } from '@/app/(creator)/actions';
 import { getViewer, type Viewer } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
+import { loadTaxonomy } from '@/lib/taxonomy';
 import { formatDate } from '@/lib/dates';
 import { formatRupiah } from '@/lib/money';
 import type { Job, Participation, PublicJob, SocialAccount } from '@/lib/types';
@@ -47,7 +48,7 @@ export default async function JobDetail({ params }: { params: Promise<{ id: stri
   const tps = await getTranslations('participationStatus');
   const tn = await getTranslations('nav');
   const ttier = await getTranslations('tier');
-  const tper = await getTranslations('persona');
+  const tax = await loadTaxonomy();
   const locale = await getLocale();
 
   // Signed-in users read the job through RLS (full brief); guests get the teaser.
@@ -93,13 +94,14 @@ export default async function JobDetail({ params }: { params: Promise<{ id: stri
             <p>{t('briefLocked')}</p>
           </div>
         )}
-        {(job.requirements || job.min_followers > 0 || job.tiers.length > 0 || job.personas.length > 0) && (
+        {(job.requirements || job.min_followers > 0 || job.tiers.length > 0 || job.niches.length > 0 || job.personas.length > 0) && (
           <div>
             <h2 className="font-bold">{t('requirements')}</h2>
             <ul className="mt-1 list-disc space-y-0.5 pl-5 text-[15px]">
               {job.min_followers > 0 && <li>{t('minFollowers', { count: job.min_followers.toLocaleString('id-ID') })}</li>}
               {job.tiers.length > 0 && <li>{t('tiers')}: {job.tiers.map((x) => (ttier.has(x) ? ttier(x) : x)).join(', ')}</li>}
-              {job.personas.length > 0 && <li>{t('personas')}: {job.personas.map((x) => (tper.has(x) ? tper(x) : x)).join(', ')}</li>}
+              {job.niches.length > 0 && <li>{t('niches')}: {job.niches.map((x) => tax.name('niche', x)).join(', ')}</li>}
+              {job.personas.length > 0 && <li>{t('personas')}: {job.personas.map((x) => tax.name('persona', x)).join(', ')}</li>}
             </ul>
             {job.requirements && <p className="mt-2 whitespace-pre-line text-[15px]">{job.requirements}</p>}
           </div>

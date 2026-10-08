@@ -14,6 +14,7 @@ import { decideApplication, inviteCreator } from '@/app/admin/actions';
 import { requireStaff } from '@/lib/auth';
 import { realBrand, type BrandEmbed } from '@/lib/brand';
 import { formatRupiah } from '@/lib/money';
+import { loadTaxonomy } from '@/lib/taxonomy';
 import { latestByKind, timeline } from '@/lib/work';
 import type { Job, Participation, Profile, SocialAccount, Submission } from '@/lib/types';
 
@@ -29,6 +30,7 @@ export default async function AdminJob({ params }: { params: Promise<{ id: strin
   const tp = await getTranslations('platform');
   const tv = await getTranslations('verification');
   const tw = await getTranslations('work');
+  const tax = await loadTaxonomy();
 
   const { data: job } = await viewer.supabase.from('jobs').select('*, job_brands(real_name)').eq('id', id).maybeSingle<Job & { job_brands: BrandEmbed }>();
   if (!job) notFound();
@@ -73,6 +75,11 @@ export default async function AdminJob({ params }: { params: Promise<{ id: strin
                 <div>
                   <p className="font-bold">{r.profiles.full_name ?? r.profiles.email}</p>
                   <p className="text-[13px] text-teks-redup">{[r.profiles.city, r.profiles.email].filter(Boolean).join(' · ')}</p>
+                  {(r.profiles.categories.length > 0 || r.profiles.persona) && (
+                    <p className="text-[13px] text-teks-redup">
+                      {[...r.profiles.categories.map((k) => tax.name('niche', k)), r.profiles.persona && tax.name('persona', r.profiles.persona)].filter(Boolean).join(' · ')}
+                    </p>
+                  )}
                 </div>
                 <ul className="space-y-1">
                   {accs.map((a) => (

@@ -32,32 +32,11 @@
     "threads": "Threads",
     "x": "X"
   },
-  "category": {
-    "food": "Kuliner",
-    "beauty": "Kecantikan",
-    "fashion": "Fashion",
-    "lifestyle": "Lifestyle",
-    "tech": "Teknologi",
-    "travel": "Travel",
-    "parenting": "Parenting",
-    "gaming": "Gaming",
-    "health": "Kesehatan",
-    "finance": "Keuangan",
-    "education": "Edukasi",
-    "entertainment": "Hiburan"
-  },
-  "persona": {
-    "genz": "Gen Z",
-    "student": "Pelajar/mahasiswa",
-    "foodies": "Foodies",
-    "lifestyle": "Lifestyle",
-    "parent": "Orang tua",
-    "professional": "Profesional",
-    "other": "Lainnya"
-  },
   "tier": {
-    "nano": "Nano",
-    "micro": "Micro"
+    "nano": "Nano (1rb–10rb)",
+    "micro": "Micro (10rb–100rb)",
+    "macro": "Macro (100rb–1jt)",
+    "mega": "Mega (>1jt)"
   },
   "verification": {
     "pending": "Menunggu verifikasi",
@@ -160,7 +139,8 @@
     "social": "Akun sosial",
     "payouts": "Pencairan",
     "clients": "Klien",
-    "holidays": "Hari libur"
+    "holidays": "Hari libur",
+    "taxonomy": "Niche & persona"
   },
   "onboarding": {
     "title": "Lengkapi profilmu",
@@ -171,7 +151,7 @@
     "phone": "Nomor HP (WhatsApp)",
     "phoneHint": "Dipakai tim Tali untuk konfirmasi job dan pencairan. Hanya terlihat oleh tim Tali.",
     "city": "Kota/kabupaten",
-    "categories": "Kategori konten",
+    "categories": "Niche konten",
     "categoriesHint": "Pilih maksimal 3.",
     "persona": "Persona",
     "address": "Alamat pengiriman",
@@ -280,7 +260,8 @@
     "pendingAccountNote": "Akun media sosialmu sedang diverifikasi. Kamu tetap bisa daftar sekarang; tim Tali memverifikasinya saat menyeleksi pelamar.",
     "shareText": "Ada campaign {title} dari {brand} di Tali, fee {fee}. Cek detailnya:",
     "followersBelowMin": "Job ini butuh minimal {min} followers, sedangkan akun {platform} kamu tercatat {count}. Kalau sudah bertambah, perbarui angkanya dulu.",
-    "updateFollowersCta": "Perbarui followers"
+    "updateFollowersCta": "Perbarui followers",
+    "niches": "Niche"
   },
   "work": {
     "title": "Kerjaan",
@@ -470,7 +451,8 @@
       "brandDisplayReal": "Tampilkan nama asli",
       "brandAlias": "Label samaran",
       "brandAliasHint": "Tampil ke publik dan pelamar. Nama asli terlihat setelah creator diundang atau diterima. Jangan tulis nama brand di judul, produk, deliverable, brief, syarat, atau lokasi.",
-      "brandAliasPlaceholder": "Brand snack nasional"
+      "brandAliasPlaceholder": "Brand snack nasional",
+      "niches": "Target niche"
     },
     "applicants": "Pelamar",
     "participants": "Creator bergabung",
@@ -545,7 +527,19 @@
     "brandShownAs": "{real} · tampil sebagai “{alias}”",
     "acceptVerifies": "Menerima pelamar ini sekaligus memverifikasi akunnya. Buka link profilnya dulu untuk mengecek.",
     "cannotAccept": "Belum bisa diterima: akun di platform job ini ditolak, belum ada, atau followers-nya di bawah syarat.",
-    "socialQueueHint": "Tidak wajib memverifikasi semua akun. Akun pelamar otomatis terverifikasi saat kamu menerima lamarannya."
+    "socialQueueHint": "Tidak wajib memverifikasi semua akun. Akun pelamar otomatis terverifikasi saat kamu menerima lamarannya.",
+    "taxonomyTitle": "Niche & persona",
+    "taxonomyHint": "Pilihan niche dan persona untuk profil creator dan target job. Nonaktifkan yang tidak dipakai; data lama tetap menampilkan labelnya.",
+    "niches": "Niche",
+    "personas": "Persona",
+    "addNiche": "Tambah niche",
+    "addPersona": "Tambah persona",
+    "labelId": "Label (Indonesia)",
+    "labelEn": "Label (English, opsional)",
+    "sortOrder": "Urutan",
+    "inactive": "Nonaktif",
+    "activeLabel": "Aktif (muncul di pilihan)",
+    "add": "Tambah"
   },
   "errors": {
     "generic": "Ada yang belum berhasil. Coba lagi sebentar lagi.",

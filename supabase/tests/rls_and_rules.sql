@@ -330,3 +330,17 @@ select tests.act_as('00000000-0000-0000-0000-00000000000a');
 update public.profiles set app_installed_at = now() where id = auth.uid();
 select tests.check((select app_installed_at is not null from public.profiles where id = auth.uid()), 'app install recorded');
 reset role;
+
+-- Taxonomy: curators manage niches/personas; others only read active items ----------
+set role authenticated;
+select tests.act_as('00000000-0000-0000-0000-000000000002');
+insert into public.taxonomy (kind, key, label_id) values ('niche', 'otomotif', 'Otomotif');
+update public.taxonomy set active = false where kind = 'niche' and key = 'gaming';
+select tests.act_as('00000000-0000-0000-0000-00000000000a');
+select tests.check((select count(*) = 12 from public.taxonomy where kind = 'niche'), 'creator sees active niches only');
+select tests.expect_error($$insert into public.taxonomy (kind, key, label_id) values ('niche', 'x', 'X')$$, 'row-level security');
+reset role;
+set role anon;
+select tests.check((select count(*) > 0 from public.taxonomy where kind = 'persona'), 'guests can read personas');
+select tests.check((select niches = '{}' from public.public_open_jobs() limit 1), 'teaser has niches');
+reset role;

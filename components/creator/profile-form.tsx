@@ -5,13 +5,12 @@ import { SubmitButton } from '@/components/ui/submit-button';
 import { saveProfile } from '@/app/(creator)/actions';
 import { RegionSelect } from '@/components/creator/region-select';
 import { decrypt } from '@/lib/crypto';
+import { loadTaxonomy } from '@/lib/taxonomy';
 import { provinceOf } from '@/lib/wilayah';
 import { SocialList } from '@/components/creator/social-list';
 import { SocialRows } from '@/components/creator/social-rows';
 import type { Profile, SocialAccount } from '@/lib/types';
 
-const CATEGORIES = ['food', 'beauty', 'fashion', 'lifestyle', 'tech', 'travel', 'parenting', 'gaming', 'health', 'finance', 'education', 'entertainment'];
-const PERSONAS = ['genz', 'student', 'foodies', 'lifestyle', 'parent', 'professional', 'other'];
 
 /**
  * Personal details and social accounts in one form with one button at the bottom.
@@ -24,8 +23,7 @@ export async function ProfileForm({ profile, accounts, mode, next }: {
   next?: string | null;
 }) {
   const t = await getTranslations('onboarding');
-  const tc = await getTranslations('category');
-  const tp = await getTranslations('persona');
+  const tax = await loadTaxonomy();
   const c = await getTranslations('common');
   const ts = await getTranslations('social');
   const onboarding = mode === 'onboarding';
@@ -46,10 +44,10 @@ export async function ProfileForm({ profile, accounts, mode, next }: {
         <legend className="text-[15px] font-bold">{t('categories')}</legend>
         <p className="text-[13px] text-teks-redup">{t('categoriesHint')}</p>
         <div className="flex flex-wrap gap-2">
-          {CATEGORIES.map((key) => (
+          {tax.choices('niche', profile.categories).map(({ value: key, label }) => (
             <label key={key} className="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-full border border-garis bg-kertas px-3 has-[:checked]:border-nila-800 has-[:checked]:bg-nila-50">
               <input type="checkbox" name="categories" value={key} defaultChecked={profile.categories.includes(key)} className="accent-nila-800" />
-              <span className="text-[15px]">{tc(key)}</span>
+              <span className="text-[15px]">{label}</span>
             </label>
           ))}
         </div>
@@ -58,7 +56,7 @@ export async function ProfileForm({ profile, accounts, mode, next }: {
       <Field label={t('persona')} htmlFor="persona">
         <Select id="persona" name="persona" defaultValue={profile.persona ?? ''}>
           <option value="">{c('none')}</option>
-          {PERSONAS.map((key) => <option key={key} value={key}>{tp(key)}</option>)}
+          {tax.choices('persona', profile.persona ? [profile.persona] : []).map(({ value, label }) => <option key={value} value={value}>{label}</option>)}
         </Select>
       </Field>
       <Field label={<>{t('address')} <span className="font-medium text-teks-redup">({c('optional')})</span></>} hint={t('addressHint')} htmlFor="address">

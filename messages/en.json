@@ -32,32 +32,11 @@
     "threads": "Threads",
     "x": "X"
   },
-  "category": {
-    "food": "Food",
-    "beauty": "Beauty",
-    "fashion": "Fashion",
-    "lifestyle": "Lifestyle",
-    "tech": "Tech",
-    "travel": "Travel",
-    "parenting": "Parenting",
-    "gaming": "Gaming",
-    "health": "Health",
-    "finance": "Finance",
-    "education": "Education",
-    "entertainment": "Entertainment"
-  },
-  "persona": {
-    "genz": "Gen Z",
-    "student": "Student",
-    "foodies": "Foodies",
-    "lifestyle": "Lifestyle",
-    "parent": "Parent",
-    "professional": "Professional",
-    "other": "Other"
-  },
   "tier": {
-    "nano": "Nano",
-    "micro": "Micro"
+    "nano": "Nano (1K–10K)",
+    "micro": "Micro (10K–100K)",
+    "macro": "Macro (100K–1M)",
+    "mega": "Mega (1M+)"
   },
   "verification": {
     "pending": "Awaiting verification",
@@ -160,7 +139,8 @@
     "social": "Social accounts",
     "payouts": "Payouts",
     "clients": "Clients",
-    "holidays": "Holidays"
+    "holidays": "Holidays",
+    "taxonomy": "Niches & personas"
   },
   "onboarding": {
     "title": "Complete your profile",
@@ -171,7 +151,7 @@
     "phone": "Phone number (WhatsApp)",
     "phoneHint": "Used by the Tali team to confirm jobs and payouts. Only the Tali team can see it.",
     "city": "City/regency",
-    "categories": "Content categories",
+    "categories": "Content niches",
     "categoriesHint": "Pick up to 3.",
     "persona": "Persona",
     "address": "Shipping address",
@@ -280,7 +260,8 @@
     "pendingAccountNote": "Your social media account is being verified. You can still apply now; the Tali team verifies it while reviewing applicants.",
     "shareText": "There's a {title} campaign from {brand} on Tali, fee {fee}. See the details:",
     "followersBelowMin": "This job needs at least {min} followers; your {platform} account shows {count}. If it has grown, update the number first.",
-    "updateFollowersCta": "Update followers"
+    "updateFollowersCta": "Update followers",
+    "niches": "Niches"
   },
   "work": {
     "title": "Work",
@@ -470,7 +451,8 @@
       "brandDisplayReal": "Show the real name",
       "brandAlias": "Alias",
       "brandAliasHint": "Shown publicly and to applicants. The real name appears once a creator is invited or accepted. Don't write the brand name in the title, product, deliverables, brief, requirements or locations.",
-      "brandAliasPlaceholder": "National snack brand"
+      "brandAliasPlaceholder": "National snack brand",
+      "niches": "Target niches"
     },
     "applicants": "Applicants",
     "participants": "Joined creators",
@@ -545,7 +527,19 @@
     "brandShownAs": "{real} · shown as “{alias}”",
     "acceptVerifies": "Accepting this applicant also verifies their account. Open the profile link first to check it.",
     "cannotAccept": "Can't be accepted yet: the account on this job's platform is rejected, missing, or below the follower minimum.",
-    "socialQueueHint": "You don't have to verify every account. An applicant's account is verified automatically when you accept them."
+    "socialQueueHint": "You don't have to verify every account. An applicant's account is verified automatically when you accept them.",
+    "taxonomyTitle": "Niches & personas",
+    "taxonomyHint": "Niche and persona choices for creator profiles and job targets. Deactivate the ones you no longer use; existing data keeps its label.",
+    "niches": "Niches",
+    "personas": "Personas",
+    "addNiche": "Add niche",
+    "addPersona": "Add persona",
+    "labelId": "Label (Indonesian)",
+    "labelEn": "Label (English, optional)",
+    "sortOrder": "Order",
+    "inactive": "Inactive",
+    "activeLabel": "Active (shown in pickers)",
+    "add": "Add"
   },
   "errors": {
     "generic": "Something didn't work. Try again in a moment.",

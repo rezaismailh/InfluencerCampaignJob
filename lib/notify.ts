@@ -3,6 +3,7 @@ import { createTranslator } from 'next-intl';
 import webpush from 'web-push';
 import messages from '@/messages/id.json';
 import { createAdminClient } from './supabase/admin';
+import { channelsFor } from './notification-channels';
 import { notificationText } from './notification-text';
 
 type Pending = {
@@ -48,9 +49,6 @@ async function sendEmail(to: string, subject: string, body: string, url: string,
  * Sends email and web push for notifications not delivered yet, then marks them.
  * In-app notifications need nothing: they are read straight from the table.
  */
-// Low-urgency notices: shown in the app only, no email or push.
-const IN_APP_ONLY = new Set(['followers_updated', 'followers_stale']);
-
 export async function deliverPending(limit = 50) {
   const admin = createAdminClient();
   const { data, error } = await admin
@@ -71,16 +69,13 @@ export async function deliverPending(limit = 50) {
   for (const n of data) {
     const body = notificationText(n, t as never, tKind as never, tPlatform as never);
     const url = `${site()}${n.link ?? '/notifikasi'}`;
-    if (IN_APP_ONLY.has(n.kind)) {
-      await admin.from('notifications').update({ delivered_at: new Date().toISOString() }).eq('id', n.id);
-      continue;
-    }
+    const channels = channelsFor(n.kind);
     try {
-      if (n.profiles?.email) await sendEmail(n.profiles.email, t('emailSubject'), body, url, t('emailOpen'));
+      if (channels.email && n.profiles?.email) await sendEmail(n.profiles.email, t('emailSubject'), body, url, t('emailOpen'));
     } catch {
       // Email failure must not block push or the in-app copy.
     }
-    if (canPush) {
+    if (canPush && channels.push) {
       const { data: subs } = await admin.from('push_subscriptions').select('id, endpoint, p256dh, auth').eq('user_id', n.user_id);
       for (const s of subs ?? []) {
         try {

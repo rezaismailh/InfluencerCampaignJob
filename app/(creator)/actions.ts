@@ -13,8 +13,6 @@ import { PLATFORMS, postMatchesAccounts, profileFromInput, type Platform } from 
 import { isValidRegion } from '@/lib/wilayah';
 import { dbErrorKey, type ActionState } from '@/lib/action-state';
 
-const CATEGORIES = ['food', 'beauty', 'fashion', 'lifestyle', 'tech', 'travel', 'parenting', 'gaming', 'health', 'finance', 'education', 'entertainment'];
-const PERSONAS = ['genz', 'student', 'foodies', 'lifestyle', 'parent', 'professional', 'other'];
 
 const text = (v: FormDataEntryValue | null) => (typeof v === 'string' ? v.trim() : '');
 
@@ -30,8 +28,8 @@ const profileSchema = z.object({
   phone: z.string().regex(/^\+?[0-9]{8,15}$/),
   province: z.string().min(1),
   city: z.string().min(1),
-  categories: z.array(z.enum(CATEGORIES)).max(3),
-  persona: z.enum(PERSONAS).nullable(),
+  categories: z.array(z.string()).max(3),
+  persona: z.string().nullable(),
   address: z.string().max(500),
 });
 
@@ -72,8 +70,14 @@ export async function saveProfile(_prev: ActionState, formData: FormData): Promi
       const key = String(issue.path[0]);
       problems[key] = key === 'categories' ? 'max_categories' : issue.code === 'too_small' && Number(issue.minimum) <= 2 ? 'required' : 'invalid';
     }
-  } else if (!isValidRegion(parsed.data.province, parsed.data.city)) {
-    problems.city = 'required';
+  } else {
+    if (!isValidRegion(parsed.data.province, parsed.data.city)) problems.city = 'required';
+    // Niches/personas must exist in the managed list (active, or already on the profile).
+    const { data: tax } = await viewer.supabase.from('taxonomy').select('kind, key');
+    const known = (kind: string, key: string) => (tax ?? []).some((x) => x.kind === kind && x.key === key);
+    const p = viewer.profile;
+    if (parsed.data.categories.some((k) => !known('niche', k) && !p.categories.includes(k))) problems.categories = 'invalid';
+    if (parsed.data.persona && !known('persona', parsed.data.persona) && parsed.data.persona !== p.persona) problems.persona = 'invalid';
   }
   // New social accounts, one row per social_<field>_<index>; fully empty rows are ignored.
   const rowKeys: string[] = [];

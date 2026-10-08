@@ -9,6 +9,7 @@ import { encrypt } from '@/lib/crypto';
 import { parseRupiah } from '@/lib/money';
 import { deliverPending } from '@/lib/notify';
 import { parseProfileUrl, postMatchesAccounts } from '@/lib/social';
+import { isValidRegion } from '@/lib/wilayah';
 import { dbErrorKey, type ActionState } from '@/lib/action-state';
 
 const CATEGORIES = ['food', 'beauty', 'fashion', 'lifestyle', 'tech', 'travel', 'parenting', 'gaming', 'health', 'finance', 'education', 'entertainment'];
@@ -26,7 +27,8 @@ function deliverLater() {
 const profileSchema = z.object({
   full_name: z.string().min(2).max(100),
   phone: z.string().regex(/^\+?[0-9]{8,15}$/),
-  city: z.string().min(2).max(80),
+  province: z.string().min(1),
+  city: z.string().min(1),
   categories: z.array(z.enum(CATEGORIES)).max(3),
   persona: z.enum(PERSONAS).nullable(),
   address: z.string().max(500),
@@ -37,6 +39,7 @@ export async function saveProfile(_prev: ActionState, formData: FormData): Promi
   const parsed = profileSchema.safeParse({
     full_name: text(formData.get('full_name')),
     phone: text(formData.get('phone')).replace(/[\s-]/g, ''),
+    province: text(formData.get('province')),
     city: text(formData.get('city')),
     categories: formData.getAll('categories').map(String),
     persona: text(formData.get('persona')) || null,
@@ -46,14 +49,16 @@ export async function saveProfile(_prev: ActionState, formData: FormData): Promi
     const fields: Record<string, string> = {};
     for (const issue of parsed.error.issues) {
       const key = String(issue.path[0]);
-      fields[key] = key === 'categories' ? 'max_categories' : issue.code === 'too_small' && issue.minimum === 2 ? 'required' : 'invalid';
+      fields[key] = key === 'categories' ? 'max_categories' : issue.code === 'too_small' && Number(issue.minimum) <= 2 ? 'required' : 'invalid';
     }
     return { error: 'invalid', fields };
   }
   const d = parsed.data;
+  if (!isValidRegion(d.province, d.city)) return { error: 'invalid', fields: { city: 'required' } };
   const { error } = await viewer.supabase.from('profiles').update({
     full_name: d.full_name,
     phone_enc: encrypt(d.phone),
+    province: d.province,
     city: d.city,
     categories: d.categories,
     persona: d.persona,

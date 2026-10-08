@@ -43,7 +43,9 @@ export default async function Onboarding({ searchParams }: { searchParams: Promi
       </section>
 
       <section className="mt-10 space-y-3">
-        <p className="text-[15px] text-teks-redup">{t('finishHint')}</p>
+        <p className="text-[15px] text-teks-redup">
+          {!profileDone ? t('finishNeedProfile') : !accounts?.length ? t('needSocial') : t('finishHint')}
+        </p>
         <ActionForm action={finishOnboarding}>
           {next && <input type="hidden" name="next" value={next} />}
           <SubmitButton className="w-full" disabled={!profileDone || !accounts?.length}>{t('finish')}</SubmitButton>

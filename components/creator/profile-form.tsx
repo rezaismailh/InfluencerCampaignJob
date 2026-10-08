@@ -3,7 +3,9 @@ import { ActionForm, FieldError } from '@/components/action-form';
 import { Field, Input, Select, Textarea } from '@/components/ui/field';
 import { SubmitButton } from '@/components/ui/submit-button';
 import { saveProfile } from '@/app/(creator)/actions';
+import { RegionSelect } from '@/components/creator/region-select';
 import { decrypt } from '@/lib/crypto';
+import { provinceOf } from '@/lib/wilayah';
 import type { Profile } from '@/lib/types';
 
 const CATEGORIES = ['food', 'beauty', 'fashion', 'lifestyle', 'tech', 'travel', 'parenting', 'gaming', 'health', 'finance', 'education', 'entertainment'];
@@ -25,10 +27,7 @@ export async function ProfileForm({ profile }: { profile: Profile }) {
           defaultValue={decrypt(profile.phone_enc) ?? ''} required />
         <FieldError name="phone" />
       </Field>
-      <Field label={t('city')} htmlFor="city">
-        <Input id="city" name="city" autoComplete="address-level2" defaultValue={profile.city ?? ''} required />
-        <FieldError name="city" />
-      </Field>
+      <RegionSelect province={profile.province ?? provinceOf(profile.city)} city={profile.city} />
       <fieldset className="space-y-1.5">
         <legend className="text-[15px] font-bold">{t('categories')}</legend>
         <p className="text-[13px] text-teks-redup">{t('categoriesHint')}</p>

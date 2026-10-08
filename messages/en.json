@@ -170,7 +170,7 @@
     "fullName": "Full name",
     "phone": "Phone number (WhatsApp)",
     "phoneHint": "Used by the Tali team to confirm jobs and payouts. Only the Tali team can see it.",
-    "city": "City",
+    "city": "City/regency",
     "categories": "Content categories",
     "categoriesHint": "Pick up to 3.",
     "persona": "Persona",
@@ -181,7 +181,12 @@
     "socialHint": "Paste your profile link. The username is read from the link.",
     "needSocial": "Add at least one social media account.",
     "finish": "Done, show me jobs",
-    "finishHint": "You can apply to jobs once at least one account is verified by the Tali team."
+    "finishHint": "The Tali team will verify your account. Meanwhile you can already browse and apply to jobs.",
+    "province": "Province",
+    "provincePlaceholder": "Choose a province",
+    "cityPlaceholder": "Choose a city/regency",
+    "cityPickProvince": "Choose a province first",
+    "finishNeedProfile": "Save your details in step 1 first (Save profile button), then you can tap the button below."
   },
   "social": {
     "title": "Social media accounts",

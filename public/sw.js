@@ -1,6 +1,7 @@
 // Tali service worker: app shell cache, offline fallback and web push.
-const VERSION = 'tali-v1';
-const SHELL = ['/offline', '/manifest.webmanifest', '/icons/icon-192.png', '/brand/tali-wordmark-dark-bg.svg'];
+// Bump when shell files change; activate() deletes caches from older versions.
+const VERSION = 'tali-v2';
+const SHELL = ['/offline', '/manifest.webmanifest', '/icons/icon-192.png', '/brand/tali-wordmark-dark-bg.svg?v=2'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(VERSION).then((cache) => cache.addAll(SHELL)).then(() => self.skipWaiting()));
@@ -20,13 +21,27 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
 
-  // Static assets: cache first. Pages: network first, last copy or /offline when offline.
-  if (url.pathname.startsWith('/_next/static/') || url.pathname.startsWith('/icons/') || url.pathname.startsWith('/brand/')) {
+  // Hashed Next.js assets never change: cache first. Logos and icons keep their names when
+  // updated, so serve the cached copy but refresh it in the background (stale-while-revalidate).
+  if (url.pathname.startsWith('/_next/static/')) {
     event.respondWith(
       caches.match(request).then((hit) => hit || fetch(request).then((res) => {
         const copy = res.clone();
         caches.open(VERSION).then((cache) => cache.put(request, copy));
         return res;
+      })),
+    );
+    return;
+  }
+  if (url.pathname.startsWith('/icons/') || url.pathname.startsWith('/brand/')) {
+    event.respondWith(
+      caches.open(VERSION).then((cache) => cache.match(request).then((hit) => {
+        const fresh = fetch(request).then((res) => {
+          if (res.ok) cache.put(request, res.clone());
+          return res;
+        });
+        if (hit) { event.waitUntil(fresh.catch(() => undefined)); return hit; }
+        return fresh;
       })),
     );
     return;

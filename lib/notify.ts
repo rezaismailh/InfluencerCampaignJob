@@ -48,8 +48,8 @@ async function sendEmail(to: string, subject: string, body: string, url: string,
  * Sends email and web push for notifications not delivered yet, then marks them.
  * In-app notifications need nothing: they are read straight from the table.
  */
-// Frequent, low-urgency updates for staff: shown in the app only, no email or push.
-const IN_APP_ONLY = new Set(['followers_updated']);
+// Low-urgency notices: shown in the app only, no email or push.
+const IN_APP_ONLY = new Set(['followers_updated', 'followers_stale']);
 
 export async function deliverPending(limit = 50) {
   const admin = createAdminClient();

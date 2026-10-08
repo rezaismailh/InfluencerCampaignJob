@@ -1,5 +1,6 @@
 -- Follower updates: creators update their count through a function that
--- tells the Tali team, and a daily reminder nudges counts not updated in 90 days.
+-- tells the Tali team, and a quiet in-app reminder (at most once every 90 days)
+-- nudges counts not updated in 90 days.
 
 alter table public.social_accounts
   add column followers_updated_at timestamptz not null default now(),
@@ -88,19 +89,20 @@ begin
       and due_date <= public.add_business_days(public.today_wib(), 1);
   end if;
 
-  -- Follower counts not updated for 90 days: remind the creator, at most every 30 days.
+  -- Follower counts not updated for 90 days: one gentle in-app reminder per creator
+  -- (all their stale accounts together), repeated at most every 90 days.
   for r in
-    select sa.id, sa.creator_id, sa.username, sa.platform
+    select sa.creator_id, string_agg('@' || sa.username, ', ' order by sa.username) as accounts
     from public.social_accounts sa
     join public.profiles p on p.id = sa.creator_id and p.onboarded_at is not null
     where sa.status <> 'rejected'
       and sa.followers_updated_at < now() - interval '90 days'
-      and (sa.followers_reminded_at is null or sa.followers_reminded_at < now() - interval '30 days')
-    for update of sa
+      and (sa.followers_reminded_at is null or sa.followers_reminded_at < now() - interval '90 days')
+    group by sa.creator_id
   loop
-    perform public.notify(r.creator_id, 'followers_stale',
-      jsonb_build_object('username', r.username, 'platform', r.platform), '/profil#field-social');
-    update public.social_accounts set followers_reminded_at = now() where id = r.id;
+    perform public.notify(r.creator_id, 'followers_stale', jsonb_build_object('accounts', r.accounts), '/profil#field-social');
+    update public.social_accounts set followers_reminded_at = now()
+    where creator_id = r.creator_id and status <> 'rejected' and followers_updated_at < now() - interval '90 days';
     v_stale := v_stale + 1;
   end loop;
 

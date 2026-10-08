@@ -412,7 +412,7 @@
     "emailSubject": "An update from Tali",
     "emailOpen": "Open Tali",
     "followers_updated": "{name} updated {platform} @{username} followers: {old} → {new}. Recheck the number.",
-    "followers_stale": "Your {platform} @{username} follower count hasn't been updated in 3 months. Update it so you can apply to jobs that fit."
+    "followers_stale": "Your follower count for {accounts} hasn't been updated in 3 months. If it has changed, update it in your Profile so the jobs you see fit."
   },
   "admin": {
     "title": "Tali admin",

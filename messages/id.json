@@ -412,7 +412,7 @@
     "emailSubject": "Kabar terbaru dari Tali",
     "emailOpen": "Buka Tali",
     "followers_updated": "{name} memperbarui followers {platform} @{username}: {old} → {new}. Cek ulang angkanya.",
-    "followers_stale": "Sudah 3 bulan followers {platform} @{username} belum diperbarui. Perbarui angkanya supaya kamu bisa daftar ke job yang syaratnya pas."
+    "followers_stale": "Sudah 3 bulan angka followers {accounts} belum diperbarui. Kalau sudah berubah, perbarui di Profil supaya job yang tampil sesuai."
   },
   "admin": {
     "title": "Admin Tali",

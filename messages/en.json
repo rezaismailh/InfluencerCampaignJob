@@ -261,7 +261,13 @@
     "shareText": "There's a {title} campaign from {brand} on Tali, fee {fee}. See the details:",
     "followersBelowMin": "This job needs at least {min} followers; your {platform} account shows {count}. If it has grown, update the number first.",
     "updateFollowersCta": "Update followers",
-    "niches": "Niches"
+    "niches": "Niches",
+    "feeRange": "{min} – {max}",
+    "tierBasisPrimaryNote": "Your tier is based on your {platform} followers.",
+    "tierBasisLargestNote": "Your tier is based on your largest account on this job's platforms.",
+    "needPrimaryAccount": "This job sets the tier from your {platform} account. Add your {platform} account first.",
+    "tierNotOffered": "Your tier ({tier}) isn't included in this job.",
+    "yourTierFee": "Your fee: <b>{fee}</b> ({tier})"
   },
   "work": {
     "title": "Work",
@@ -452,7 +458,16 @@
       "brandAlias": "Alias",
       "brandAliasHint": "Shown publicly and to applicants. The real name appears once a creator is invited or accepted. Don't write the brand name in the title, product, deliverables, brief, requirements or locations.",
       "brandAliasPlaceholder": "National snack brand",
-      "niches": "Target niches"
+      "niches": "Target niches",
+      "feeTier": "Per tier",
+      "tierFees": "Fee per tier",
+      "tierFeesHint": "Used when the fee type is Per tier. Fill in only the tiers you offer; leave the rest empty.",
+      "tierBasis": "Tier based on",
+      "tierBasisHint": "Matters for multi-platform jobs.",
+      "tierBasisLargest": "Largest account on the job's platforms",
+      "tierBasisPrimary": "Followers on the main platform",
+      "primaryPlatform": "Main platform",
+      "primaryPlatformNone": "—"
     },
     "applicants": "Applicants",
     "participants": "Joined creators",
@@ -539,7 +554,9 @@
     "sortOrder": "Order",
     "inactive": "Inactive",
     "activeLabel": "Active (shown in pickers)",
-    "add": "Add"
+    "add": "Add",
+    "tierFeeHint": "From the {tier} tier fee. You can change it.",
+    "inviteTierFeeHint": "Leave empty to use the fee for the creator's tier."
   },
   "errors": {
     "generic": "Something didn't work. Try again in a moment.",
@@ -595,7 +612,10 @@
     "brand_in_text": "The real brand name is still written here. Remove it so the alias doesn't leak.",
     "incomplete": "Some details are missing. Please complete:",
     "platform_mismatch": "This link isn't from the selected platform. Change the platform or paste a matching link.",
-    "social_duplicate": "One of these social accounts is already registered on Tali. Contact the Tali team if it's yours."
+    "social_duplicate": "One of these social accounts is already registered on Tali. Contact the Tali team if it's yours.",
+    "tier_fee_required": "Enter a fee for at least one tier.",
+    "primary_platform_required": "Pick a main platform that is one of the job's platforms.",
+    "tier_not_offered": "Your tier isn't included in this job."
   },
   "success": {
     "saved": "Saved.",

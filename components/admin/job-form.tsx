@@ -99,6 +99,7 @@ export async function JobForm({ job, realBrand, clients }: { job?: Job; realBran
           <Select id="fee_type" name="fee_type" defaultValue={job?.fee_type ?? 'fixed'}>
             <option value="fixed">{t('feeFixed')}</option>
             <option value="open">{t('feeOpen')}</option>
+            <option value="tier">{t('feeTier')}</option>
           </Select>
         </Field>
         <Field label={t('fee')} htmlFor="fee">
@@ -119,6 +120,35 @@ export async function JobForm({ job, realBrand, clients }: { job?: Job; realBran
           </Select>
         </Field>
       </div>
+
+      <fieldset className="space-y-3 rounded-2xl border border-garis p-4">
+        <legend className="px-1 text-[15px] font-bold">{t('tierFees')}</legend>
+        <p className="text-[13px] text-teks-redup">{t('tierFeesHint')}</p>
+        <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-4">
+          {TIERS.map((tier) => (
+            <Field key={tier} label={ttier(tier)} htmlFor={`tier_fee_${tier}`}>
+              <Input id={`tier_fee_${tier}`} name={`tier_fee_${tier}`} inputMode="numeric" className="tabular"
+                defaultValue={job?.tier_fees?.[tier] ?? ''} placeholder="—" />
+            </Field>
+          ))}
+        </div>
+        <FieldError name="tier_fees" />
+        <div className="grid gap-3 md:grid-cols-2">
+          <Field label={t('tierBasis')} hint={t('tierBasisHint')} htmlFor="tier_basis">
+            <Select id="tier_basis" name="tier_basis" defaultValue={job?.tier_basis ?? 'largest'}>
+              <option value="largest">{t('tierBasisLargest')}</option>
+              <option value="primary">{t('tierBasisPrimary')}</option>
+            </Select>
+          </Field>
+          <Field label={t('primaryPlatform')} htmlFor="primary_platform">
+            <Select id="primary_platform" name="primary_platform" defaultValue={job?.primary_platform ?? ''}>
+              <option value="">{t('primaryPlatformNone')}</option>
+              {PLATFORMS.map((p) => <option key={p} value={p}>{tp(p)}</option>)}
+            </Select>
+            <FieldError name="primary_platform" />
+          </Field>
+        </div>
+      </fieldset>
 
       <div className="grid gap-4 md:grid-cols-2">
         <Field label={t('productOption')} htmlFor="product_option">

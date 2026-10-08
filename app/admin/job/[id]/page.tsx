@@ -15,6 +15,7 @@ import { requireStaff } from '@/lib/auth';
 import { realBrand, type BrandEmbed } from '@/lib/brand';
 import { formatRupiah } from '@/lib/money';
 import { loadTaxonomy } from '@/lib/taxonomy';
+import { creatorTier } from '@/lib/tiers';
 import { latestByKind, timeline } from '@/lib/work';
 import type { Job, Participation, Profile, SocialAccount, Submission } from '@/lib/types';
 
@@ -30,6 +31,7 @@ export default async function AdminJob({ params }: { params: Promise<{ id: strin
   const tp = await getTranslations('platform');
   const tv = await getTranslations('verification');
   const tw = await getTranslations('work');
+  const ttier = await getTranslations('tier');
   const tax = await loadTaxonomy();
 
   const { data: job } = await viewer.supabase.from('jobs').select('*, job_brands(real_name)').eq('id', id).maybeSingle<Job & { job_brands: BrandEmbed }>();
@@ -100,6 +102,16 @@ export default async function AdminJob({ params }: { params: Promise<{ id: strin
                       <Input id={`fee-${r.id}`} name="fee" inputMode="numeric" defaultValue={r.proposed_rate ?? ''} className="tabular" />
                     </Field>
                   )}
+                  {job.fee_type === 'tier' && (() => {
+                    // Suggested fee from the applicant's tier (verified or pending accounts); editable.
+                    const tier = creatorTier(job, accs.filter((a) => a.status !== 'rejected'));
+                    const fee = tier ? job.tier_fees[tier] : undefined;
+                    return (
+                      <Field label={t('agreedFee')} hint={tier ? t('tierFeeHint', { tier: ttier(tier) }) : undefined} htmlFor={`fee-${r.id}`}>
+                        <Input id={`fee-${r.id}`} name="fee" inputMode="numeric" defaultValue={fee ?? ''} className="tabular" />
+                      </Field>
+                    );
+                  })()}
                   <div className="flex gap-2">
                     <SubmitButton name="decision" value="approve" className="flex-1">{t('approve')}</SubmitButton>
                     <SubmitButton name="decision" value="reject" variant="outline">{t('reject')}</SubmitButton>
@@ -143,6 +155,9 @@ export default async function AdminJob({ params }: { params: Promise<{ id: strin
           <Field label={t('inviteEmail')} htmlFor="invite-email"><Input id="invite-email" name="email" type="email" required /></Field>
           {job.fee_type === 'open' && (
             <Field label={t('inviteFee')} htmlFor="invite-fee"><Input id="invite-fee" name="fee" inputMode="numeric" required className="tabular" /></Field>
+          )}
+          {job.fee_type === 'tier' && (
+            <Field label={t('inviteFee')} hint={t('inviteTierFeeHint')} htmlFor="invite-fee"><Input id="invite-fee" name="fee" inputMode="numeric" className="tabular" /></Field>
           )}
           <SubmitButton variant="outline">{t('invite')}</SubmitButton>
         </ActionForm>

@@ -7,7 +7,7 @@ import { z } from 'zod';
 import { requireStaff } from '@/lib/auth';
 import { parseRupiah } from '@/lib/money';
 import { deliverPending } from '@/lib/notify';
-import { PLATFORMS } from '@/lib/social';
+import { PLATFORMS, type Platform } from '@/lib/social';
 import { taxonomyKey } from '@/lib/taxonomy';
 import { TIERS } from '@/lib/tiers';
 import { mentionsBrand } from '@/lib/brand';
@@ -68,7 +68,7 @@ const jobSchema = z.object({
   niches: z.array(z.string()),
   personas: z.array(z.string()),
   min_followers: z.number().int().min(0),
-  fee_type: z.enum(['fixed', 'open']),
+  fee_type: z.enum(['fixed', 'open', 'tier']),
   fee: z.number().int().positive().nullable(),
   rate_cap: z.number().int().positive().nullable(),
   quota: z.number().int().positive(),
@@ -80,7 +80,7 @@ const jobSchema = z.object({
   content_deadline: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable(),
   top_days: z.union([z.literal(7), z.literal(14), z.literal(30)]),
   status: z.enum(['draft', 'open', 'closed', 'completed']),
-}).refine((d) => d.fee_type === 'open' || d.fee !== null, { path: ['fee'], message: 'required' });
+}).refine((d) => d.fee_type !== 'fixed' || d.fee !== null, { path: ['fee'], message: 'required' });
 
 export async function saveJob(_prev: ActionState, formData: FormData): Promise<ActionState> {
   const viewer = await requireStaff('curator');
@@ -139,9 +139,27 @@ export async function saveJob(_prev: ActionState, formData: FormData): Promise<A
     if (Object.keys(fields).length) return { error: 'brand_in_text', fields };
   }
 
+  // Fee per tier: one amount per offered tier; the tier comes from the largest account or the main platform.
+  const tierFees: Record<string, number> = {};
+  for (const tier of TIERS) {
+    const fee = optionalInt(formData.get(`tier_fee_${tier}`));
+    if (fee && fee > 0) tierFees[tier] = fee;
+  }
+  const tierBasis = text(formData.get('tier_basis')) === 'primary' ? 'primary' : 'largest';
+  const primaryPlatform = text(formData.get('primary_platform')) || null;
+  if (parsed.data.fee_type === 'tier') {
+    if (!Object.keys(tierFees).length) return { error: 'invalid', fields: { tier_fees: 'tier_fee_required' } };
+    if (tierBasis === 'primary' && (!primaryPlatform || !parsed.data.platforms.includes(primaryPlatform as Platform))) {
+      return { error: 'invalid', fields: { primary_platform: 'primary_platform_required' } };
+    }
+  }
+
   const row = { ...parsed.data, brand_name: alias || realName,
     fee: parsed.data.fee_type === 'fixed' ? parsed.data.fee : null,
-    rate_cap: parsed.data.fee_type === 'open' ? parsed.data.rate_cap : null };
+    rate_cap: parsed.data.fee_type === 'open' ? parsed.data.rate_cap : null,
+    tier_fees: parsed.data.fee_type === 'tier' ? tierFees : {},
+    tier_basis: tierBasis,
+    primary_platform: primaryPlatform && parsed.data.platforms.includes(primaryPlatform as Platform) ? primaryPlatform : null };
 
   const result = id
     ? await viewer.supabase.from('jobs').update(row).eq('id', id).select('id').single()

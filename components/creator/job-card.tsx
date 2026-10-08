@@ -3,11 +3,18 @@ import { getLocale, getTranslations } from 'next-intl/server';
 import { Badge } from '@/components/ui/badge';
 import { formatDate } from '@/lib/dates';
 import { formatRupiah } from '@/lib/money';
+import { tierFeeList } from '@/lib/tiers';
 import type { Job, PublicJob } from '@/lib/types';
 
-export async function feeLabel(job: Pick<Job, 'fee_type' | 'fee' | 'rate_cap'>) {
+export async function feeLabel(job: Pick<Job, 'fee_type' | 'fee' | 'rate_cap' | 'tier_fees'>) {
   const t = await getTranslations('jobs');
   if (job.fee_type === 'fixed' && job.fee) return formatRupiah(job.fee);
+  if (job.fee_type === 'tier') {
+    const fees = tierFeeList(job.tier_fees ?? {}).map((x) => x.fee);
+    if (!fees.length) return t('openRate');
+    const [min, max] = [Math.min(...fees), Math.max(...fees)];
+    return min === max ? formatRupiah(min) : t('feeRange', { min: formatRupiah(min), max: formatRupiah(max) });
+  }
   return job.rate_cap ? t('rateCapLabel', { amount: formatRupiah(job.rate_cap) }) : t('openRate');
 }
 

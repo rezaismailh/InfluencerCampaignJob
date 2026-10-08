@@ -261,7 +261,13 @@
     "shareText": "Ada campaign {title} dari {brand} di Tali, fee {fee}. Cek detailnya:",
     "followersBelowMin": "Job ini butuh minimal {min} followers, sedangkan akun {platform} kamu tercatat {count}. Kalau sudah bertambah, perbarui angkanya dulu.",
     "updateFollowersCta": "Perbarui followers",
-    "niches": "Niche"
+    "niches": "Niche",
+    "feeRange": "{min} – {max}",
+    "tierBasisPrimaryNote": "Tier dihitung dari followers akun {platform} kamu.",
+    "tierBasisLargestNote": "Tier dihitung dari followers terbesar kamu di platform job ini.",
+    "needPrimaryAccount": "Job ini menghitung tier dari akun {platform}. Tambahkan akun {platform} kamu dulu.",
+    "tierNotOffered": "Tier kamu ({tier}) belum termasuk di job ini.",
+    "yourTierFee": "Fee kamu: <b>{fee}</b> ({tier})"
   },
   "work": {
     "title": "Kerjaan",
@@ -452,7 +458,16 @@
       "brandAlias": "Label samaran",
       "brandAliasHint": "Tampil ke publik dan pelamar. Nama asli terlihat setelah creator diundang atau diterima. Jangan tulis nama brand di judul, produk, deliverable, brief, syarat, atau lokasi.",
       "brandAliasPlaceholder": "Brand snack nasional",
-      "niches": "Target niche"
+      "niches": "Target niche",
+      "feeTier": "Per tier",
+      "tierFees": "Fee per tier",
+      "tierFeesHint": "Dipakai kalau jenis fee = Per tier. Isi hanya tier yang ditawarkan; kosongkan yang tidak.",
+      "tierBasis": "Tier dihitung dari",
+      "tierBasisHint": "Penting untuk job multi-platform.",
+      "tierBasisLargest": "Followers terbesar di platform job",
+      "tierBasisPrimary": "Followers di platform utama",
+      "primaryPlatform": "Platform utama",
+      "primaryPlatformNone": "—"
     },
     "applicants": "Pelamar",
     "participants": "Creator bergabung",
@@ -539,7 +554,9 @@
     "sortOrder": "Urutan",
     "inactive": "Nonaktif",
     "activeLabel": "Aktif (muncul di pilihan)",
-    "add": "Tambah"
+    "add": "Tambah",
+    "tierFeeHint": "Sesuai fee tier {tier}. Bisa diubah.",
+    "inviteTierFeeHint": "Kosongkan untuk memakai fee sesuai tier creator."
   },
   "errors": {
     "generic": "Ada yang belum berhasil. Coba lagi sebentar lagi.",
@@ -595,7 +612,10 @@
     "brand_in_text": "Nama brand asli masih tertulis di sini. Hapus dulu supaya samarannya tidak bocor.",
     "incomplete": "Data belum lengkap. Lengkapi yang berikut:",
     "platform_mismatch": "Link ini bukan dari platform yang dipilih. Ganti platformnya atau tempel link yang sesuai.",
-    "social_duplicate": "Salah satu akun media sosial ini sudah terdaftar di Tali. Hubungi tim Tali kalau akun itu milikmu."
+    "social_duplicate": "Salah satu akun media sosial ini sudah terdaftar di Tali. Hubungi tim Tali kalau akun itu milikmu.",
+    "tier_fee_required": "Isi fee untuk minimal satu tier.",
+    "primary_platform_required": "Pilih platform utama yang termasuk platform job ini.",
+    "tier_not_offered": "Tier kamu belum termasuk di job ini."
   },
   "success": {
     "saved": "Tersimpan.",

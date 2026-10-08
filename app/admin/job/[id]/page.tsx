@@ -3,7 +3,8 @@ import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 import { ActionForm } from '@/components/action-form';
 import { Badge } from '@/components/ui/badge';
-import { ButtonLink } from '@/components/ui/button';
+import { ButtonLink, buttonClass } from '@/components/ui/button';
+import { Download } from 'lucide-react';
 import { Card, CardTitle } from '@/components/ui/card';
 import { Field, Input } from '@/components/ui/field';
 import { PageHeader } from '@/components/ui/page';
@@ -61,6 +62,22 @@ export default async function AdminJob({ params }: { params: Promise<{ id: strin
         <span className="font-bold tabular">{await feeLabel(job)}</span>
         <span className="text-[15px] text-teks-redup">{t('slots', { used: approvedCount, quota: job.quota })}</span>
         <span className="text-[15px] text-teks-redup">{job.platforms.map((p) => tp(p)).join(' · ')}</span>
+      </Card>
+
+      <Card className="space-y-3">
+        <div>
+          <CardTitle>{t('export.title')}</CardTitle>
+          <p className="text-[13px] text-teks-redup">{t('export.hint')}</p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {/* Plain links: the route answers with a file download. */}
+          <a href={`/admin/job/${id}/export`} className={buttonClass('primary', 'sm')} download>
+            <Download className="size-4" aria-hidden /> {t('export.client', { count: applicants.length })}
+          </a>
+          <a href={`/admin/job/${id}/export?internal=1`} className={buttonClass('outline', 'sm')} download>
+            <Download className="size-4" aria-hidden /> {t('export.internal')}
+          </a>
+        </div>
       </Card>
 
       <section className="space-y-3">

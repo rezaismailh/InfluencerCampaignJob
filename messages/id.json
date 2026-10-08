@@ -117,7 +117,7 @@
     "email": "Email",
     "emailPlaceholder": "nama@email.com",
     "sendCode": "Kirim kode",
-    "codeSent": "Kode 6 digit sudah dikirim ke {email}. Cek juga folder spam.",
+    "codeSent": "Kode verifikasi sudah dikirim ke {email}. Cek juga folder spam.",
     "code": "Kode verifikasi",
     "verify": "Masuk",
     "changeEmail": "Ganti email",

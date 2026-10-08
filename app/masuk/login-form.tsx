@@ -69,10 +69,10 @@ export function LoginForm({ next, callbackError }: { next: string; callbackError
         <form onSubmit={verify} className="space-y-4">
           <Alert tone="info">{t('codeSent', { email: email.trim() })}</Alert>
           <Field label={t('code')} htmlFor="code">
-            <Input id="code" inputMode="numeric" autoComplete="one-time-code" pattern="[0-9]*" maxLength={6}
+            <Input id="code" inputMode="numeric" autoComplete="one-time-code" pattern="[0-9]*" maxLength={10}
               value={code} onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))} required className="tabular tracking-[0.3em]" />
           </Field>
-          <Button type="submit" className="w-full" disabled={pending || code.length < 6}>{t('verify')}</Button>
+          <Button type="submit" className="w-full" disabled={pending || code.length < 6 /* Supabase sends 6–10 digits, set in Auth settings */}>{t('verify')}</Button>
           <Button type="button" variant="ghost" className="w-full" onClick={() => { setStep('email'); setCode(''); }}>
             {t('changeEmail')}
           </Button>

@@ -8,7 +8,7 @@ Spesifikasi produk: [`docs/PRD.md`](docs/PRD.md). Identitas brand: [`BRAND.md`](
 
 - Next.js 16 (App Router, Server Actions) + TypeScript, Tailwind CSS v4 dengan token di `styles/tokens.css`
 - Supabase: Postgres + RLS, Auth (OTP email + Google), Storage (bucket privat `uploads`)
-- next-intl (`id` default, `en`), PWA (manifest + `public/sw.js`), Web Push, email via ZeptoMail atau Resend
+- next-intl (`id` default, `en`), PWA (manifest + `public/sw.js`), Web Push, email via Brevo atau Resend
 - Deploy di Railway (aplikasi + cron)
 
 ## Menjalankan lokal
@@ -64,7 +64,7 @@ npm run db:test   # migrasi + tes RLS/aturan bisnis di PostgreSQL lokal (butuh i
    | `NEXT_PUBLIC_SITE_URL` | URL publik, mis. `https://tali.up.railway.app` sampai domain final dipilih |
    | `DATA_ENCRYPTION_KEY` | `openssl rand -base64 32`. Mengenkripsi nomor rekening, HP, alamat. **Simpan cadangannya**: kalau hilang, data terenkripsi tidak bisa dibaca |
    | `CRON_SECRET` | String acak panjang untuk endpoint cron |
-   | `EMAIL_FROM` + `ZEPTOMAIL_TOKEN` (atau `RESEND_API_KEY`) | Opsional, untuk email notifikasi. ZeptoMail dipakai kalau tokennya diisi; `ZEPTOMAIL_API_URL` untuk akun di region lain |
+   | `EMAIL_FROM` + `BREVO_API_KEY` (atau `RESEND_API_KEY`) | Opsional, untuk email notifikasi. Brevo dipakai kalau API key-nya diisi; alamat `EMAIL_FROM` harus di domain yang sudah diautentikasi di Brevo |
    | `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` | Opsional, untuk Web Push (`npx web-push generate-vapid-keys`) |
    | `CONTACT_WA`, `CONTACT_EMAIL` | Opsional, kontak brand di halaman pembuka. WA format internasional tanpa `+` (mis. `62812...`). Tombol tidak tampil kalau kosong |
 

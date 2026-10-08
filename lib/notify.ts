@@ -36,29 +36,28 @@ export function parseFrom(from: string): { name: string; address: string } {
 }
 
 /**
- * Sends through ZeptoMail (Zoho) when ZEPTOMAIL_TOKEN is set, otherwise Resend.
+ * Sends through Brevo when BREVO_API_KEY is set, otherwise Resend.
  * Does nothing when neither provider or EMAIL_FROM is configured.
  */
 export async function sendEmail(to: string, subject: string, body: string, url: string, cta: string) {
   const from = process.env.EMAIL_FROM;
-  const zepto = process.env.ZEPTOMAIL_TOKEN;
+  const brevo = process.env.BREVO_API_KEY;
   const resend = process.env.RESEND_API_KEY;
-  if (!from || (!zepto && !resend)) return;
+  if (!from || (!brevo && !resend)) return;
   const html = `<div style="font-family:sans-serif;font-size:16px;line-height:24px;color:#1A174F">
     <p>${escapeHtml(body)}</p>
     <p><a href="${escapeHtml(url)}" style="display:inline-block;background:#24206B;color:#F7F5EF;padding:12px 20px;border-radius:14px;text-decoration:none;font-weight:700">${escapeHtml(cta)}</a></p>
   </div>`;
   const text = `${body}\n\n${url}`;
 
-  if (zepto) {
-    // The console shows the token as "Zoho-enczapikey …"; accept it with or without the prefix.
-    const token = zepto.replace(/^Zoho-enczapikey\s+/i, '').trim();
-    const res = await fetch(process.env.ZEPTOMAIL_API_URL ?? 'https://api.zeptomail.com/v1.1/email', {
+  if (brevo) {
+    const sender = parseFrom(from);
+    const res = await fetch('https://api.brevo.com/v3/smtp/email', {
       method: 'POST',
-      headers: { Authorization: `Zoho-enczapikey ${token}`, 'Content-Type': 'application/json', Accept: 'application/json' },
-      body: JSON.stringify({ from: parseFrom(from), to: [{ email_address: { address: to } }], subject, htmlbody: html, textbody: text }),
+      headers: { 'api-key': brevo.trim(), 'Content-Type': 'application/json', Accept: 'application/json' },
+      body: JSON.stringify({ sender: { name: sender.name || undefined, email: sender.address }, to: [{ email: to }], subject, htmlContent: html, textContent: text }),
     });
-    if (!res.ok) throw new Error(`zeptomail ${res.status}`);
+    if (!res.ok) throw new Error(`brevo ${res.status}`);
     return;
   }
 

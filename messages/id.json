@@ -507,7 +507,7 @@
       "requireInsight": "Wajib kirim insight setelah posting",
       "requireInsightHint": "Kalau aktif, tanggal cair dihitung dari tanggal insight dikirim (setelah disetujui), bukan dari konfirmasi posting.",
       "brandLogo": "Logo brand (opsional)",
-      "brandLogoHint": "PNG, JPG, atau WebP, maks. 1 MB. Hanya tampil kalau nama asli ditampilkan; brand yang disamarkan memakai ikon.",
+      "brandLogoHint": "PNG, JPG, atau WebP. Otomatis dikecilkan dan dikompres saat diunggah. Hanya tampil kalau nama asli ditampilkan; brand yang disamarkan memakai ikon.",
       "brandLogoUpload": "Unggah logo",
       "brandIcon": "Ikon pengganti logo",
       "brandIconHint": "Dipakai untuk brand yang disamarkan, atau kalau belum ada logo. Pilih yang paling dekat dengan kategori produknya.",

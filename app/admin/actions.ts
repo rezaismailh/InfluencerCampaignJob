@@ -8,6 +8,7 @@ import { requireStaff } from '@/lib/auth';
 import { parseRupiah } from '@/lib/money';
 import { deliverPending } from '@/lib/notify';
 import { PLATFORMS } from '@/lib/social';
+import { taxonomyKey } from '@/lib/taxonomy';
 import { TIERS } from '@/lib/tiers';
 import { mentionsBrand } from '@/lib/brand';
 import { dbErrorKey, type ActionState } from '@/lib/action-state';
@@ -64,6 +65,7 @@ const jobSchema = z.object({
   brief: z.string().min(3),
   requirements: z.string().nullable(),
   tiers: z.array(z.enum(TIERS)),
+  niches: z.array(z.string()),
   personas: z.array(z.string()),
   min_followers: z.number().int().min(0),
   fee_type: z.enum(['fixed', 'open']),
@@ -95,6 +97,7 @@ export async function saveJob(_prev: ActionState, formData: FormData): Promise<A
     brief: text(formData.get('brief')),
     requirements: text(formData.get('requirements')) || null,
     tiers: formData.getAll('tiers').map(String),
+    niches: formData.getAll('niches').map(String),
     personas: formData.getAll('personas').map(String),
     min_followers: optionalInt(formData.get('min_followers')) ?? 0,
     fee_type: text(formData.get('fee_type')),
@@ -115,6 +118,11 @@ export async function saveJob(_prev: ActionState, formData: FormData): Promise<A
     for (const issue of parsed.error.issues) fields[String(issue.path[0])] = issue.message === 'required' ? 'required' : 'invalid';
     return { error: 'invalid', fields };
   }
+  const { data: tax } = await viewer.supabase.from('taxonomy').select('kind, key');
+  const known = (kind: string, key: string) => (tax ?? []).some((x) => x.kind === kind && x.key === key);
+  if (parsed.data.niches.some((k) => !known('niche', k))) return { error: 'invalid', fields: { niches: 'invalid' } };
+  if (parsed.data.personas.some((k) => !known('persona', k))) return { error: 'invalid', fields: { personas: 'invalid' } };
+
   // Disguised brand: creators (and guests) see the alias until they are invited or approved.
   const realName = parsed.data.brand_name;
   const alias = text(formData.get('brand_display')) === 'alias' ? text(formData.get('brand_alias')) : '';
@@ -190,6 +198,37 @@ export async function cancelParticipation(_prev: ActionState, formData: FormData
 // ---------------------------------------------------------------------------
 // Social accounts
 // ---------------------------------------------------------------------------
+/** Adds or edits a niche/persona. New items get a key from the Indonesian label; items are deactivated, never deleted. */
+export async function saveTaxonomyItem(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const viewer = await requireStaff('curator');
+  const kind = text(formData.get('kind'));
+  if (kind !== 'niche' && kind !== 'persona') return { error: 'invalid' };
+  const labelId = text(formData.get('label_id'));
+  if (!labelId || labelId.length > 60) return { error: 'invalid', fields: { label_id: 'required' } };
+  const row = { label_id: labelId, label_en: text(formData.get('label_en')) || null };
+  const key = text(formData.get('key'));
+
+  if (key) {
+    const { error } = await viewer.supabase.from('taxonomy').update({
+      ...row,
+      active: formData.get('active') === 'on',
+      sort: optionalInt(formData.get('sort')) ?? 100,
+    }).eq('kind', kind).eq('key', key);
+    if (error) return { error: dbErrorKey(error) };
+  } else {
+    const { data: existing } = await viewer.supabase.from('taxonomy').select('key, sort').eq('kind', kind);
+    const keys = new Set((existing ?? []).map((x) => x.key));
+    const base = taxonomyKey(labelId);
+    let next = base;
+    for (let n = 2; keys.has(next); n++) next = `${base.slice(0, 36)}_${n}`;
+    const sort = Math.max(0, ...(existing ?? []).map((x) => x.sort)) + 10;
+    const { error } = await viewer.supabase.from('taxonomy').insert({ kind, key: next, sort, ...row });
+    if (error) return { error: dbErrorKey(error) };
+  }
+  revalidatePath('/', 'layout');
+  return { ok: true, success: 'saved' };
+}
+
 export async function verifySocial(_prev: ActionState, formData: FormData): Promise<ActionState> {
   const viewer = await requireStaff('curator');
   const approve = text(formData.get('decision')) === 'approve';

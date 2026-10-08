@@ -12,7 +12,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const role = viewer.profile.role;
   const items: NavItem[] = [{ href: '/admin', key: 'overview' }];
   if (canCurate(role)) {
-    items.push({ href: '/admin/job', key: 'adminJobs' }, { href: '/admin/review', key: 'review' }, { href: '/admin/akun-sosial', key: 'social' }, { href: '/admin/klien', key: 'clients' });
+    items.push({ href: '/admin/job', key: 'adminJobs' }, { href: '/admin/review', key: 'review' }, { href: '/admin/akun-sosial', key: 'social' }, { href: '/admin/klien', key: 'clients' }, { href: '/admin/niche', key: 'taxonomy' });
   }
   if (canFinance(role)) items.push({ href: '/admin/pencairan', key: 'payouts' });
   items.push({ href: '/admin/libur', key: 'holidays' });

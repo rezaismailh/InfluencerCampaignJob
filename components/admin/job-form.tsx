@@ -4,10 +4,10 @@ import { Field, Input, Select, Textarea } from '@/components/ui/field';
 import { SubmitButton } from '@/components/ui/submit-button';
 import { saveJob } from '@/app/admin/actions';
 import { PLATFORMS } from '@/lib/social';
+import { loadTaxonomy } from '@/lib/taxonomy';
 import { TIERS } from '@/lib/tiers';
 import type { Job } from '@/lib/types';
 
-const PERSONAS = ['genz', 'student', 'foodies', 'lifestyle', 'parent', 'professional', 'other'];
 
 function Chips({ name, options, checked, label }: { name: string; options: { value: string; label: string }[]; checked: string[]; label: string }) {
   return (
@@ -33,7 +33,7 @@ export async function JobForm({ job, realBrand, clients }: { job?: Job; realBran
   const tpo = await getTranslations('productOption');
   const tst = await getTranslations('jobStatus');
   const ttier = await getTranslations('tier');
-  const tper = await getTranslations('persona');
+  const tax = await loadTaxonomy();
   const c = await getTranslations('common');
   // New jobs are disguised by default; an existing job is disguised when it has a real name stored separately.
   const disguised = job ? !!realBrand : true;
@@ -91,7 +91,8 @@ export async function JobForm({ job, realBrand, clients }: { job?: Job; realBran
           <Input id="min_followers" name="min_followers" inputMode="numeric" defaultValue={job?.min_followers ?? 0} className="tabular" />
         </Field>
       </div>
-      <Chips name="personas" label={t('personas')} checked={job?.personas ?? []} options={PERSONAS.map((v) => ({ value: v, label: tper(v) }))} />
+      <Chips name="niches" label={t('niches')} checked={job?.niches ?? []} options={tax.choices('niche', job?.niches)} />
+      <Chips name="personas" label={t('personas')} checked={job?.personas ?? []} options={tax.choices('persona', job?.personas)} />
 
       <div className="grid gap-4 md:grid-cols-3">
         <Field label={t('feeType')} htmlFor="fee_type">

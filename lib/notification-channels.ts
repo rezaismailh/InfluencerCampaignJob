@@ -1,6 +1,6 @@
 // Which channels each notification kind uses besides the in-app list.
 // Email is kept for decisions and money; small steps go by push only; some stay in the app.
-// This also keeps email volume inside the Resend quota.
+// This also keeps email volume (and the provider's quota or credits) down.
 
 export type Channels = { email: boolean; push: boolean };
 

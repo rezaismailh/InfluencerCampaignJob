@@ -103,3 +103,33 @@ export function postMatchesAccounts(
   const name = found.username.toLowerCase();
   return accounts.some((a) => a.platform === found.platform && a.username.toLowerCase() === name);
 }
+
+const PROFILE_URL: Record<Platform, (u: string) => string> = {
+  instagram: (u) => `https://www.instagram.com/${u}`,
+  tiktok: (u) => `https://www.tiktok.com/@${u}`,
+  youtube: (u) => `https://www.youtube.com/@${u}`,
+  threads: (u) => `https://www.threads.net/@${u}`,
+  x: (u) => `https://x.com/${u}`,
+};
+
+export type ProfileInput =
+  | { ok: true; url: string; username: string }
+  | { ok: false; error: 'required' | 'unsupported_link' | 'platform_mismatch' | 'username_required' };
+
+/** A profile link or a bare username for the chosen platform, normalised to link + username. */
+export function profileFromInput(platform: Platform, input: string): ProfileInput {
+  const value = input.trim();
+  if (!value) return { ok: false, error: 'required' };
+  // Usernames may contain dots (isreza.id), so only a scheme, a slash or a bare domain means "link".
+  const looksLikeLink = /^https?:\/\//i.test(value) || value.includes('/') || /^(www\.|m\.)?[a-z0-9-]+\.(com|net|be)$/i.test(value);
+  if (looksLikeLink) {
+    const parsed = parseProfileUrl(value);
+    if (!parsed) return { ok: false, error: 'unsupported_link' };
+    if (parsed.platform !== platform) return { ok: false, error: 'platform_mismatch' };
+    if (!parsed.username) return { ok: false, error: 'username_required' };
+    return { ok: true, url: parsed.url, username: parsed.username };
+  }
+  const username = value.replace(/^@/, '');
+  if (!USERNAME.test(username)) return { ok: false, error: 'username_required' };
+  return { ok: true, url: PROFILE_URL[platform](username), username };
+}

@@ -47,3 +47,20 @@ describe('post links', () => {
     expect(postMatchesAccounts('https://www.tiktok.com/@other/video/1', accounts)).toBe(false);
   });
 });
+
+describe('profileFromInput', () => {
+  it('accepts a bare username and builds the link', async () => {
+    const { profileFromInput } = await import('@/lib/social');
+    expect(profileFromInput('instagram', '@isreza')).toEqual({ ok: true, url: 'https://www.instagram.com/isreza', username: 'isreza' });
+    expect(profileFromInput('tiktok', 'isreza')).toEqual({ ok: true, url: 'https://www.tiktok.com/@isreza', username: 'isreza' });
+    expect(profileFromInput('instagram', '@isreza.id')).toMatchObject({ ok: true, username: 'isreza.id' });
+    expect(profileFromInput('instagram', 'instagram.com/isreza')).toMatchObject({ ok: true, username: 'isreza' });
+  });
+  it('accepts a link for the chosen platform and rejects others', async () => {
+    const { profileFromInput } = await import('@/lib/social');
+    expect(profileFromInput('instagram', 'https://www.instagram.com/isreza?igsh=abc')).toMatchObject({ ok: true, username: 'isreza' });
+    expect(profileFromInput('tiktok', 'https://www.instagram.com/isreza')).toEqual({ ok: false, error: 'platform_mismatch' });
+    expect(profileFromInput('instagram', 'https://example.com/x')).toEqual({ ok: false, error: 'unsupported_link' });
+    expect(profileFromInput('instagram', '  ')).toEqual({ ok: false, error: 'required' });
+  });
+});

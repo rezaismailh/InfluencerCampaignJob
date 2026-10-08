@@ -6,6 +6,8 @@ export type ActionState = {
   /** i18n key under "success" */
   success?: string;
   fields?: Record<string, string>;
+  /** Already-translated labels of what is missing, listed under the error. */
+  missing?: string[];
 };
 
 export const initialState: ActionState = {};

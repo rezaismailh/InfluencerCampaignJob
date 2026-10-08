@@ -3,12 +3,13 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { after } from 'next/server';
+import { getTranslations } from 'next-intl/server';
 import { z } from 'zod';
 import { requireCreator, safeNext } from '@/lib/auth';
 import { encrypt } from '@/lib/crypto';
 import { parseRupiah } from '@/lib/money';
 import { deliverPending } from '@/lib/notify';
-import { parseProfileUrl, postMatchesAccounts } from '@/lib/social';
+import { PLATFORMS, postMatchesAccounts, profileFromInput, type Platform } from '@/lib/social';
 import { isValidRegion } from '@/lib/wilayah';
 import { dbErrorKey, type ActionState } from '@/lib/action-state';
 
@@ -34,8 +35,27 @@ const profileSchema = z.object({
   address: z.string().max(500),
 });
 
+// Field order on the form, so missing items are listed (and scrolled to) top-down.
+const MAX_SOCIAL_ROWS = 10;
+const PROFILE_FIELDS = ['full_name', 'phone', 'province', 'city', 'categories', 'persona', 'address'] as const;
+const FIELD_LABEL: Record<string, string> = {
+  full_name: 'fullName', phone: 'phone', province: 'province', city: 'city', categories: 'categories',
+  persona: 'persona', address: 'address', social: 'socialLabel',
+};
+
+async function socialCount(viewer: Awaited<ReturnType<typeof requireCreator>>) {
+  const { count } = await viewer.supabase.from('social_accounts').select('id', { count: 'exact', head: true }).eq('creator_id', viewer.id);
+  return count ?? 0;
+}
+
+/**
+ * Saves the profile. With finish=1 (the onboarding "Done" button) it also checks
+ * that there is a social account, then completes onboarding and continues to the
+ * job list or the job the creator came from.
+ */
 export async function saveProfile(_prev: ActionState, formData: FormData): Promise<ActionState> {
   const viewer = await requireCreator({ allowIncomplete: true });
+  const finish = text(formData.get('finish')) === '1';
   const parsed = profileSchema.safeParse({
     full_name: text(formData.get('full_name')),
     phone: text(formData.get('phone')).replace(/[\s-]/g, ''),
@@ -45,16 +65,54 @@ export async function saveProfile(_prev: ActionState, formData: FormData): Promi
     persona: text(formData.get('persona')) || null,
     address: text(formData.get('address')),
   });
+
+  const problems: Record<string, string> = {};
   if (!parsed.success) {
-    const fields: Record<string, string> = {};
     for (const issue of parsed.error.issues) {
       const key = String(issue.path[0]);
-      fields[key] = key === 'categories' ? 'max_categories' : issue.code === 'too_small' && Number(issue.minimum) <= 2 ? 'required' : 'invalid';
+      problems[key] = key === 'categories' ? 'max_categories' : issue.code === 'too_small' && Number(issue.minimum) <= 2 ? 'required' : 'invalid';
     }
-    return { error: 'invalid', fields };
+  } else if (!isValidRegion(parsed.data.province, parsed.data.city)) {
+    problems.city = 'required';
   }
-  const d = parsed.data;
-  if (!isValidRegion(d.province, d.city)) return { error: 'invalid', fields: { city: 'required' } };
+  // New social accounts, one row per social_<field>_<index>; fully empty rows are ignored.
+  const rowKeys: string[] = [];
+  const newAccounts: { creator_id: string; platform: Platform; url: string; username: string; followers: number }[] = [];
+  for (let i = 0; i < MAX_SOCIAL_ROWS && formData.has(`social_platform_${i}`); i++) {
+    const platform = text(formData.get(`social_platform_${i}`));
+    const link = text(formData.get(`social_link_${i}`));
+    const followersText = text(formData.get(`social_followers_${i}`));
+    if (!link && !followersText) continue;
+    const keys = { platform: `social_platform_${i}`, link: `social_link_${i}`, followers: `social_followers_${i}` };
+    rowKeys.push(keys.platform, keys.link, keys.followers);
+    if (!(PLATFORMS as readonly string[]).includes(platform)) { problems[keys.platform] = 'required'; continue; }
+    const profile = profileFromInput(platform as Platform, link);
+    if (!profile.ok) problems[keys.link] = profile.error;
+    const followers = parseRupiah(followersText);
+    if (followers === null) problems[keys.followers] = 'required';
+    if (profile.ok && followers !== null) {
+      newAccounts.push({ creator_id: viewer.id, platform: platform as Platform, url: profile.url, username: profile.username, followers });
+    }
+  }
+  if (finish && !newAccounts.length && !rowKeys.some((k) => problems[k]) && !(await socialCount(viewer))) problems.social = 'needSocial';
+
+  if (Object.keys(problems).length) {
+    const t = await getTranslations('onboarding');
+    const fields: Record<string, string> = {};
+    for (const key of [...PROFILE_FIELDS, ...rowKeys, 'social']) if (problems[key]) fields[key] = problems[key];
+    const label = (key: string) => {
+      const row = /^social_(platform|link|followers)_(\d+)$/.exec(key);
+      return row ? t('socialRowField', { n: Number(row[2]) + 1, field: t(`socialField_${row[1]}`) }) : t(FIELD_LABEL[key]);
+    };
+    return { error: finish ? 'incomplete' : 'invalid', fields, missing: Object.keys(fields).map(label) };
+  }
+
+  if (newAccounts.length) {
+    const { error } = await viewer.supabase.from('social_accounts').insert(newAccounts);
+    if (error) return { error: dbErrorKey(error) === 'duplicate' ? 'social_duplicate' : dbErrorKey(error) };
+  }
+
+  const d = parsed.data!;
   const { error } = await viewer.supabase.from('profiles').update({
     full_name: d.full_name,
     phone_enc: encrypt(d.phone),
@@ -63,30 +121,11 @@ export async function saveProfile(_prev: ActionState, formData: FormData): Promi
     categories: d.categories,
     persona: d.persona,
     address_enc: d.address ? encrypt(d.address) : null,
+    ...(finish ? { onboarded_at: new Date().toISOString() } : {}),
   }).eq('id', viewer.id);
   if (error) return { error: dbErrorKey(error) };
   revalidatePath('/', 'layout');
-  return { ok: true, success: 'saved' };
-}
-
-export async function addSocialAccount(_prev: ActionState, formData: FormData): Promise<ActionState> {
-  const viewer = await requireCreator({ allowIncomplete: true });
-  const parsed = parseProfileUrl(text(formData.get('url')));
-  if (!parsed) return { error: 'unsupported_link', fields: { url: 'unsupported_link' } };
-  const username = (parsed.username ?? text(formData.get('username')).replace(/^@/, '')).trim();
-  if (!/^[A-Za-z0-9._-]{1,64}$/.test(username)) return { error: 'username_required', fields: { username: 'username_required' } };
-  const followers = parseRupiah(text(formData.get('followers')));
-  if (followers === null) return { error: 'invalid', fields: { followers: 'invalid' } };
-
-  const { error } = await viewer.supabase.from('social_accounts').insert({
-    creator_id: viewer.id,
-    platform: parsed.platform,
-    url: parsed.url,
-    username,
-    followers,
-  });
-  if (error) return { error: dbErrorKey(error) };
-  revalidatePath('/', 'layout');
+  if (finish) redirect(safeNext(text(formData.get('next'))) ?? '/job');
   return { ok: true, success: 'saved' };
 }
 
@@ -94,17 +133,6 @@ export async function removeSocialAccount(formData: FormData) {
   const viewer = await requireCreator({ allowIncomplete: true });
   await viewer.supabase.from('social_accounts').delete().eq('id', text(formData.get('id'))).eq('creator_id', viewer.id);
   revalidatePath('/', 'layout');
-}
-
-export async function finishOnboarding(_prev: ActionState, formData: FormData): Promise<ActionState> {
-  const viewer = await requireCreator({ allowIncomplete: true });
-  const p = viewer.profile;
-  if (!p.full_name || !p.phone_enc || !p.city) return { error: 'onboarding_incomplete' };
-  const { count } = await viewer.supabase.from('social_accounts').select('id', { count: 'exact', head: true }).eq('creator_id', viewer.id);
-  if (!count) return { error: 'needSocial' };
-  const { error } = await viewer.supabase.from('profiles').update({ onboarded_at: new Date().toISOString() }).eq('id', viewer.id);
-  if (error) return { error: dbErrorKey(error) };
-  redirect(safeNext(text(formData.get('next'))) ?? '/beranda');
 }
 
 // ---------------------------------------------------------------------------

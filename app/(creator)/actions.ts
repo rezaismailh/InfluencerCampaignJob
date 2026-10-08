@@ -125,7 +125,12 @@ export async function saveProfile(_prev: ActionState, formData: FormData): Promi
   }).eq('id', viewer.id);
   if (error) return { error: dbErrorKey(error) };
   revalidatePath('/', 'layout');
-  if (finish) redirect(safeNext(text(formData.get('next'))) ?? '/job');
+  if (finish) {
+    // ?pasang=onboarding opens the one-time "add to home screen" sheet.
+    const dest = new URL(safeNext(text(formData.get('next'))) ?? '/job', 'http://x');
+    dest.searchParams.set('pasang', 'onboarding');
+    redirect(dest.pathname + dest.search);
+  }
   return { ok: true, success: 'saved' };
 }
 
@@ -165,7 +170,8 @@ export async function applyToJob(_prev: ActionState, formData: FormData): Promis
   if (error) return { error: dbErrorKey(error) };
   revalidatePath(`/job/${jobId}`);
   revalidatePath('/beranda');
-  return { ok: true, success: 'applied' };
+  // The job page then shows the application status; ?pasang=lamaran opens the install sheet once.
+  redirect(`/job/${jobId}?pasang=lamaran`);
 }
 
 export async function respondInvite(formData: FormData) {

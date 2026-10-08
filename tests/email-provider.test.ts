@@ -16,24 +16,25 @@ describe('sendEmail', () => {
     expect(parseFrom('a@b.id')).toEqual({ name: '', address: 'a@b.id' });
   });
 
-  it('uses ZeptoMail when its token is set, with or without the prefix', async () => {
+  it('uses Brevo when its key is set', async () => {
     vi.stubEnv('EMAIL_FROM', 'Tali <notifikasi@jointali.online>');
-    vi.stubEnv('ZEPTOMAIL_TOKEN', 'Zoho-enczapikey abc123');
+    vi.stubEnv('BREVO_API_KEY', ' xkeysib-abc ');
     vi.stubEnv('RESEND_API_KEY', 're_x');
     const fetch = stubFetch();
     await sendEmail('rani@example.com', 'Kabar', 'Halo <b>', 'https://app/x', 'Buka');
     const [url, init] = fetch.mock.calls[0] as [string, RequestInit];
-    expect(url).toBe('https://api.zeptomail.com/v1.1/email');
-    expect((init.headers as Record<string, string>).Authorization).toBe('Zoho-enczapikey abc123');
+    expect(url).toBe('https://api.brevo.com/v3/smtp/email');
+    expect((init.headers as Record<string, string>)['api-key']).toBe('xkeysib-abc');
     const body = JSON.parse(String(init.body));
-    expect(body.from).toEqual({ name: 'Tali', address: 'notifikasi@jointali.online' });
-    expect(body.to).toEqual([{ email_address: { address: 'rani@example.com' } }]);
-    expect(body.htmlbody).toContain('Halo &lt;b&gt;');
+    expect(body.sender).toEqual({ name: 'Tali', email: 'notifikasi@jointali.online' });
+    expect(body.to).toEqual([{ email: 'rani@example.com' }]);
+    expect(body.htmlContent).toContain('Halo &lt;b&gt;');
+    expect(body.textContent).toContain('https://app/x');
   });
 
   it('falls back to Resend, and skips when nothing is configured', async () => {
     vi.stubEnv('EMAIL_FROM', 'Tali <n@x.id>');
-    vi.stubEnv('ZEPTOMAIL_TOKEN', '');
+    vi.stubEnv('BREVO_API_KEY', '');
     vi.stubEnv('RESEND_API_KEY', 're_x');
     const fetch = stubFetch();
     await sendEmail('a@b.id', 's', 'b', 'u', 'c');
@@ -45,8 +46,8 @@ describe('sendEmail', () => {
 
   it('throws on a failed send so the caller can log it', async () => {
     vi.stubEnv('EMAIL_FROM', 'Tali <n@x.id>');
-    vi.stubEnv('ZEPTOMAIL_TOKEN', 't');
+    vi.stubEnv('BREVO_API_KEY', 'k');
     vi.stubGlobal('fetch', vi.fn(async () => new Response('{}', { status: 401 })));
-    await expect(sendEmail('a@b.id', 's', 'b', 'u', 'c')).rejects.toThrow('zeptomail 401');
+    await expect(sendEmail('a@b.id', 's', 'b', 'u', 'c')).rejects.toThrow('brevo 401');
   });
 });

@@ -4,8 +4,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardTitle } from '@/components/ui/card';
 import { PageHeader } from '@/components/ui/page';
 import { ProfileForm } from '@/components/creator/profile-form';
-import { SocialForm } from '@/components/creator/social-form';
-import { SocialList } from '@/components/creator/social-list';
 import { LanguageSwitch } from '@/components/language-switch';
 import { PushToggle } from '@/components/push-toggle';
 import { requireCreator } from '@/lib/auth';
@@ -19,7 +17,6 @@ export async function generateMetadata() {
 export default async function ProfilePage() {
   const viewer = await requireCreator();
   const t = await getTranslations('profile');
-  const ts = await getTranslations('social');
   const c = await getTranslations('common');
   const tl = await getTranslations('legal');
   const { data: accounts } = await viewer.supabase
@@ -31,16 +28,7 @@ export default async function ProfilePage() {
 
       <Card className="space-y-4">
         <CardTitle>{t('personal')}</CardTitle>
-        <ProfileForm profile={viewer.profile} />
-      </Card>
-
-      <Card className="space-y-4">
-        <CardTitle>{ts('title')}</CardTitle>
-        <SocialList accounts={accounts ?? []} />
-        <details>
-          <summary className="min-h-11 cursor-pointer py-2 font-bold text-nila-800">{ts('add')}</summary>
-          <SocialForm />
-        </details>
+        <ProfileForm profile={viewer.profile} accounts={accounts ?? []} mode="profile" />
       </Card>
 
       <Card className="space-y-4">

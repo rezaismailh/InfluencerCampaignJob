@@ -1,15 +1,14 @@
 import { getTranslations } from 'next-intl/server';
-import { Trash2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { verificationTone } from '@/components/status';
-import { removeSocialAccount } from '@/app/(creator)/actions';
+import { SocialRemoveButton } from '@/components/creator/social-remove-button';
 import type { SocialAccount } from '@/lib/types';
 
 export async function SocialList({ accounts }: { accounts: SocialAccount[] }) {
   const t = await getTranslations('social');
   const tp = await getTranslations('platform');
   const tv = await getTranslations('verification');
-  if (!accounts.length) return <p className="text-[15px] text-teks-redup">{t('empty')}</p>;
+  if (!accounts.length) return null;
   return (
     <ul className="space-y-2">
       {accounts.map((a) => (
@@ -20,12 +19,7 @@ export async function SocialList({ accounts }: { accounts: SocialAccount[] }) {
             <Badge tone={verificationTone[a.status]}>{tv(a.status)}</Badge>
             {a.status === 'rejected' && a.reject_reason && <p className="text-[13px] text-bahaya">{t('rejectedReason', { reason: a.reject_reason })}</p>}
           </div>
-          <form action={removeSocialAccount}>
-            <input type="hidden" name="id" value={a.id} />
-            <button className="inline-flex size-11 items-center justify-center rounded-full text-teks-redup hover:bg-latar" aria-label={t('remove')}>
-              <Trash2 className="size-5" aria-hidden />
-            </button>
-          </form>
+          <SocialRemoveButton id={a.id} label={t('remove')} />
         </li>
       ))}
     </ul>

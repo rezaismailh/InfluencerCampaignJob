@@ -6,18 +6,32 @@ import { saveProfile } from '@/app/(creator)/actions';
 import { RegionSelect } from '@/components/creator/region-select';
 import { decrypt } from '@/lib/crypto';
 import { provinceOf } from '@/lib/wilayah';
-import type { Profile } from '@/lib/types';
+import { SocialList } from '@/components/creator/social-list';
+import { SocialRows } from '@/components/creator/social-rows';
+import type { Profile, SocialAccount } from '@/lib/types';
 
 const CATEGORIES = ['food', 'beauty', 'fashion', 'lifestyle', 'tech', 'travel', 'parenting', 'gaming', 'health', 'finance', 'education', 'entertainment'];
 const PERSONAS = ['genz', 'student', 'foodies', 'lifestyle', 'parent', 'professional', 'other'];
 
-export async function ProfileForm({ profile }: { profile: Profile }) {
+/**
+ * Personal details and social accounts in one form with one button at the bottom.
+ * In onboarding the button finishes onboarding; on the profile page it saves.
+ */
+export async function ProfileForm({ profile, accounts, mode, next }: {
+  profile: Profile;
+  accounts: SocialAccount[];
+  mode: 'onboarding' | 'profile';
+  next?: string | null;
+}) {
   const t = await getTranslations('onboarding');
   const tc = await getTranslations('category');
   const tp = await getTranslations('persona');
   const c = await getTranslations('common');
+  const ts = await getTranslations('social');
+  const onboarding = mode === 'onboarding';
   return (
-    <ActionForm action={saveProfile}>
+    <ActionForm action={saveProfile} noValidate className="space-y-4">
+      {onboarding && <h2 className="pt-2 text-xl font-bold">{t('profileStep')}</h2>}
       <Field label={t('fullName')} htmlFor="full_name">
         <Input id="full_name" name="full_name" autoComplete="name" defaultValue={profile.full_name ?? ''} required />
         <FieldError name="full_name" />
@@ -51,7 +65,22 @@ export async function ProfileForm({ profile }: { profile: Profile }) {
         <Textarea id="address" name="address" autoComplete="street-address" defaultValue={decrypt(profile.address_enc) ?? ''} />
         <FieldError name="address" />
       </Field>
-      <SubmitButton pendingLabel={c('saving')} className="w-full">{t('saveProfile')}</SubmitButton>
+
+      <section id="field-social" tabIndex={-1} className="space-y-3 pt-6">
+        <h2 className="text-xl font-bold">{onboarding ? t('socialStep') : ts('title')}</h2>
+        <p className="text-[15px] text-teks-redup">{t('socialHint')}</p>
+        <SocialList accounts={accounts} />
+        <SocialRows startWithRow={accounts.length === 0} />
+        <FieldError name="social" />
+      </section>
+
+      {onboarding && next && <input type="hidden" name="next" value={next} />}
+      <div className="space-y-2 pt-4">
+        {onboarding && <p className="text-[15px] text-teks-redup">{t('finishHint')}</p>}
+        <SubmitButton name="finish" value={onboarding ? '1' : '0'} pendingLabel={c('saving')} className="w-full">
+          {onboarding ? t('finish') : t('saveProfile')}
+        </SubmitButton>
+      </div>
     </ActionForm>
   );
 }

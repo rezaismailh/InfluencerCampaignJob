@@ -816,6 +816,15 @@
     "iosBody": "Tap the Share button <share></share> in your browser, then choose Add to Home Screen.",
     "shareIcon": "Share icon",
     "inAppBody": "You're viewing Tali inside another app. Tap the ••• menu and choose Open in browser so you can install Tali.",
-    "dismiss": "Close"
+    "dismiss": "Close",
+    "later": "Maybe later",
+    "sheetTitle_onboarding": "Your profile is ready! Install Tali",
+    "sheetBody_onboarding": "Open Tali straight from your home screen and get notified when a matching job opens.",
+    "sheetTitle_applied": "Application sent! Install Tali so you don't miss a thing",
+    "sheetBody_applied": "You'll hear right away when your application is accepted, no need to keep checking.",
+    "iosStep1": "Tap the Share button",
+    "iosStep1Hint": "At the bottom of the screen (Safari) or in the address bar (Chrome).",
+    "iosStep2": "Choose Add to Home Screen",
+    "iosStep2Hint": "Scroll a little if you don't see it, then tap Add."
   }
 }

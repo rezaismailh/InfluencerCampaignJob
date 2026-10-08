@@ -57,7 +57,7 @@ describe('saveProfile', () => {
       finish: '1', next: '/job/abc', ...filled,
       social_platform_0: 'instagram', social_link_0: '@isreza', social_followers_0: '1.000',
       social_platform_1: '', social_link_1: '', social_followers_1: '',
-    }))).rejects.toThrow('REDIRECT /job/abc');
+    }))).rejects.toThrow('REDIRECT /job/abc?pasang=onboarding');
     expect(db.inserted).toEqual([{ creator_id: 'u1', platform: 'instagram', url: 'https://www.instagram.com/isreza', username: 'isreza', followers: 1000 }]);
     expect(db.updated).toMatchObject({ city: 'Kota Bandung', province: 'Jawa Barat' });
     expect(db.updated?.onboarded_at).toBeTruthy();
@@ -73,6 +73,6 @@ describe('saveProfile', () => {
   it('accepts finishing with an account saved earlier', async () => {
     db.socialCount = 1;
     const { saveProfile } = await import('@/app/(creator)/actions');
-    await expect(saveProfile({}, form({ finish: '1', ...filled }))).rejects.toThrow('REDIRECT /job');
+    await expect(saveProfile({}, form({ finish: '1', ...filled }))).rejects.toThrow('REDIRECT /job?pasang=onboarding');
   });
 });

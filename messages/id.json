@@ -816,6 +816,15 @@
     "iosBody": "Ketuk tombol Bagikan <share></share> di browser, lalu pilih Tambah ke Layar Utama (Add to Home Screen).",
     "shareIcon": "ikon Bagikan",
     "inAppBody": "Kamu sedang membuka Tali dari dalam aplikasi lain. Ketuk menu ••• lalu pilih Buka di browser, supaya Tali bisa dipasang ke layar utama.",
-    "dismiss": "Tutup"
+    "dismiss": "Tutup",
+    "later": "Nanti saja",
+    "sheetTitle_onboarding": "Profilmu siap! Pasang Tali di HP",
+    "sheetBody_onboarding": "Buka Tali langsung dari layar utama dan dapat notifikasi saat ada job baru yang cocok.",
+    "sheetTitle_applied": "Lamaranmu terkirim! Pasang Tali biar nggak ketinggalan",
+    "sheetBody_applied": "Kamu langsung dapat kabar begitu lamaranmu diterima, tanpa perlu cek berkali-kali.",
+    "iosStep1": "Ketuk tombol Bagikan",
+    "iosStep1Hint": "Di bawah layar (Safari) atau di kolom alamat (Chrome).",
+    "iosStep2": "Pilih Tambah ke Layar Utama",
+    "iosStep2Hint": "Gulir sedikit kalau belum terlihat, lalu ketuk Tambah."
   }
 }

@@ -303,3 +303,23 @@ select public.decide_application(id, true) from public.participations
 select tests.check((select status = 'verified' and verified_by = auth.uid() from public.social_accounts
   where creator_id = '00000000-0000-0000-0000-00000000000b'), 'accepting verified the pending account');
 reset role;
+
+-- Follower updates notify curators; stale counts get a reminder ------------------
+set role authenticated;
+select tests.act_as('00000000-0000-0000-0000-00000000000b');
+select public.update_social_followers((select id from public.social_accounts), 15000);
+select tests.check((select followers = 15000 and status = 'pending' from public.social_accounts), 'followers updated, back to pending');
+select tests.expect_error($$select public.update_social_followers((select id from public.social_accounts), -1)$$, 'invalid');
+select tests.act_as('00000000-0000-0000-0000-00000000000a');
+select tests.expect_error($$select public.update_social_followers((select id from public.social_accounts
+  where creator_id = '00000000-0000-0000-0000-00000000000b'), 1)$$, 'not_found');
+select tests.act_as('00000000-0000-0000-0000-000000000002');
+select tests.check((select count(*) = 1 from public.notifications where kind = 'followers_updated'
+  and (params ->> 'old')::int = 9000 and (params ->> 'new')::int = 15000), 'curator notified of follower update');
+reset role;
+update public.social_accounts set followers_updated_at = now() - interval '100 days'
+  where creator_id = '00000000-0000-0000-0000-00000000000a';
+set role service_role;
+select tests.check((public.run_daily() ->> 'followers_reminded')::int = 1, 'stale followers reminded');
+select tests.check((public.run_daily() ->> 'followers_reminded')::int = 0, 'reminder not repeated');
+reset role;

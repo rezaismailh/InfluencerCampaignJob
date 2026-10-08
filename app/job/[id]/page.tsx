@@ -150,6 +150,7 @@ export default async function JobDetail({ params }: { params: Promise<{ id: stri
     const matching = (accounts ?? []).filter((a) => job.platforms.includes(a.platform));
     const eligible = matching.length > 0;
     const pendingOnly = eligible && matching.every((a) => a.status === 'pending');
+    const best = matching.reduce<SocialAccount | null>((top, a) => (!top || a.followers > top.followers ? a : top), null);
     if (part) {
       if (part.status === 'invited') {
         return (
@@ -184,6 +185,18 @@ export default async function JobDetail({ params }: { params: Promise<{ id: stri
         <Alert tone="warning">
           {t('needAccount', { platforms: job.platforms.map((p) => tp(p)).join(' / ') })}{' '}
           <Link href="/profil" className="font-bold underline underline-offset-4">{t('addAccount')}</Link>
+        </Alert>
+      );
+    }
+    if (best && best.followers < job.min_followers) {
+      return (
+        <Alert tone="warning">
+          {t('followersBelowMin', {
+            min: job.min_followers.toLocaleString('id-ID'),
+            platform: tp(best.platform),
+            count: best.followers.toLocaleString('id-ID'),
+          })}{' '}
+          <Link href="/profil#field-social" className="font-bold underline underline-offset-4">{t('updateFollowersCta')}</Link>
         </Alert>
       );
     }

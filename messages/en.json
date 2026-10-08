@@ -278,7 +278,9 @@
     "needAccount": "Add your {platforms} account first to join this job.",
     "addAccount": "Add in Profile",
     "pendingAccountNote": "Your social media account is being verified. You can still apply now; the Tali team verifies it while reviewing applicants.",
-    "shareText": "There's a {title} campaign from {brand} on Tali, fee {fee}. See the details:"
+    "shareText": "There's a {title} campaign from {brand} on Tali, fee {fee}. See the details:",
+    "followersBelowMin": "This job needs at least {min} followers; your {platform} account shows {count}. If it has grown, update the number first.",
+    "updateFollowersCta": "Update followers"
   },
   "work": {
     "title": "Work",
@@ -408,7 +410,9 @@
     "social_verified": "Account @{username} is verified.",
     "social_rejected": "Account @{username} was rejected. {reason}",
     "emailSubject": "An update from Tali",
-    "emailOpen": "Open Tali"
+    "emailOpen": "Open Tali",
+    "followers_updated": "{name} updated {platform} @{username} followers: {old} → {new}. Recheck the number.",
+    "followers_stale": "Your {platform} @{username} follower count hasn't been updated in 3 months. Update it so you can apply to jobs that fit."
   },
   "admin": {
     "title": "Tali admin",
@@ -557,7 +561,7 @@
     "job_closed": "Applications for this job are closed.",
     "onboarding_incomplete": "Complete your profile before joining a job.",
     "no_verified_account": "You need a verified account on this job's platform.",
-    "followers_below_minimum": "Your followers are below this job's minimum.",
+    "followers_below_minimum": "Your followers are below this job's minimum. If they have grown, update the number in your Profile.",
     "rate_required": "Enter your proposed rate.",
     "rate_above_cap": "The rate is above this job's cap.",
     "already_applied": "You've already applied to this job.",

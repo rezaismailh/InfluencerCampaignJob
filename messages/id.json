@@ -278,7 +278,9 @@
     "needAccount": "Tambahkan akun {platforms} kamu dulu untuk gabung job ini.",
     "addAccount": "Tambah di Profil",
     "pendingAccountNote": "Akun media sosialmu sedang diverifikasi. Kamu tetap bisa daftar sekarang; tim Tali memverifikasinya saat menyeleksi pelamar.",
-    "shareText": "Ada campaign {title} dari {brand} di Tali, fee {fee}. Cek detailnya:"
+    "shareText": "Ada campaign {title} dari {brand} di Tali, fee {fee}. Cek detailnya:",
+    "followersBelowMin": "Job ini butuh minimal {min} followers, sedangkan akun {platform} kamu tercatat {count}. Kalau sudah bertambah, perbarui angkanya dulu.",
+    "updateFollowersCta": "Perbarui followers"
   },
   "work": {
     "title": "Kerjaan",
@@ -408,7 +410,9 @@
     "social_verified": "Akun @{username} terverifikasi.",
     "social_rejected": "Akun @{username} ditolak. {reason}",
     "emailSubject": "Kabar terbaru dari Tali",
-    "emailOpen": "Buka Tali"
+    "emailOpen": "Buka Tali",
+    "followers_updated": "{name} memperbarui followers {platform} @{username}: {old} → {new}. Cek ulang angkanya.",
+    "followers_stale": "Sudah 3 bulan followers {platform} @{username} belum diperbarui. Perbarui angkanya supaya kamu bisa daftar ke job yang syaratnya pas."
   },
   "admin": {
     "title": "Admin Tali",
@@ -557,7 +561,7 @@
     "job_closed": "Pendaftaran job ini sudah ditutup.",
     "onboarding_incomplete": "Lengkapi profilmu dulu sebelum gabung job.",
     "no_verified_account": "Kamu perlu akun terverifikasi di platform job ini.",
-    "followers_below_minimum": "Followers kamu belum memenuhi syarat minimal job ini.",
+    "followers_below_minimum": "Followers kamu belum memenuhi syarat minimal job ini. Kalau sudah bertambah, perbarui angkanya di Profil.",
     "rate_required": "Isi rate yang kamu ajukan.",
     "rate_above_cap": "Rate melebihi batas atas job ini.",
     "already_applied": "Kamu sudah mendaftar di job ini.",

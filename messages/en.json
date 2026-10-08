@@ -117,7 +117,7 @@
     "email": "Email",
     "emailPlaceholder": "name@email.com",
     "sendCode": "Send code",
-    "codeSent": "A 6-digit code was sent to {email}. Check your spam folder too.",
+    "codeSent": "A verification code was sent to {email}. Check your spam folder too.",
     "code": "Verification code",
     "verify": "Log in",
     "changeEmail": "Use another email",

@@ -25,7 +25,7 @@ export function revisionNumeral(version: number): string | null {
 
 export type Step = { key: string; done: boolean; date?: string | null; optional?: boolean };
 
-export function timeline(part: Participation, job: Pick<Job, 'job_type' | 'product_option'>, latest: Latest, payout?: PayoutRequest | null): Step[] {
+export function timeline(part: Participation, job: Pick<Job, 'job_type' | 'product_option' | 'require_insight'>, latest: Latest, payout?: PayoutRequest | null): Step[] {
   const hasPrep = job.job_type === 'visit' || job.product_option === 'shipped';
   const prepDone = job.job_type === 'visit' ? !!part.visit_at && new Date(part.visit_at) <= new Date() : part.shipment_status === 'received';
   const steps: Step[] = [{ key: 'stepJoined', done: part.status === 'approved', date: part.decided_at }];
@@ -35,6 +35,9 @@ export function timeline(part: Participation, job: Pick<Job, 'job_type' | 'produ
     { key: 'stepDraft', done: latest.draft?.status === 'approved', date: latest.draft?.approved_at },
     { key: 'stepCaption', done: latest.caption?.status === 'approved', date: latest.caption?.approved_at },
     { key: 'stepPosted', done: !!part.post_confirmed_at, date: part.post_confirmed_at },
+  );
+  if (job.require_insight) steps.push({ key: 'stepInsight', done: latest.insight?.status === 'approved', date: latest.insight?.approved_at });
+  steps.push(
     { key: 'stepRequested', done: !!payout, date: payout?.requested_at },
     { key: 'stepPaid', done: payout?.status === 'transferred', date: payout?.transferred_on },
   );

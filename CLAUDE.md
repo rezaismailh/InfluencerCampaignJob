@@ -9,7 +9,7 @@ Tali adalah PWA influencer marketing untuk nano & micro creator (pasar Indonesia
 - Brand **bukan** pengguna aplikasi. Peran: `creator`, `curator`, `finance`, `owner` (kurator + keuangan).
 - Job dikurasi tim Tali; tipe `non_visit` / `visit`; fee `fixed` atau `open` (creator mengajukan rate, batas atas opsional). Satu job bisa beberapa platform dengan satu fee.
 - Storyline (link Google Docs) → draft (link Google Drive / foto) → caption; masing-masing wajib disetujui, revisi tidak dibatasi, feedback tim Tali dan brand dicatat terpisah.
-- Pencairan manual by request setelah TOP (H+7/H+14/H+30 sejak postingan dikonfirmasi). Minimal Rp 10.000, biaya Rp 2.500 kecuali BCA/Mandiri, transfer maks. H+3 hari kerja. Tidak ada unggah bukti transfer; admin keuangan menandai status.
+- Pencairan manual by request setelah TOP: H+7/H+14/H+30, atau tanggal bayar bulanan dengan cut-off (mis. bayar tgl 21, cut-off tgl 14). Patokannya tanggal posting dikonfirmasi, atau tanggal insight dikirim kalau job mewajibkan insight (`public.ready_date`). Minimal Rp 10.000, biaya Rp 2.500 kecuali BCA/Mandiri, transfer maks. H+3 hari kerja. Tidak ada unggah bukti transfer; admin keuangan menandai status.
 - Tidak ada Xendit, eKYC, potong PPh, atau akses klien di MVP.
 
 ## Stack

@@ -193,7 +193,7 @@ export async function submitItem(_prev: ActionState, formData: FormData): Promis
   const viewer = await requireCreator();
   const part = text(formData.get('participation_id'));
   const kind = text(formData.get('kind'));
-  if (!['storyline', 'draft', 'caption'].includes(kind)) return { error: 'invalid' };
+  if (!['storyline', 'draft', 'caption', 'insight'].includes(kind)) return { error: 'invalid' };
   let photos: string[] = [];
   try {
     const raw = JSON.parse(text(formData.get('photos')) || '[]');

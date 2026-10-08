@@ -373,3 +373,49 @@ reset role;
 set role anon;
 select tests.check((select tier_fees ->> 'micro' = '300000' from public.public_open_jobs('20000000-0000-0000-0000-0000000000a1')), 'teaser shows tier fees');
 reset role;
+
+-- Monthly payment terms and the insight step ------------------------------------
+reset role;
+insert into public.jobs (id, brand_name, title, platforms, deliverables, brief, fee_type, fee, quota, top_days, status,
+  top_mode, pay_day, cutoff_day, require_insight)
+values ('20000000-0000-0000-0000-0000000000b1', 'Uji', 'Job bulanan', '{tiktok}', 'x', 'x', 'fixed', 200000, 5, 7, 'open',
+  'monthly', 21, 14, true);
+select tests.check((select public.ready_date(j, '2026-10-10') = '2026-10-21' and public.ready_date(j, '2026-10-14') = '2026-10-21'
+  and public.ready_date(j, '2026-10-15') = '2026-11-21' and public.ready_date(j, '2026-12-20') = '2027-01-21'
+  from public.jobs j where id = '20000000-0000-0000-0000-0000000000b1'), 'monthly: cut-off 14 inclusive, pay day 21');
+update public.jobs set pay_day = 5, cutoff_day = 25 where id = '20000000-0000-0000-0000-0000000000b1';
+select tests.check((select public.ready_date(j, '2026-10-20') = '2026-11-05' from public.jobs j
+  where id = '20000000-0000-0000-0000-0000000000b1'), 'monthly: pay day earlier than cut-off rolls to next month');
+update public.jobs set pay_day = 21, cutoff_day = 14 where id = '20000000-0000-0000-0000-0000000000b1';
+select tests.check((select public.ready_date(j, '2026-10-10') = '2026-10-17' from public.jobs j
+  where id = '20000000-0000-0000-0000-000000000001'), 'days mode unchanged (H+7)');
+
+-- Insight flow on an approved participation for creator A
+insert into public.participations (id, job_id, creator_id, status, agreed_fee, post_url)
+values ('30000000-0000-0000-0000-0000000000b1', '20000000-0000-0000-0000-0000000000b1', '00000000-0000-0000-0000-00000000000a',
+  'approved', 200000, 'https://www.tiktok.com/@cra/video/1');
+set role authenticated;
+select tests.act_as('00000000-0000-0000-0000-00000000000a');
+select tests.expect_error($$select public.submit_item('30000000-0000-0000-0000-0000000000b1', 'insight', null,
+  array['00000000-0000-0000-0000-00000000000a/i/1.jpg'])$$, 'post_not_confirmed');
+select tests.act_as('00000000-0000-0000-0000-000000000002');
+select public.confirm_post('30000000-0000-0000-0000-0000000000b1');
+select tests.check((select ready_at is null from public.participations where id = '30000000-0000-0000-0000-0000000000b1'),
+  'insight job: no payout date at post confirmation');
+select tests.act_as('00000000-0000-0000-0000-00000000000a');
+select tests.check((select count(*) = 1 from public.notifications where kind = 'insight_requested'), 'creator asked for insight');
+select tests.expect_error($$select public.submit_item('30000000-0000-0000-0000-0000000000b1', 'insight', null, '{}')$$, 'insight_photos_required');
+select public.submit_item('30000000-0000-0000-0000-0000000000b1', 'insight', 'Reach 12rb',
+  array['00000000-0000-0000-0000-00000000000a/i/1.jpg']);
+reset role;
+update public.submissions set submitted_at = '2026-10-15 09:00+07' where kind = 'insight';
+set role authenticated;
+select tests.act_as('00000000-0000-0000-0000-000000000002');
+select public.review_submission((select id from public.submissions where kind = 'insight'), 'approved');
+select tests.check((select insight_sent_on = '2026-10-15' and ready_at = '2026-11-21' from public.participations
+  where id = '30000000-0000-0000-0000-0000000000b1'), 'insight sent on the 15th -> payable 21 next month');
+reset role;
+set role anon;
+select tests.check((select top_mode = 'monthly' and pay_day = 21 and require_insight from public.public_open_jobs('20000000-0000-0000-0000-0000000000b1')),
+  'teaser has payment terms');
+reset role;

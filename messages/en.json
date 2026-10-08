@@ -384,8 +384,7 @@
     "pushOn": "Turn on notifications",
     "pushEnabled": "Notifications are on for this device.",
     "pushUnsupported": "This browser doesn't support notifications yet. On iPhone, add Tali to the Home Screen first.",
-    "pushDenied": "Notification permission was denied. Turn it on in your browser settings.",
-    "installHint": "Add Tali to your Home Screen to open it faster."
+    "pushDenied": "Notification permission was denied. Turn it on in your browser settings."
   },
   "notifications": {
     "title": "Notifications",
@@ -809,5 +808,14 @@
     "copied": "Link copied",
     "whatsapp": "WhatsApp",
     "copyPrompt": "Copy this link:"
+  },
+  "install": {
+    "title": "Install Tali on your phone",
+    "androidBody": "Open Tali straight from your home screen, faster and with notifications.",
+    "install": "Install app",
+    "iosBody": "Tap the Share button <share></share> in your browser, then choose Add to Home Screen.",
+    "shareIcon": "Share icon",
+    "inAppBody": "You're viewing Tali inside another app. Tap the ••• menu and choose Open in browser so you can install Tali.",
+    "dismiss": "Close"
   }
 }

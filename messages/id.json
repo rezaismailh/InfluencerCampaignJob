@@ -384,8 +384,7 @@
     "pushOn": "Aktifkan notifikasi",
     "pushEnabled": "Notifikasi aktif di perangkat ini.",
     "pushUnsupported": "Browser ini belum mendukung notifikasi. Di iPhone, pasang Tali ke Home Screen dulu.",
-    "pushDenied": "Izin notifikasi ditolak. Aktifkan dari pengaturan browser.",
-    "installHint": "Pasang Tali ke Home Screen supaya lebih cepat dibuka."
+    "pushDenied": "Izin notifikasi ditolak. Aktifkan dari pengaturan browser."
   },
   "notifications": {
     "title": "Notifikasi",
@@ -809,5 +808,14 @@
     "copied": "Link disalin",
     "whatsapp": "WhatsApp",
     "copyPrompt": "Salin link ini:"
+  },
+  "install": {
+    "title": "Pasang Tali di HP kamu",
+    "androidBody": "Buka Tali langsung dari layar utama, lebih cepat dan dapat notifikasi.",
+    "install": "Pasang aplikasi",
+    "iosBody": "Ketuk tombol Bagikan <share></share> di browser, lalu pilih Tambah ke Layar Utama (Add to Home Screen).",
+    "shareIcon": "ikon Bagikan",
+    "inAppBody": "Kamu sedang membuka Tali dari dalam aplikasi lain. Ketuk menu ••• lalu pilih Buka di browser, supaya Tali bisa dipasang ke layar utama.",
+    "dismiss": "Tutup"
   }
 }

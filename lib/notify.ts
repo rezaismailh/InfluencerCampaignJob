@@ -29,18 +29,43 @@ function escapeHtml(s: string) {
   return s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 }
 
-async function sendEmail(to: string, subject: string, body: string, url: string, cta: string) {
-  const key = process.env.RESEND_API_KEY;
+/** "Tali <notifikasi@jointali.online>" → name and address. */
+export function parseFrom(from: string): { name: string; address: string } {
+  const m = from.match(/^\s*"?([^"<]*?)"?\s*<([^>]+)>\s*$/);
+  return m ? { name: m[1].trim(), address: m[2].trim() } : { name: '', address: from.trim() };
+}
+
+/**
+ * Sends through ZeptoMail (Zoho) when ZEPTOMAIL_TOKEN is set, otherwise Resend.
+ * Does nothing when neither provider or EMAIL_FROM is configured.
+ */
+export async function sendEmail(to: string, subject: string, body: string, url: string, cta: string) {
   const from = process.env.EMAIL_FROM;
-  if (!key || !from) return;
+  const zepto = process.env.ZEPTOMAIL_TOKEN;
+  const resend = process.env.RESEND_API_KEY;
+  if (!from || (!zepto && !resend)) return;
   const html = `<div style="font-family:sans-serif;font-size:16px;line-height:24px;color:#1A174F">
     <p>${escapeHtml(body)}</p>
     <p><a href="${escapeHtml(url)}" style="display:inline-block;background:#24206B;color:#F7F5EF;padding:12px 20px;border-radius:14px;text-decoration:none;font-weight:700">${escapeHtml(cta)}</a></p>
   </div>`;
+  const text = `${body}\n\n${url}`;
+
+  if (zepto) {
+    // The console shows the token as "Zoho-enczapikey …"; accept it with or without the prefix.
+    const token = zepto.replace(/^Zoho-enczapikey\s+/i, '').trim();
+    const res = await fetch(process.env.ZEPTOMAIL_API_URL ?? 'https://api.zeptomail.com/v1.1/email', {
+      method: 'POST',
+      headers: { Authorization: `Zoho-enczapikey ${token}`, 'Content-Type': 'application/json', Accept: 'application/json' },
+      body: JSON.stringify({ from: parseFrom(from), to: [{ email_address: { address: to } }], subject, htmlbody: html, textbody: text }),
+    });
+    if (!res.ok) throw new Error(`zeptomail ${res.status}`);
+    return;
+  }
+
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
-    headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ from, to, subject, html, text: `${body}\n\n${url}` }),
+    headers: { Authorization: `Bearer ${resend}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ from, to, subject, html, text }),
   });
   if (!res.ok) throw new Error(`resend ${res.status}`);
 }
@@ -72,8 +97,9 @@ export async function deliverPending(limit = 50) {
     const channels = channelsFor(n.kind);
     try {
       if (channels.email && n.profiles?.email) await sendEmail(n.profiles.email, t('emailSubject'), body, url, t('emailOpen'));
-    } catch {
-      // Email failure must not block push or the in-app copy.
+    } catch (e) {
+      // Email failure must not block push or the in-app copy; log it so it shows in Railway logs.
+      console.error('email failed', n.kind, (e as Error).message);
     }
     if (canPush && channels.push) {
       const { data: subs } = await admin.from('push_subscriptions').select('id, endpoint, p256dh, auth').eq('user_id', n.user_id);

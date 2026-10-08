@@ -23,7 +23,7 @@ Tali adalah PWA influencer marketing untuk nano & micro creator (pasar Indonesia
 | Backend & DB | **Supabase** (Postgres, Auth, Storage, RLS), region Singapura, paket gratis dulu |
 | Form & validasi | Server Actions + **Zod**; aturan uang dan urutan review ada di fungsi SQL |
 | i18n | **next-intl** tanpa prefix URL (cookie `NEXT_LOCALE`, `id` default, `en`) |
-| Notifikasi | Tabel `notifications` (in-app) + email (Resend) + Web Push, dikirim `lib/notify.ts` |
+| Notifikasi | Tabel `notifications` (in-app) + email (ZeptoMail/Resend) + Web Push, dikirim `lib/notify.ts` |
 | Hosting | **Railway** (aplikasi + cron yang memanggil `/api/cron/*`) |
 
 ## Konvensi

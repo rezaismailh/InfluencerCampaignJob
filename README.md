@@ -40,7 +40,7 @@ npm run db:test   # migrasi + tes RLS/aturan bisnis di PostgreSQL lokal (butuh i
      | Magic Link | `{{ .Token }} adalah kode masuk Tali kamu` | `supabase/templates/magic-link.html` |
      | Confirm signup | `Selamat datang di Tali, ini kode verifikasimu` | `supabase/templates/confirm-signup.html` |
    - Google: aktifkan dan isi Client ID/Secret dari Google Cloud Console. Di consent screen Google, isi privacy policy `https://<domain>/privasi` dan terms `https://<domain>/ketentuan`.
-4. **Auth → URL Configuration**: Site URL = URL Railway, tambahkan `https://<domain>/auth/callback` ke Redirect URLs.
+4. **Auth → URL Configuration**: Site URL = `https://<domain>` (bukan localhost). Di Redirect URLs tambahkan `https://<domain>/**` (pakai `/**`, karena callback membawa `?next=...`) dan domain Railway dengan pola yang sama.
 5. **Project Settings → API**: salin URL, `anon` key, dan `service_role` key ke environment variable.
 6. **Akun staf**: login sekali ke aplikasi, lalu set perannya di SQL Editor:
 

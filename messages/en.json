@@ -521,10 +521,10 @@
       "requireInsight": "Insight required after posting",
       "requireInsightHint": "When on, the payout date counts from the day the insight is sent (once approved), not from post confirmation.",
       "brandLogo": "Brand logo (optional)",
-      "brandLogoHint": "PNG, JPG or WebP. Resized and compressed automatically on upload. Shown only when the real name is shown; disguised brands use an icon.",
+      "brandLogoHint": "PNG, JPG or WebP. Resized and compressed automatically on upload. For a disguised brand, creators see the logo only once they are invited or approved; until then they see the stand-in icon.",
       "brandLogoUpload": "Upload logo",
       "brandIcon": "Stand-in icon",
-      "brandIconHint": "Used for disguised brands, or when there is no logo. Pick the closest product category.",
+      "brandIconHint": "Shown while the brand is disguised (before a creator is accepted), or when there is no logo. Pick the closest product category.",
       "brandIcons": {
         "store": "General",
         "food": "Food",
@@ -627,7 +627,33 @@
     "activeLabel": "Active (shown in pickers)",
     "add": "Add",
     "tierFeeHint": "From the {tier} tier fee. You can change it.",
-    "inviteTierFeeHint": "Leave empty to use the fee for the creator's tier."
+    "inviteTierFeeHint": "Leave empty to use the fee for the creator's tier.",
+    "export": {
+      "title": "Export applicants",
+      "hint": "Excel file for the client to curate. The client version lists applicants still waiting for a decision, without email, phone or address, plus \"Client decision\" and \"Client note\" columns to fill in. The internal version lists everyone on this job with contact details; never send it to the client.",
+      "client": "For the client ({count} applicants)",
+      "internal": "Internal (with contacts)",
+      "sheetName": "Applicants",
+      "no": "No",
+      "id": "ID",
+      "name": "Name",
+      "city": "City",
+      "niche": "Niche",
+      "persona": "Persona",
+      "tier": "Account size",
+      "username": "{platform} username",
+      "link": "{platform} link",
+      "followers": "{platform} followers",
+      "accountStatus": "{platform} account status",
+      "proposedRate": "Proposed rate (Rp)",
+      "fee": "Fee (Rp)",
+      "appliedAt": "Applied on",
+      "status": "Status",
+      "email": "Email",
+      "whatsapp": "WhatsApp",
+      "clientDecision": "Client decision (Yes/No)",
+      "clientNote": "Client note"
+    }
   },
   "errors": {
     "generic": "Something didn't work. Try again in a moment.",
@@ -688,8 +714,7 @@
     "primary_platform_required": "Pick a main platform that is one of the job's platforms.",
     "tier_not_offered": "Your tier isn't included in this job.",
     "post_not_confirmed": "You can send the insight once your post is confirmed.",
-    "insight_photos_required": "Upload at least one insight screenshot.",
-    "logo_with_alias": "A logo would reveal the disguised brand. Remove the logo, or choose to show the real name."
+    "insight_photos_required": "Upload at least one insight screenshot."
   },
   "success": {
     "saved": "Saved.",

@@ -521,10 +521,10 @@
       "requireInsight": "Wajib kirim insight setelah posting",
       "requireInsightHint": "Kalau aktif, tanggal cair dihitung dari tanggal insight dikirim (setelah disetujui), bukan dari konfirmasi posting.",
       "brandLogo": "Logo brand (opsional)",
-      "brandLogoHint": "PNG, JPG, atau WebP. Otomatis dikecilkan dan dikompres saat diunggah. Hanya tampil kalau nama asli ditampilkan; brand yang disamarkan memakai ikon.",
+      "brandLogoHint": "PNG, JPG, atau WebP. Otomatis dikecilkan dan dikompres saat diunggah. Kalau brand disamarkan, logo baru tampil ke creator setelah mereka diundang atau diterima; sebelum itu yang tampil ikon pengganti.",
       "brandLogoUpload": "Unggah logo",
       "brandIcon": "Ikon pengganti logo",
-      "brandIconHint": "Dipakai untuk brand yang disamarkan, atau kalau belum ada logo. Pilih yang paling dekat dengan kategori produknya.",
+      "brandIconHint": "Tampil selama brand disamarkan (sebelum creator diterima), atau kalau belum ada logo. Pilih yang paling dekat dengan kategori produknya.",
       "brandIcons": {
         "store": "Umum",
         "food": "Makanan",
@@ -627,7 +627,33 @@
     "activeLabel": "Aktif (muncul di pilihan)",
     "add": "Tambah",
     "tierFeeHint": "Sesuai fee tier {tier}. Bisa diubah.",
-    "inviteTierFeeHint": "Kosongkan untuk memakai fee sesuai tier creator."
+    "inviteTierFeeHint": "Kosongkan untuk memakai fee sesuai tier creator.",
+    "export": {
+      "title": "Export data pelamar",
+      "hint": "File Excel untuk dikurasi klien. Versi klien berisi pelamar yang belum diputuskan, tanpa email, nomor HP, dan alamat, plus kolom \"Keputusan klien\" dan \"Catatan klien\" untuk diisi. Versi internal berisi semua creator di job ini beserta kontaknya; jangan dikirim ke klien.",
+      "client": "Untuk klien ({count} pelamar)",
+      "internal": "Internal (dengan kontak)",
+      "sheetName": "Pelamar",
+      "no": "No",
+      "id": "ID",
+      "name": "Nama",
+      "city": "Kota",
+      "niche": "Niche",
+      "persona": "Persona",
+      "tier": "Ukuran akun",
+      "username": "{platform} username",
+      "link": "{platform} link",
+      "followers": "{platform} followers",
+      "accountStatus": "{platform} status akun",
+      "proposedRate": "Rate diajukan (Rp)",
+      "fee": "Fee (Rp)",
+      "appliedAt": "Tanggal daftar",
+      "status": "Status",
+      "email": "Email",
+      "whatsapp": "WhatsApp",
+      "clientDecision": "Keputusan klien (Ya/Tidak)",
+      "clientNote": "Catatan klien"
+    }
   },
   "errors": {
     "generic": "Ada yang belum berhasil. Coba lagi sebentar lagi.",
@@ -688,8 +714,7 @@
     "primary_platform_required": "Pilih platform utama yang termasuk platform job ini.",
     "tier_not_offered": "Tier kamu belum termasuk di job ini.",
     "post_not_confirmed": "Insight bisa dikirim setelah postingan dikonfirmasi.",
-    "insight_photos_required": "Unggah minimal satu screenshot insight.",
-    "logo_with_alias": "Logo akan membuka nama brand yang disamarkan. Hapus logonya, atau pilih tampilkan nama asli."
+    "insight_photos_required": "Unggah minimal satu screenshot insight."
   },
   "success": {
     "saved": "Tersimpan.",

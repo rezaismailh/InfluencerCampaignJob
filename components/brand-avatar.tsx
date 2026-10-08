@@ -8,8 +8,8 @@ export const BRAND_ICON_COMPONENTS: Record<BrandIcon, LucideIcon> = {
 };
 
 /**
- * The brand's logo, or its category icon when there is none. Disguised brands never
- * have a logo (saveJob clears it), so they always get the icon.
+ * The brand's logo, or its category icon when there is none. Callers pass the logo this
+ * viewer may see: a disguised brand's logo only reaches staff and accepted creators.
  */
 export function BrandAvatar({ logo, icon, size = 40, className }: {
   logo?: string | null;

@@ -21,7 +21,7 @@ import { formatDate, formatDayMonth, monthlyPaymentExample, todayWib } from '@/l
 import { cn } from '@/lib/cn';
 import { formatRupiah } from '@/lib/money';
 import type { Job, Participation, PublicJob, SocialAccount } from '@/lib/types';
-import { visibleBrand, type BrandEmbed } from '@/lib/brand';
+import { visibleBrand, visibleLogo, type BrandEmbed } from '@/lib/brand';
 
 async function publicJob(id: string) {
   const supabase = await createClient();
@@ -54,7 +54,7 @@ export default async function JobDetail({ params }: { params: Promise<{ id: stri
   const locale = await getLocale();
 
   // Signed-in users read the job through RLS (full brief); guests get the teaser.
-  const full = viewer ? (await viewer.supabase.from('jobs').select('*, job_brands(real_name)').eq('id', id).maybeSingle<Job & { job_brands: BrandEmbed }>()).data : null;
+  const full = viewer ? (await viewer.supabase.from('jobs').select('*, job_brands(real_name, logo)').eq('id', id).maybeSingle<Job & { job_brands: BrandEmbed }>()).data : null;
   const job: Job | PublicJob | null = full ?? await publicJob(id);
   if (!job) notFound();
   const fee = await feeLabel(job);
@@ -69,7 +69,7 @@ export default async function JobDetail({ params }: { params: Promise<{ id: stri
         <ChevronLeft className="size-5" strokeWidth={2} aria-hidden /> {tn('jobs')}
       </Link>
       <header className="flex items-start gap-3">
-        <BrandAvatar logo={job.brand_logo} icon={job.brand_icon} size={48} />
+        <BrandAvatar logo={full ? visibleLogo(full) : job.brand_logo} icon={job.brand_icon} size={48} />
         <div className="min-w-0">
           <p className="text-[13px] font-medium text-teks-redup">{full ? visibleBrand(full) : job.brand_name}</p>
           <h1 className="text-[22px] font-bold leading-7">{job.title}</h1>

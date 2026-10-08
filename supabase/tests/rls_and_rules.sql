@@ -429,3 +429,9 @@ set role anon;
 select tests.check((select brand_icon = 'food' and brand_logo like 'jobs/%' from public.public_open_jobs('20000000-0000-0000-0000-0000000000b1')),
   'teaser has brand look');
 reset role;
+
+-- Hidden brand logo lives in job_brands
+reset role;
+select tests.expect_error($$update public.job_brands set logo = 'x.png'$$, 'job_brands_logo_check');
+update public.job_brands set logo = 'jobs/20000000-0000-0000-0000-000000000001.png' where job_id = '20000000-0000-0000-0000-000000000001';
+select tests.check((select count(*) = 1 from public.job_brands where logo is not null), 'hidden logo stored');

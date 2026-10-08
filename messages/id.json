@@ -826,5 +826,11 @@
     "iosStep1Hint": "Di bawah layar (Safari) atau di kolom alamat (Chrome).",
     "iosStep2": "Pilih Tambah ke Layar Utama",
     "iosStep2Hint": "Gulir sedikit kalau belum terlihat, lalu ketuk Tambah."
+  },
+  "pushCard": {
+    "title": "Aktifkan notifikasi",
+    "body": "Dapat kabar langsung di HP saat lamaranmu diterima, ada revisi, atau fee siap dicairkan.",
+    "enable": "Aktifkan",
+    "dismiss": "Tutup"
   }
 }

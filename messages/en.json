@@ -826,5 +826,11 @@
     "iosStep1Hint": "At the bottom of the screen (Safari) or in the address bar (Chrome).",
     "iosStep2": "Choose Add to Home Screen",
     "iosStep2Hint": "Scroll a little if you don't see it, then tap Add."
+  },
+  "pushCard": {
+    "title": "Turn on notifications",
+    "body": "Get notified on your phone when your application is accepted, a revision comes in, or your fee is ready.",
+    "enable": "Turn on",
+    "dismiss": "Close"
   }
 }

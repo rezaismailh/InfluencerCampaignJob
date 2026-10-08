@@ -6,6 +6,7 @@ import { PageHeader } from '@/components/ui/page';
 import { ProfileForm } from '@/components/creator/profile-form';
 import { LanguageSwitch } from '@/components/language-switch';
 import { PushToggle } from '@/components/push-toggle';
+import { InstallPrompt } from '@/components/install-prompt';
 import { requireCreator } from '@/lib/auth';
 import type { SocialAccount } from '@/lib/types';
 
@@ -40,8 +41,9 @@ export default async function ProfilePage() {
         <div className="space-y-2">
           <p className="text-[15px] font-bold">{t('push')}</p>
           <PushToggle />
-          <p className="text-[13px] text-teks-redup">{t('installHint')}</p>
         </div>
+        {/* Always available in the browser (hidden inside the installed app), so a removed app can be reinstalled. */}
+        <InstallPrompt dismissible={false} />
         <div className="flex gap-4 text-[15px]">
           <Link href="/privasi" className="inline-flex min-h-11 items-center font-bold text-nila-800 underline underline-offset-4">{tl('privacyTitle')}</Link>
           <Link href="/ketentuan" className="inline-flex min-h-11 items-center font-bold text-nila-800 underline underline-offset-4">{tl('termsTitle')}</Link>

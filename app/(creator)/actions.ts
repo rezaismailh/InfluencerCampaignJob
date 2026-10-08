@@ -129,6 +129,25 @@ export async function saveProfile(_prev: ActionState, formData: FormData): Promi
   return { ok: true, success: 'saved' };
 }
 
+/** Called once when the app is opened from the home screen; hides the install banner everywhere. */
+export async function markAppInstalled() {
+  const viewer = await requireCreator({ allowIncomplete: true });
+  if (viewer.profile.app_installed_at) return;
+  await viewer.supabase.from('profiles').update({ app_installed_at: new Date().toISOString() }).eq('id', viewer.id);
+}
+
+/** A creator updates their follower count; the account goes back to "pending" for a recheck and curators are notified. */
+export async function updateFollowers(id: string, value: string): Promise<{ ok: boolean }> {
+  const viewer = await requireCreator({ allowIncomplete: true });
+  const followers = parseRupiah(value);
+  if (followers === null) return { ok: false };
+  const { error } = await viewer.supabase.rpc('update_social_followers', { p_id: id, p_followers: followers });
+  if (error) return { ok: false };
+  deliverLater();
+  revalidatePath('/', 'layout');
+  return { ok: true };
+}
+
 export async function removeSocialAccount(formData: FormData) {
   const viewer = await requireCreator({ allowIncomplete: true });
   await viewer.supabase.from('social_accounts').delete().eq('id', text(formData.get('id'))).eq('creator_id', viewer.id);

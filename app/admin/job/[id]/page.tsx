@@ -10,7 +10,7 @@ import { PageHeader } from '@/components/ui/page';
 import { SubmitButton } from '@/components/ui/submit-button';
 import { participationTone, verificationTone } from '@/components/status';
 import { feeLabel } from '@/components/creator/job-card';
-import { decideApplication, inviteCreator, verifySocial } from '@/app/admin/actions';
+import { decideApplication, inviteCreator } from '@/app/admin/actions';
 import { requireStaff } from '@/lib/auth';
 import { realBrand, type BrandEmbed } from '@/lib/brand';
 import { formatRupiah } from '@/lib/money';
@@ -65,7 +65,9 @@ export default async function AdminJob({ params }: { params: Promise<{ id: strin
         <div className="grid gap-3 lg:grid-cols-2">
           {applicants.map((r) => {
             const accs = (accounts ?? []).filter((a) => a.creator_id === r.creator_id);
-            const ready = accs.some((a) => a.status === 'verified' && job.platforms.includes(a.platform) && a.followers >= job.min_followers);
+            const eligible = (a: SocialAccount) => job.platforms.includes(a.platform) && a.followers >= job.min_followers;
+            const ready = accs.some((a) => a.status === 'verified' && eligible(a));
+            const pending = !ready && accs.some((a) => a.status === 'pending' && eligible(a));
             return (
               <Card key={r.id} className="space-y-3">
                 <div>
@@ -78,17 +80,11 @@ export default async function AdminJob({ params }: { params: Promise<{ id: strin
                       <a href={a.url} target="_blank" rel="noreferrer" className="font-medium underline underline-offset-4">{tp(a.platform)} @{a.username}</a>
                       <span className="tabular text-teks-redup">{a.followers.toLocaleString('id-ID')}</span>
                       <Badge tone={verificationTone[a.status]}>{tv(a.status)}</Badge>
-                      {a.status === 'pending' && job.platforms.includes(a.platform) && (
-                        <ActionForm action={verifySocial}>
-                          <input type="hidden" name="id" value={a.id} />
-                          <input type="hidden" name="followers" value={a.followers} />
-                          <SubmitButton name="decision" value="approve" size="sm" variant="outline">{t('verifyNow')}</SubmitButton>
-                        </ActionForm>
-                      )}
                     </li>
                   ))}
                 </ul>
-                {!ready && <p className="text-[13px] text-peringatan">{t('verifyBeforeApprove')}</p>}
+                {pending && <p className="text-[13px] text-teks-redup">{t('acceptVerifies')}</p>}
+                {!ready && !pending && <p className="text-[13px] text-peringatan">{t('cannotAccept')}</p>}
                 {r.proposed_rate && <p className="font-bold">{t('proposedRate', { amount: formatRupiah(r.proposed_rate) })}</p>}
                 <ActionForm action={decideApplication} className="space-y-3">
                   <input type="hidden" name="participation_id" value={r.id} />

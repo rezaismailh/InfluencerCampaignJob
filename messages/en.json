@@ -207,7 +207,11 @@
     "addRow": "Add social account",
     "hint_unsupported_link": "Link not recognised. Paste your profile link or just type the username.",
     "hint_platform_mismatch": "This link isn't from the selected platform.",
-    "hint_username_required": "Couldn't read a username. Just type it, for example @yourname."
+    "hint_username_required": "Couldn't read a username. Just type it, for example @yourname.",
+    "updateFollowers": "Update",
+    "saveFollowers": "Save",
+    "followersInvalid": "Enter a valid follower count.",
+    "followersRecheck": "After updating, the Tali team rechecks the number."
   },
   "home": {
     "greeting": "Hi, {name}",
@@ -221,7 +225,7 @@
     "emptyActive": "You haven't joined a campaign yet.",
     "emptyActiveBody": "See the jobs open right now.",
     "seeJobs": "See jobs",
-    "socialPending": "Your social accounts are being verified. You can apply to jobs once one is verified.",
+    "socialPending": "The Tali team is verifying your social accounts. You can already apply to jobs while you wait.",
     "inviteTitle": "Job invitations"
   },
   "jobs": {
@@ -273,7 +277,10 @@
     "briefLocked": "The full brief and location addresses are visible after you log in.",
     "needAccount": "Add your {platforms} account first to join this job.",
     "addAccount": "Add in Profile",
-    "pendingAccountNote": "Your social media account is being verified. You can still apply now; the Tali team verifies it while reviewing applicants."
+    "pendingAccountNote": "Your social media account is being verified. You can still apply now; the Tali team verifies it while reviewing applicants.",
+    "shareText": "There's a {title} campaign from {brand} on Tali, fee {fee}. See the details:",
+    "followersBelowMin": "This job needs at least {min} followers; your {platform} account shows {count}. If it has grown, update the number first.",
+    "updateFollowersCta": "Update followers"
   },
   "work": {
     "title": "Work",
@@ -377,8 +384,7 @@
     "pushOn": "Turn on notifications",
     "pushEnabled": "Notifications are on for this device.",
     "pushUnsupported": "This browser doesn't support notifications yet. On iPhone, add Tali to the Home Screen first.",
-    "pushDenied": "Notification permission was denied. Turn it on in your browser settings.",
-    "installHint": "Add Tali to your Home Screen to open it faster."
+    "pushDenied": "Notification permission was denied. Turn it on in your browser settings."
   },
   "notifications": {
     "title": "Notifications",
@@ -403,7 +409,9 @@
     "social_verified": "Account @{username} is verified.",
     "social_rejected": "Account @{username} was rejected. {reason}",
     "emailSubject": "An update from Tali",
-    "emailOpen": "Open Tali"
+    "emailOpen": "Open Tali",
+    "followers_updated": "{name} updated {platform} @{username} followers: {old} → {new}. Recheck the number.",
+    "followers_stale": "Your follower count for {accounts} hasn't been updated in 3 months. If it has changed, update it in your Profile so the jobs you see fit."
   },
   "admin": {
     "title": "Tali admin",
@@ -534,9 +542,10 @@
     "holidaysEmpty": "No holidays yet.",
     "onlyFinance": "This page is for finance admins.",
     "onlyCurator": "This page is for curators.",
-    "verifyNow": "Verify",
-    "verifyBeforeApprove": "Verify the applicant's account on this job's platform (and check the follower minimum) before accepting.",
-    "brandShownAs": "{real} · shown as “{alias}”"
+    "brandShownAs": "{real} · shown as “{alias}”",
+    "acceptVerifies": "Accepting this applicant also verifies their account. Open the profile link first to check it.",
+    "cannotAccept": "Can't be accepted yet: the account on this job's platform is rejected, missing, or below the follower minimum.",
+    "socialQueueHint": "You don't have to verify every account. An applicant's account is verified automatically when you accept them."
   },
   "errors": {
     "generic": "Something didn't work. Try again in a moment.",
@@ -551,7 +560,7 @@
     "job_closed": "Applications for this job are closed.",
     "onboarding_incomplete": "Complete your profile before joining a job.",
     "no_verified_account": "You need a verified account on this job's platform.",
-    "followers_below_minimum": "Your followers are below this job's minimum.",
+    "followers_below_minimum": "Your followers are below this job's minimum. If they have grown, update the number in your Profile.",
     "rate_required": "Enter your proposed rate.",
     "rate_above_cap": "The rate is above this job's cap.",
     "already_applied": "You've already applied to this job.",
@@ -588,7 +597,7 @@
     "needSocial": "Add at least one social media account.",
     "inviteNotFound": "No creator is registered with that email.",
     "no_social_account": "Add a social media account on this job's platform first, from your Profile.",
-    "account_not_verified": "The applicant's account on this job's platform isn't verified or is below the follower minimum. Verify it, then accept.",
+    "account_not_verified": "This applicant can't be accepted yet: their account on this job's platform is rejected or below the follower minimum.",
     "brand_in_text": "The real brand name is still written here. Remove it so the alias doesn't leak.",
     "incomplete": "Some details are missing. Please complete:",
     "platform_mismatch": "This link isn't from the selected platform. Change the platform or paste a matching link.",
@@ -793,5 +802,20 @@
         ]
       }
     ]
+  },
+  "share": {
+    "share": "Share",
+    "copied": "Link copied",
+    "whatsapp": "WhatsApp",
+    "copyPrompt": "Copy this link:"
+  },
+  "install": {
+    "title": "Install Tali on your phone",
+    "androidBody": "Open Tali straight from your home screen, faster and with notifications.",
+    "install": "Install app",
+    "iosBody": "Tap the Share button <share></share> in your browser, then choose Add to Home Screen.",
+    "shareIcon": "Share icon",
+    "inAppBody": "You're viewing Tali inside another app. Tap the ••• menu and choose Open in browser so you can install Tali.",
+    "dismiss": "Close"
   }
 }

@@ -11,6 +11,7 @@ import { Field, Input } from '@/components/ui/field';
 import { PageHeader } from '@/components/ui/page';
 import { SubmitButton } from '@/components/ui/submit-button';
 import { feeLabel } from '@/components/creator/job-card';
+import { ShareButton } from '@/components/share-button';
 import { applyToJob, respondInvite } from '@/app/(creator)/actions';
 import { getViewer, type Viewer } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
@@ -58,6 +59,9 @@ export default async function JobDetail({ params }: { params: Promise<{ id: stri
   return (
     <div className="space-y-5">
       <PageHeader back={{ href: '/job', label: tn('jobs') }} title={job.title} subtitle={full ? visibleBrand(full) : job.brand_name} />
+      {/* Shares the public name (alias for disguised brands), never the real one. */}
+      <ShareButton path={`/job/${job.id}`} title={`${job.title} · ${job.brand_name}`}
+        text={t('shareText', { title: job.title, brand: job.brand_name, fee: await feeLabel(job) })} />
 
       <Card className="space-y-3">
         <p className="text-[13px] font-medium text-teks-redup">{t('fee')}</p>
@@ -146,6 +150,7 @@ export default async function JobDetail({ params }: { params: Promise<{ id: stri
     const matching = (accounts ?? []).filter((a) => job.platforms.includes(a.platform));
     const eligible = matching.length > 0;
     const pendingOnly = eligible && matching.every((a) => a.status === 'pending');
+    const best = matching.reduce<SocialAccount | null>((top, a) => (!top || a.followers > top.followers ? a : top), null);
     if (part) {
       if (part.status === 'invited') {
         return (
@@ -180,6 +185,18 @@ export default async function JobDetail({ params }: { params: Promise<{ id: stri
         <Alert tone="warning">
           {t('needAccount', { platforms: job.platforms.map((p) => tp(p)).join(' / ') })}{' '}
           <Link href="/profil" className="font-bold underline underline-offset-4">{t('addAccount')}</Link>
+        </Alert>
+      );
+    }
+    if (best && best.followers < job.min_followers) {
+      return (
+        <Alert tone="warning">
+          {t('followersBelowMin', {
+            min: job.min_followers.toLocaleString('id-ID'),
+            platform: tp(best.platform),
+            count: best.followers.toLocaleString('id-ID'),
+          })}{' '}
+          <Link href="/profil#field-social" className="font-bold underline underline-offset-4">{t('updateFollowersCta')}</Link>
         </Alert>
       );
     }

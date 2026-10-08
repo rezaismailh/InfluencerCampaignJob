@@ -48,6 +48,9 @@ async function sendEmail(to: string, subject: string, body: string, url: string,
  * Sends email and web push for notifications not delivered yet, then marks them.
  * In-app notifications need nothing: they are read straight from the table.
  */
+// Low-urgency notices: shown in the app only, no email or push.
+const IN_APP_ONLY = new Set(['followers_updated', 'followers_stale']);
+
 export async function deliverPending(limit = 50) {
   const admin = createAdminClient();
   const { data, error } = await admin
@@ -68,6 +71,10 @@ export async function deliverPending(limit = 50) {
   for (const n of data) {
     const body = notificationText(n, t as never, tKind as never, tPlatform as never);
     const url = `${site()}${n.link ?? '/notifikasi'}`;
+    if (IN_APP_ONLY.has(n.kind)) {
+      await admin.from('notifications').update({ delivered_at: new Date().toISOString() }).eq('id', n.id);
+      continue;
+    }
     try {
       if (n.profiles?.email) await sendEmail(n.profiles.email, t('emailSubject'), body, url, t('emailOpen'));
     } catch {

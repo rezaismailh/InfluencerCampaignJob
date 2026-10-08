@@ -3,6 +3,7 @@ import { Alert } from '@/components/ui/alert';
 import { ButtonLink } from '@/components/ui/button';
 import { EmptyState, Section } from '@/components/ui/page';
 import { BalanceCard } from '@/components/creator/balance-card';
+import { InstallPrompt } from '@/components/install-prompt';
 import { WorkCard } from '@/components/creator/work-card';
 import { requireCreator } from '@/lib/auth';
 import { loadCreatorWork } from '@/lib/creator-data';
@@ -31,6 +32,7 @@ export default async function Home() {
       <h1 className="text-2xl font-bold leading-8">{t('greeting', { name })}</h1>
       <BalanceCard balance={bal} nextTransfer={nextTransfer} />
       {!verified && <Alert tone="warning">{t('socialPending')}</Alert>}
+      <InstallPrompt installed={!!viewer.profile.app_installed_at} />
 
       <Section title={t('activeTitle')}>
         {active.length ? (

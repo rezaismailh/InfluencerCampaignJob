@@ -93,11 +93,14 @@ select public.apply_to_job('20000000-0000-0000-0000-000000000001');
 select tests.expect_error($$select public.apply_to_job('20000000-0000-0000-0000-000000000001')$$, 'already_applied');
 select tests.expect_error($$select public.verify_social_account((select id from public.social_accounts limit 1), true)$$, 'forbidden');
 
--- ...but the curator must verify before approving
+-- ...and a rejected account blocks acceptance; verifying it again clears that
 select tests.act_as('00000000-0000-0000-0000-000000000002');
+select public.verify_social_account(id, false, null, 'Link salah') from public.social_accounts
+  where creator_id = '00000000-0000-0000-0000-00000000000a';
 select tests.expect_error($$select public.decide_application((select id from public.participations
   where creator_id = '00000000-0000-0000-0000-00000000000a'), true)$$, 'account_not_verified');
-select public.verify_social_account(id, true, 12500) from public.social_accounts;
+select public.verify_social_account(id, true, 12500) from public.social_accounts
+  where creator_id = '00000000-0000-0000-0000-00000000000a';
 insert into public.jobs (id, brand_name, title, platforms, deliverables, brief, fee_type, fee, quota, top_days, status)
 values ('20000000-0000-0000-0000-0000000000f1', 'Uji', 'Job YouTube', '{youtube}', '1 video', 'Brief', 'fixed', 100000, 1, 7, 'open');
 
@@ -114,6 +117,7 @@ select tests.check((select status = 'applied' from public.participations), 'dire
 
 select tests.act_as('00000000-0000-0000-0000-00000000000b');
 select public.apply_to_job('20000000-0000-0000-0000-000000000001');
+select tests.check((select status = 'pending' from public.social_accounts), 'B account still pending');
 
 -- Curator approves A; quota of 1 blocks B
 select tests.act_as('00000000-0000-0000-0000-000000000002');
@@ -123,6 +127,8 @@ select tests.expect_error($$select public.decide_application((select id from pub
   where creator_id = '00000000-0000-0000-0000-00000000000b'), true)$$, 'quota_full');
 select tests.check((select agreed_fee = 150000 and shipment_status = 'pending' from public.participations
   where creator_id = '00000000-0000-0000-0000-00000000000a'), 'fixed fee applied, shipment pending');
+select tests.check((select status = 'pending' from public.social_accounts
+  where creator_id = '00000000-0000-0000-0000-00000000000b'), 'failed acceptance (quota) does not verify');
 
 -- Disguised brand: real name only for staff and approved/invited creators
 insert into public.job_brands (job_id, real_name) values ('20000000-0000-0000-0000-000000000001', 'Nissin');
@@ -285,4 +291,42 @@ select tests.expect_error($$select public.run_daily()$$, 'permission denied');
 reset role;
 set role service_role;
 select tests.check((public.run_daily() ->> 'ready_notified')::int >= 0, 'run_daily runs for service role');
+reset role;
+
+-- Accepting an applicant verifies their pending account ------------------------
+set role authenticated;
+select tests.act_as('00000000-0000-0000-0000-00000000000b');
+select public.apply_to_job('20000000-0000-0000-0000-000000000003', 200000);
+select tests.act_as('00000000-0000-0000-0000-000000000002');
+select public.decide_application(id, true) from public.participations
+  where job_id = '20000000-0000-0000-0000-000000000003' and creator_id = '00000000-0000-0000-0000-00000000000b';
+select tests.check((select status = 'verified' and verified_by = auth.uid() from public.social_accounts
+  where creator_id = '00000000-0000-0000-0000-00000000000b'), 'accepting verified the pending account');
+reset role;
+
+-- Follower updates notify curators; stale counts get a reminder ------------------
+set role authenticated;
+select tests.act_as('00000000-0000-0000-0000-00000000000b');
+select public.update_social_followers((select id from public.social_accounts), 15000);
+select tests.check((select followers = 15000 and status = 'pending' from public.social_accounts), 'followers updated, back to pending');
+select tests.expect_error($$select public.update_social_followers((select id from public.social_accounts), -1)$$, 'invalid');
+select tests.act_as('00000000-0000-0000-0000-00000000000a');
+select tests.expect_error($$select public.update_social_followers((select id from public.social_accounts
+  where creator_id = '00000000-0000-0000-0000-00000000000b'), 1)$$, 'not_found');
+select tests.act_as('00000000-0000-0000-0000-000000000002');
+select tests.check((select count(*) = 1 from public.notifications where kind = 'followers_updated'
+  and (params ->> 'old')::int = 9000 and (params ->> 'new')::int = 15000), 'curator notified of follower update');
+reset role;
+update public.social_accounts set followers_updated_at = now() - interval '100 days'
+  where creator_id = '00000000-0000-0000-0000-00000000000a';
+set role service_role;
+select tests.check((public.run_daily() ->> 'followers_reminded')::int = 1, 'stale followers reminded');
+select tests.check((public.run_daily() ->> 'followers_reminded')::int = 0, 'reminder not repeated');
+reset role;
+
+-- Creators can record that they installed the app --------------------------------
+set role authenticated;
+select tests.act_as('00000000-0000-0000-0000-00000000000a');
+update public.profiles set app_installed_at = now() where id = auth.uid();
+select tests.check((select app_installed_at is not null from public.profiles where id = auth.uid()), 'app install recorded');
 reset role;

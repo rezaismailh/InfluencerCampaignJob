@@ -5,6 +5,7 @@ type Translate = (key: string, values?: Record<string, string | number>) => stri
 
 const MONEY = ['amount', 'fee'];
 const DATES = ['date', 'ready_at'];
+const COUNTS = ['old', 'new'];
 
 /**
  * Turns a stored notification (kind + params) into a sentence.
@@ -23,6 +24,8 @@ export function notificationText(
       values[key] = '';
     } else if (MONEY.includes(key) && typeof raw === 'number') {
       values[key] = formatRupiah(raw);
+    } else if (COUNTS.includes(key) && typeof raw === 'number') {
+      values[key] = raw.toLocaleString('id-ID');
     } else if (DATES.includes(key) && typeof raw === 'string') {
       values[key] = formatDate(raw, locale);
     } else if (key === 'at' && typeof raw === 'string') {

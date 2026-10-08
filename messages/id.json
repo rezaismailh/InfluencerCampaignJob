@@ -207,7 +207,11 @@
     "addRow": "Tambah akun media sosial",
     "hint_unsupported_link": "Link belum dikenali. Tempel link profil atau ketik username saja.",
     "hint_platform_mismatch": "Link ini bukan dari platform yang dipilih.",
-    "hint_username_required": "Username belum terbaca. Ketik username-nya saja, misalnya @namakamu."
+    "hint_username_required": "Username belum terbaca. Ketik username-nya saja, misalnya @namakamu.",
+    "updateFollowers": "Perbarui",
+    "saveFollowers": "Simpan",
+    "followersInvalid": "Isi angka followers yang benar.",
+    "followersRecheck": "Setelah diperbarui, tim Tali mengecek ulang angkanya."
   },
   "home": {
     "greeting": "Halo, {name}",
@@ -221,7 +225,7 @@
     "emptyActive": "Belum ada campaign yang kamu ikuti.",
     "emptyActiveBody": "Lihat job yang buka sekarang.",
     "seeJobs": "Lihat job",
-    "socialPending": "Akun media sosialmu sedang diverifikasi. Kamu bisa daftar job setelah terverifikasi.",
+    "socialPending": "Akun media sosialmu sedang diverifikasi tim Tali. Sambil menunggu, kamu sudah bisa daftar job.",
     "inviteTitle": "Undangan job"
   },
   "jobs": {
@@ -273,7 +277,10 @@
     "briefLocked": "Brief lengkap dan alamat lokasi terlihat setelah kamu masuk.",
     "needAccount": "Tambahkan akun {platforms} kamu dulu untuk gabung job ini.",
     "addAccount": "Tambah di Profil",
-    "pendingAccountNote": "Akun media sosialmu sedang diverifikasi. Kamu tetap bisa daftar sekarang; tim Tali memverifikasinya saat menyeleksi pelamar."
+    "pendingAccountNote": "Akun media sosialmu sedang diverifikasi. Kamu tetap bisa daftar sekarang; tim Tali memverifikasinya saat menyeleksi pelamar.",
+    "shareText": "Ada campaign {title} dari {brand} di Tali, fee {fee}. Cek detailnya:",
+    "followersBelowMin": "Job ini butuh minimal {min} followers, sedangkan akun {platform} kamu tercatat {count}. Kalau sudah bertambah, perbarui angkanya dulu.",
+    "updateFollowersCta": "Perbarui followers"
   },
   "work": {
     "title": "Kerjaan",
@@ -377,8 +384,7 @@
     "pushOn": "Aktifkan notifikasi",
     "pushEnabled": "Notifikasi aktif di perangkat ini.",
     "pushUnsupported": "Browser ini belum mendukung notifikasi. Di iPhone, pasang Tali ke Home Screen dulu.",
-    "pushDenied": "Izin notifikasi ditolak. Aktifkan dari pengaturan browser.",
-    "installHint": "Pasang Tali ke Home Screen supaya lebih cepat dibuka."
+    "pushDenied": "Izin notifikasi ditolak. Aktifkan dari pengaturan browser."
   },
   "notifications": {
     "title": "Notifikasi",
@@ -403,7 +409,9 @@
     "social_verified": "Akun @{username} terverifikasi.",
     "social_rejected": "Akun @{username} ditolak. {reason}",
     "emailSubject": "Kabar terbaru dari Tali",
-    "emailOpen": "Buka Tali"
+    "emailOpen": "Buka Tali",
+    "followers_updated": "{name} memperbarui followers {platform} @{username}: {old} → {new}. Cek ulang angkanya.",
+    "followers_stale": "Sudah 3 bulan angka followers {accounts} belum diperbarui. Kalau sudah berubah, perbarui di Profil supaya job yang tampil sesuai."
   },
   "admin": {
     "title": "Admin Tali",
@@ -534,9 +542,10 @@
     "holidaysEmpty": "Belum ada hari libur.",
     "onlyFinance": "Halaman ini khusus admin keuangan.",
     "onlyCurator": "Halaman ini khusus kurator.",
-    "verifyNow": "Verifikasi",
-    "verifyBeforeApprove": "Verifikasi akun di platform job ini (dan pastikan followers memenuhi syarat) sebelum menerima pelamar.",
-    "brandShownAs": "{real} · tampil sebagai “{alias}”"
+    "brandShownAs": "{real} · tampil sebagai “{alias}”",
+    "acceptVerifies": "Menerima pelamar ini sekaligus memverifikasi akunnya. Buka link profilnya dulu untuk mengecek.",
+    "cannotAccept": "Belum bisa diterima: akun di platform job ini ditolak, belum ada, atau followers-nya di bawah syarat.",
+    "socialQueueHint": "Tidak wajib memverifikasi semua akun. Akun pelamar otomatis terverifikasi saat kamu menerima lamarannya."
   },
   "errors": {
     "generic": "Ada yang belum berhasil. Coba lagi sebentar lagi.",
@@ -551,7 +560,7 @@
     "job_closed": "Pendaftaran job ini sudah ditutup.",
     "onboarding_incomplete": "Lengkapi profilmu dulu sebelum gabung job.",
     "no_verified_account": "Kamu perlu akun terverifikasi di platform job ini.",
-    "followers_below_minimum": "Followers kamu belum memenuhi syarat minimal job ini.",
+    "followers_below_minimum": "Followers kamu belum memenuhi syarat minimal job ini. Kalau sudah bertambah, perbarui angkanya di Profil.",
     "rate_required": "Isi rate yang kamu ajukan.",
     "rate_above_cap": "Rate melebihi batas atas job ini.",
     "already_applied": "Kamu sudah mendaftar di job ini.",
@@ -588,7 +597,7 @@
     "needSocial": "Tambahkan minimal satu akun media sosial.",
     "inviteNotFound": "Creator dengan email itu belum terdaftar.",
     "no_social_account": "Tambahkan akun media sosial di platform job ini dulu, lewat halaman Profil.",
-    "account_not_verified": "Akun pelamar di platform job ini belum terverifikasi atau followers-nya di bawah syarat. Verifikasi dulu, lalu terima.",
+    "account_not_verified": "Pelamar belum bisa diterima: akun di platform job ini ditolak atau followers-nya di bawah syarat.",
     "brand_in_text": "Nama brand asli masih tertulis di sini. Hapus dulu supaya samarannya tidak bocor.",
     "incomplete": "Data belum lengkap. Lengkapi yang berikut:",
     "platform_mismatch": "Link ini bukan dari platform yang dipilih. Ganti platformnya atau tempel link yang sesuai.",
@@ -793,5 +802,20 @@
         ]
       }
     ]
+  },
+  "share": {
+    "share": "Bagikan",
+    "copied": "Link disalin",
+    "whatsapp": "WhatsApp",
+    "copyPrompt": "Salin link ini:"
+  },
+  "install": {
+    "title": "Pasang Tali di HP kamu",
+    "androidBody": "Buka Tali langsung dari layar utama, lebih cepat dan dapat notifikasi.",
+    "install": "Pasang aplikasi",
+    "iosBody": "Ketuk tombol Bagikan <share></share> di browser, lalu pilih Tambah ke Layar Utama (Add to Home Screen).",
+    "shareIcon": "ikon Bagikan",
+    "inAppBody": "Kamu sedang membuka Tali dari dalam aplikasi lain. Ketuk menu ••• lalu pilih Buka di browser, supaya Tali bisa dipasang ke layar utama.",
+    "dismiss": "Tutup"
   }
 }

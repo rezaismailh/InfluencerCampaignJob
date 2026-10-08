@@ -39,3 +39,11 @@ describe('payout', () => {
     expect(payoutBreakdown(MIN_PAYOUT - 1, 'BCA').meetsMinimum).toBe(false);
   });
 });
+
+describe('notificationText counts', () => {
+  it('formats follower counts with thousands separators', async () => {
+    const { notificationText } = await import('@/lib/notification-text');
+    const t = (_k: string, v?: Record<string, string | number>) => `${v?.old} → ${v?.new}`;
+    expect(notificationText({ kind: 'followers_updated', params: { old: 9000, new: 15000 } }, t, (k) => k, (k) => k)).toBe('9.000 → 15.000');
+  });
+});

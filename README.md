@@ -110,6 +110,7 @@ Teksnya ada di `messages/*.json` (`legal.privacy`, `legal.terms`), tanggal berla
 Semua penulisan data penting lewat fungsi `security definer` yang memvalidasi peran dan tahap:
 
 - Creator bisa gabung job bila profil lengkap dan punya akun di platform job, boleh yang masih menunggu verifikasi (open rate: rate wajib, tidak boleh melebihi batas atas). Kurator baru bisa menerima pelamar setelah akunnya terverifikasi dan followers memenuhi syarat.
+- TOP: H+7/14/30 atau bulanan (`top_mode = 'monthly'`): patokan sampai tanggal cut-off → tanggal bayar bulan itu, setelahnya → bulan depan. Patokan = konfirmasi posting, atau tanggal insight yang disetujui dikirim bila job `require_insight` (`ready_date`).
 - Fee per tier: job bisa memakai fee berbeda per tier (nano < 10rb, micro < 100rb, macro < 1jt, mega). Tier creator diambil dari akun terbesar di platform job atau dari platform utama, dipilih per job (`tier_basis`). Saat menerima, fee diambil dari tier creator; kurator tetap bisa mengubahnya.
 - Brand bisa disamarkan per job: `jobs.brand_name` berisi label yang dilihat publik dan pelamar, nama asli di tabel `job_brands` yang hanya bisa dibaca staf serta creator yang diundang/diterima. Form job menolak simpan bila nama asli masih tertulis di teks publik job.
 - Pengunjung tanpa login melihat ringkasan job yang buka lewat `public_open_jobs()` (tanpa brief); tabel `jobs` tidak bisa dibaca anon.

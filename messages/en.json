@@ -73,7 +73,8 @@
   "kind": {
     "storyline": "Storyline",
     "draft": "Content draft",
-    "caption": "Caption"
+    "caption": "Caption",
+    "insight": "Insight"
   },
   "review": {
     "pending_review": "Awaiting review",
@@ -267,7 +268,11 @@
     "tierBasisLargestNote": "Your tier is based on your largest account on this job's platforms.",
     "needPrimaryAccount": "This job sets the tier from your {platform} account. Add your {platform} account first.",
     "tierNotOffered": "Your tier ({tier}) isn't included in this job.",
-    "yourTierFee": "Your fee: <b>{fee}</b> ({tier})"
+    "yourTierFee": "Your fee: <b>{fee}</b> ({tier})",
+    "paymentBodyInsight": "Your fee can be withdrawn {days} days after the date you send the insight, once it's approved. We transfer within 3 working days of your request.",
+    "paymentMonthly": "Fees are paid on day {pay} of each month. Posts confirmed by day {cutoff} can be withdrawn on day {pay} that month; later ones on day {pay} of the next month. We transfer within 3 working days of your request.",
+    "paymentMonthlyInsight": "Fees are paid on day {pay} of each month. Insights sent by day {cutoff} (and approved) can be withdrawn on day {pay} that month; later ones on day {pay} of the next month. We transfer within 3 working days of your request.",
+    "topMonthlyLabel": "Paid on day {day} monthly"
   },
   "work": {
     "title": "Work",
@@ -326,7 +331,15 @@
     "readyNow": "Fee is ready to withdraw.",
     "goToBalance": "Open balance",
     "cancelled": "This work was cancelled.",
-    "rejected": "You weren't selected for this job."
+    "rejected": "You weren't selected for this job.",
+    "stepInsight": "Insight approved",
+    "insightNeeded": "Send your post's insight below. The payout date is set once the insight is approved.",
+    "insightHint": "Upload screenshots of your post's insight (reach, views, engagement).",
+    "submitInsight": "Send insight",
+    "insightPhotos": "Insight screenshots",
+    "insightPhotosHint": "At least 1 image.",
+    "insightNote": "Note (optional)",
+    "insightNotePlaceholder": "For example: reach 12K, views 30K"
   },
   "balance": {
     "title": "Balance",
@@ -398,7 +411,9 @@
     "emailSubject": "An update from Tali",
     "emailOpen": "Open Tali",
     "followers_updated": "{name} updated {platform} @{username} followers: {old} → {new}. Recheck the number.",
-    "followers_stale": "Your follower count for {accounts} hasn't been updated in 3 months. If it has changed, update it in your Profile so the jobs you see fit."
+    "followers_stale": "Your follower count for {accounts} hasn't been updated in 3 months. If it has changed, update it in your Profile so the jobs you see fit.",
+    "insight_requested": "Your post is confirmed. Send its insight so the payout date can be set.",
+    "insight_approved": "Insight approved. Your fee can be withdrawn from {ready_at}."
   },
   "admin": {
     "title": "Tali admin",
@@ -467,7 +482,17 @@
       "tierBasisLargest": "Largest account on the job's platforms",
       "tierBasisPrimary": "Followers on the main platform",
       "primaryPlatform": "Main platform",
-      "primaryPlatformNone": "—"
+      "primaryPlatformNone": "—",
+      "paymentTerms": "Payment terms",
+      "topMode": "Term type",
+      "topModeDays": "Days after",
+      "topModeMonthly": "Monthly pay day",
+      "topDaysHint": "For the days-after type.",
+      "payDay": "Pay day",
+      "cutoffDay": "Cut-off day",
+      "monthlyHint": "For the monthly type (1–28).",
+      "requireInsight": "Insight required after posting",
+      "requireInsightHint": "When on, the payout date counts from the day the insight is sent (once approved), not from post confirmation."
     },
     "applicants": "Applicants",
     "participants": "Joined creators",
@@ -615,7 +640,9 @@
     "social_duplicate": "One of these social accounts is already registered on Tali. Contact the Tali team if it's yours.",
     "tier_fee_required": "Enter a fee for at least one tier.",
     "primary_platform_required": "Pick a main platform that is one of the job's platforms.",
-    "tier_not_offered": "Your tier isn't included in this job."
+    "tier_not_offered": "Your tier isn't included in this job.",
+    "post_not_confirmed": "You can send the insight once your post is confirmed.",
+    "insight_photos_required": "Upload at least one insight screenshot."
   },
   "success": {
     "saved": "Saved.",

@@ -79,6 +79,10 @@ const jobSchema = z.object({
   apply_deadline: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable(),
   content_deadline: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable(),
   top_days: z.union([z.literal(7), z.literal(14), z.literal(30)]),
+  top_mode: z.enum(['days', 'monthly']),
+  pay_day: z.number().int().min(1).max(28),
+  cutoff_day: z.number().int().min(1).max(28),
+  require_insight: z.boolean(),
   status: z.enum(['draft', 'open', 'closed', 'completed']),
 }).refine((d) => d.fee_type !== 'fixed' || d.fee !== null, { path: ['fee'], message: 'required' });
 
@@ -111,6 +115,10 @@ export async function saveJob(_prev: ActionState, formData: FormData): Promise<A
     apply_deadline: text(formData.get('apply_deadline')) || null,
     content_deadline: text(formData.get('content_deadline')) || null,
     top_days: Number(text(formData.get('top_days'))),
+    top_mode: text(formData.get('top_mode')) === 'monthly' ? 'monthly' : 'days',
+    pay_day: optionalInt(formData.get('pay_day')) ?? 21,
+    cutoff_day: optionalInt(formData.get('cutoff_day')) ?? 14,
+    require_insight: formData.get('require_insight') === 'on',
     status: text(formData.get('status')) || 'draft',
   });
   if (!parsed.success) {

@@ -8,7 +8,7 @@ export type ProductOption = 'shipped' | 'self_purchase' | 'none';
 export type JobStatus = 'draft' | 'open' | 'closed' | 'completed';
 export type ParticipationStatus = 'invited' | 'applied' | 'approved' | 'rejected' | 'cancelled';
 export type ShipmentStatus = 'pending' | 'shipped' | 'received';
-export type SubmissionKind = 'storyline' | 'draft' | 'caption';
+export type SubmissionKind = 'storyline' | 'draft' | 'caption' | 'insight';
 export type ReviewStatus = 'pending_review' | 'sent_to_brand' | 'approved' | 'revision' | 'rejected';
 export type PayoutStatus = 'requested' | 'processing' | 'transferred' | 'failed';
 
@@ -73,6 +73,10 @@ export type Job = {
   apply_deadline: string | null;
   content_deadline: string | null;
   top_days: 7 | 14 | 30;
+  top_mode: 'days' | 'monthly';
+  pay_day: number;
+  cutoff_day: number;
+  require_insight: boolean;
   status: JobStatus;
   created_at: string;
 };
@@ -99,6 +103,7 @@ export type Participation = {
   post_submitted_at: string | null;
   post_confirmed_at: string | null;
   ready_at: string | null;
+  insight_sent_on: string | null;
   payout_request_id: string | null;
 };
 
@@ -157,5 +162,5 @@ export type Notification = {
 export type PublicJob = Pick<Job,
   'id' | 'brand_name' | 'title' | 'product' | 'job_type' | 'platforms' | 'deliverables' | 'requirements' | 'tiers' | 'niches'
   | 'personas' | 'min_followers' | 'fee_type' | 'fee' | 'rate_cap' | 'tier_fees' | 'tier_basis' | 'primary_platform' | 'quota' | 'review_days' | 'product_option'
-  | 'require_purchase_proof' | 'apply_deadline' | 'content_deadline' | 'top_days' | 'created_at'
+  | 'require_purchase_proof' | 'apply_deadline' | 'content_deadline' | 'top_days' | 'top_mode' | 'pay_day' | 'cutoff_day' | 'require_insight' | 'created_at'
 > & { visit_location_names: string[] };

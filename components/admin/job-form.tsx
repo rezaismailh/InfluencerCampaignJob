@@ -114,12 +114,37 @@ export async function JobForm({ job, realBrand, clients }: { job?: Job; realBran
         <Field label={t('reviewDays')} htmlFor="review_days">
           <Input id="review_days" name="review_days" inputMode="numeric" defaultValue={job?.review_days ?? ''} className="tabular" />
         </Field>
-        <Field label={t('top')} htmlFor="top_days">
-          <Select id="top_days" name="top_days" defaultValue={String(job?.top_days ?? 7)}>
-            {[7, 14, 30].map((d) => <option key={d} value={d}>{t('topOption', { days: d })}</option>)}
-          </Select>
-        </Field>
       </div>
+
+      <fieldset className="space-y-3 rounded-2xl border border-garis p-4">
+        <legend className="px-1 text-[15px] font-bold">{t('paymentTerms')}</legend>
+        <div className="grid gap-3 md:grid-cols-4">
+          <Field label={t('topMode')} htmlFor="top_mode">
+            <Select id="top_mode" name="top_mode" defaultValue={job?.top_mode ?? 'days'}>
+              <option value="days">{t('topModeDays')}</option>
+              <option value="monthly">{t('topModeMonthly')}</option>
+            </Select>
+          </Field>
+          <Field label={t('top')} hint={t('topDaysHint')} htmlFor="top_days">
+            <Select id="top_days" name="top_days" defaultValue={String(job?.top_days ?? 7)}>
+              {[7, 14, 30].map((d) => <option key={d} value={d}>{t('topOption', { days: d })}</option>)}
+            </Select>
+          </Field>
+          <Field label={t('payDay')} hint={t('monthlyHint')} htmlFor="pay_day">
+            <Input id="pay_day" name="pay_day" inputMode="numeric" defaultValue={job?.pay_day ?? 21} className="tabular" />
+            <FieldError name="pay_day" />
+          </Field>
+          <Field label={t('cutoffDay')} hint={t('monthlyHint')} htmlFor="cutoff_day">
+            <Input id="cutoff_day" name="cutoff_day" inputMode="numeric" defaultValue={job?.cutoff_day ?? 14} className="tabular" />
+            <FieldError name="cutoff_day" />
+          </Field>
+        </div>
+        <label className="flex min-h-11 items-center gap-3 text-[15px]">
+          <input type="checkbox" name="require_insight" defaultChecked={job?.require_insight} className="size-5 accent-nila-800" />
+          {t('requireInsight')}
+        </label>
+        <p className="text-[13px] text-teks-redup">{t('requireInsightHint')}</p>
+      </fieldset>
 
       <fieldset className="space-y-3 rounded-2xl border border-garis p-4">
         <legend className="px-1 text-[15px] font-bold">{t('tierFees')}</legend>

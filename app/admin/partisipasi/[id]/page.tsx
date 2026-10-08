@@ -21,7 +21,7 @@ import { signedUrls } from '@/lib/storage';
 import { latestByKind, timeline } from '@/lib/work';
 import type { Job, Participation, Profile, SocialAccount, Submission, SubmissionKind } from '@/lib/types';
 
-const KINDS: SubmissionKind[] = ['storyline', 'draft', 'caption'];
+const KINDS: SubmissionKind[] = ['storyline', 'draft', 'caption', 'insight'];
 
 function toLocalInput(iso: string | null) {
   if (!iso) return '';
@@ -64,7 +64,7 @@ export default async function AdminWork({ params }: { params: Promise<{ id: stri
 
       <div className="grid gap-5 lg:grid-cols-[1fr_340px]">
         <div className="space-y-5">
-          {KINDS.map((kind) => {
+          {KINDS.filter((k) => k !== 'insight' || job.require_insight).map((kind) => {
             const items = submissions.filter((s) => s.kind === kind);
             const last = latest[kind];
             return (

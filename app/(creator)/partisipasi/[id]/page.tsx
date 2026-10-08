@@ -100,6 +100,7 @@ export default async function Work({ params }: { params: Promise<{ id: string }>
             {part.post_confirmed_at ? (
               <>
                 <Alert tone="success">{t('postConfirmed', { date: formatDate(part.post_confirmed_at, locale) })}</Alert>
+                {job.require_insight && !part.ready_at && <p className="text-[15px]">{t('insightNeeded')}</p>}
                 {part.ready_at && (part.ready_at <= todayWib()
                   ? <p className="text-[15px]">{t('readyNow')}</p>
                   : <p className="text-[15px]">{t('readyOn', { date: formatDate(part.ready_at, locale) })}</p>)}
@@ -134,6 +135,8 @@ export default async function Work({ params }: { params: Promise<{ id: string }>
               </>
             )}
           </Card>
+
+          {job.require_insight && part.post_confirmed_at && <SubmissionCard kind="insight" locked={false} />}
         </>
       )}
     </div>
@@ -213,10 +216,12 @@ export default async function Work({ params }: { params: Promise<{ id: string }>
     const tr = await getTranslations('review');
     const items = submissions.filter((s) => s.kind === kind);
     const last = latest[kind];
-    const canSubmit = !locked && !part!.post_confirmed_at && (!last || last.status === 'revision');
-    const hint = kind === 'storyline' ? t('storylineHint') : kind === 'draft' ? t('draftHint') : t('captionHint');
+    // Insight comes after the post is confirmed; the other items before.
+    const stageOpen = kind === 'insight' ? !!part!.post_confirmed_at : !part!.post_confirmed_at;
+    const canSubmit = !locked && stageOpen && (!last || last.status === 'revision');
+    const hint = { storyline: t('storylineHint'), draft: t('draftHint'), caption: t('captionHint'), insight: t('insightHint') }[kind];
     const submitLabel = last?.status === 'revision' ? t('submitRevision')
-      : kind === 'storyline' ? t('submitStoryline') : kind === 'draft' ? t('submitDraft') : t('submitCaption');
+      : { storyline: t('submitStoryline'), draft: t('submitDraft'), caption: t('submitCaption'), insight: t('submitInsight') }[kind];
 
     return (
       <Card className="space-y-3">
@@ -234,7 +239,16 @@ export default async function Work({ params }: { params: Promise<{ id: string }>
             <input type="hidden" name="participation_id" value={part!.id} />
             <input type="hidden" name="kind" value={kind} />
             <p className="text-[13px] text-teks-redup">{hint}</p>
-            {kind === 'caption' ? (
+            {kind === 'insight' ? (
+              <>
+                <Field label={t('insightPhotos')} hint={t('insightPhotosHint')}>
+                  <PhotoUpload userId={viewer.id} folder={`${part!.id}/insight`} label={t('insightPhotos')} />
+                </Field>
+                <Field label={t('insightNote')} htmlFor={`content-${kind}`}>
+                  <Textarea id={`content-${kind}`} name="content" rows={3} placeholder={t('insightNotePlaceholder')} />
+                </Field>
+              </>
+            ) : kind === 'caption' ? (
               <Field label={t('captionText')} htmlFor={`content-${kind}`}>
                 <Textarea id={`content-${kind}`} name="content" rows={6} required />
               </Field>

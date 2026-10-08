@@ -92,7 +92,11 @@ export default async function JobDetail({ params }: { params: Promise<{ id: stri
         </div>
         <div className="rounded-xl bg-latar p-3 text-[15px]">
           <p className="font-bold">{t('payment')}</p>
-          <p className="text-teks-redup">{t('paymentBody', { days: job.top_days })}</p>
+          <p className="text-teks-redup">
+            {job.top_mode === 'monthly'
+              ? t(job.require_insight ? 'paymentMonthlyInsight' : 'paymentMonthly', { pay: job.pay_day, cutoff: job.cutoff_day })
+              : t(job.require_insight ? 'paymentBodyInsight' : 'paymentBody', { days: job.top_days })}
+          </p>
         </div>
         <ul className="space-y-0.5 text-[15px] text-teks-redup">
           {job.content_deadline && <li>{t('contentDeadline', { date: formatDate(job.content_deadline, locale) })}</li>}

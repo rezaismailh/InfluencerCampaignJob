@@ -60,3 +60,14 @@ describe('tiers', () => {
     expect(tierFeeList({ micro: 500000, nano: 150000, mega: 0 })).toEqual([{ tier: 'nano', fee: 150000 }, { tier: 'micro', fee: 500000 }]);
   });
 });
+
+describe('timeline with insight', () => {
+  it('adds the insight step only when the job requires it', async () => {
+    const { timeline } = await import('@/lib/work');
+    const part = { status: 'approved', decided_at: null, post_confirmed_at: '2026-10-10T00:00:00Z' } as never;
+    const keys = (require_insight: boolean) => timeline(part, { job_type: 'non_visit', product_option: 'none', require_insight }, {}).map((s) => s.key);
+    expect(keys(true)).toContain('stepInsight');
+    expect(keys(false)).not.toContain('stepInsight');
+    expect(keys(true).indexOf('stepInsight')).toBe(keys(true).indexOf('stepPosted') + 1);
+  });
+});

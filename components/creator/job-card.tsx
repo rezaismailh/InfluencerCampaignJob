@@ -33,7 +33,7 @@ export async function JobCard({ job }: { job: Job | PublicJob }) {
         {job.platforms.map((p) => <Badge key={p}>{tp(p)}</Badge>)}
       </div>
       <ul className="mt-3 space-y-0.5 text-[13px] text-teks-redup">
-        <li>{t('topLabel', { days: job.top_days })}</li>
+        <li>{job.top_mode === 'monthly' ? t('topMonthlyLabel', { day: job.pay_day }) : t('topLabel', { days: job.top_days })}</li>
         {job.content_deadline && <li>{t('contentDeadline', { date: formatDate(job.content_deadline, locale) })}</li>}
         {job.apply_deadline && <li>{t('applyDeadline', { date: formatDate(job.apply_deadline, locale) })}</li>}
       </ul>

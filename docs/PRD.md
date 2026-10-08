@@ -170,7 +170,7 @@ Setiap kebutuhan punya ID agar bisa dirujuk di tiket dan pengujian. P0 = wajib u
 ### M4 — Kurasi campaign oleh tim Tali
 
 1. **FR-4.1 (P0) Data klien brand.** Kurator mencatat klien (nama brand, PIC, catatan) sebagai data internal; klien tidak punya akun.
-2. **FR-4.2 (P0) Buat job.** Judul, brand klien, produk, tipe job (visit atau non-visit), fase campaign (mis. awareness, amplification), brief, platform dan format deliverable (mis. Instagram Reels, video TikTok, YouTube Shorts, post Threads, post X; satu job bisa mencakup beberapa platform dengan satu fee gabungan), syarat creator (tier nano/micro, persona, min. followers), tipe fee (fix rate: fee ditetapkan tim Tali; open rate: creator mengajukan rate saat bergabung, dengan batas atas rate opsional), fee per creator untuk fix rate, batas waktu review (sesuai terms klien), opsi produk (dikirim klien, beli sendiri dan sudah termasuk fee, atau tanpa produk), kuota, deadline, dan TOP (H+7, H+14, atau H+30 setelah postingan dikonfirmasi tayang).
+2. **FR-4.2 (P0) Buat job.** Judul, brand klien, produk, tipe job (visit atau non-visit), fase campaign (mis. awareness, amplification), brief, platform dan format deliverable (mis. Instagram Reels, video TikTok, YouTube Shorts, post Threads, post X; satu job bisa mencakup beberapa platform dengan satu fee gabungan), syarat creator (tier nano/micro/macro/mega, niche, persona, min. followers), tipe fee (fix rate: fee ditetapkan tim Tali; open rate: creator mengajukan rate saat bergabung, dengan batas atas rate opsional; per tier: fee per tier, tier dihitung dari akun terbesar atau platform utama sesuai pilihan job), fee per creator untuk fix rate, batas waktu review (sesuai terms klien), opsi produk (dikirim klien, beli sendiri dan sudah termasuk fee, atau tanpa produk), kuota, deadline, TOP (H+7, H+14, atau H+30; atau tanggal bayar bulanan dengan cut-off, mis. bayar tgl 21 dan cut-off tgl 14), dan opsi wajib kirim insight setelah posting.
    - Job bisa disimpan sebagai draft dan baru tayang setelah dipublikasikan kurator.
 3. **FR-4.3 (P0) Kurasi creator.** Kurator melihat pelamar (profil, followers, kategori) dan menyetujui/menolak, atau mengundang creator langsung.
 4. **FR-4.4 (P0) Review storyline dan konten.** Kurator mereview internal, meneruskan ke brand klien di luar aplikasi, lalu mencatat keputusan akhir (setujui, minta revisi, atau tolak) beserta feedback tim Tali dan feedback brand secara terpisah. Lihat FR-3.6.
@@ -244,7 +244,7 @@ Stack mengikuti keputusan di scope: Next.js (App Router) + TypeScript, Tailwind 
 | `social_accounts` | Platform, link profil, username (diekstrak dari link), followers (manual), status verifikasi |
 | `payout_accounts` | Bank/e-wallet, nomor terenkripsi, 4 digit terakhir, nama pemilik |
 | `clients` | Brand klien (data internal, tanpa akun) |
-| `jobs` | Klien, produk, tipe (visit/non-visit), fase campaign, platform, brief, syarat (tier, persona), fee (integer rupiah), kuota, tipe fee (fix rate/open rate), batas atas rate (opsional), batas waktu review, opsi produk, deadline, TOP (H+7/H+14/H+30), lokasi visit, status |
+| `jobs` | Klien, produk, tipe (visit/non-visit), fase campaign, platform, brief, syarat (tier, persona), fee (integer rupiah), kuota, tipe fee (fix rate/open rate), batas atas rate (opsional), batas waktu review, opsi produk, deadline, TOP (H+ hari atau bulanan + cut-off), wajib insight, lokasi visit, status |
 | `participations` | Creator × job, fee yang disepakati (dan rate yang diajukan untuk open rate), status timeline beserta tanggalnya, tanggal postingan dikonfirmasi, tanggal siap dicairkan, alamat pengiriman (snapshot), status produk dan resi, jadwal visit, bukti pembelian |
 | `content_submissions` | Tipe (storyline, draft konten, atau caption), nomor versi, tautan Google Docs/Drive atau foto, tautan postingan final; setiap versi menyimpan keputusan review, feedback tim Tali, feedback brand, kurator, dan waktunya |
 | `payout_requests` | Creator, job yang dicairkan, nominal (total fee, biaya transfer, jumlah bersih), rekening tujuan, status, tanggal pengajuan, tenggat (H+3 hari kerja), tanggal transfer, catatan opsional, admin |
@@ -254,7 +254,7 @@ Stack mengikuti keputusan di scope: Next.js (App Router) + TypeScript, Tailwind 
 
 - Klien brand membayar ke Tali di luar aplikasi; fee creator dibayar dari rekening Tali.
 - Satu partisipasi menghasilkan satu fee sebesar fee yang disepakati: fix rate dari job atau rate creator yang disetujui (open rate); bukan berbasis performa.
-- TOP dihitung dalam hari sejak tim Tali mengonfirmasi postingan tayang, dan bisa berbeda per job. Pilihan TOP: H+7, H+14, atau H+30.
+- TOP bisa berbeda per job. Jenis H+ hari: H+7, H+14, atau H+30. Jenis bulanan: patokan sampai tanggal cut-off (inklusif) dicairkan pada tanggal bayar bulan itu, setelahnya pada tanggal bayar bulan berikutnya. Patokan = tanggal tim Tali mengonfirmasi postingan; untuk job yang mewajibkan insight, patokan = tanggal insight (yang disetujui) dikirim.
 - Verifikasi akun sosial dan konfirmasi postingan tayang dilakukan manual oleh tim Tali di MVP.
 
 ## Rilis bertahap, risiko, dan pertanyaan terbuka

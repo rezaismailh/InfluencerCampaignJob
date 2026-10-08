@@ -4,14 +4,14 @@ import type { BrandEmbed } from './brand';
 import type { Job, Participation, PayoutRequest, Submission } from './types';
 
 export type PartWithJob = Participation & {
-  jobs: Pick<Job, 'id' | 'title' | 'brand_name' | 'job_type' | 'product_option' | 'platforms' | 'content_deadline' | 'top_days'> & { job_brands: BrandEmbed };
+  jobs: Pick<Job, 'id' | 'title' | 'brand_name' | 'job_type' | 'product_option' | 'platforms' | 'content_deadline' | 'top_days' | 'require_insight'> & { job_brands: BrandEmbed };
 };
 
 export async function loadCreatorWork(viewer: Viewer) {
   const [{ data: parts }, { data: requests }, { data: subs }] = await Promise.all([
     viewer.supabase
       .from('participations')
-      .select('*, jobs(id, title, brand_name, job_type, product_option, platforms, content_deadline, top_days, job_brands(real_name))')
+      .select('*, jobs(id, title, brand_name, job_type, product_option, platforms, content_deadline, top_days, require_insight, job_brands(real_name))')
       .eq('creator_id', viewer.id)
       .order('applied_at', { ascending: false })
       .returns<PartWithJob[]>(),

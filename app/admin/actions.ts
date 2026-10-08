@@ -11,6 +11,7 @@ import { PLATFORMS, type Platform } from '@/lib/social';
 import { taxonomyKey } from '@/lib/taxonomy';
 import { TIERS } from '@/lib/tiers';
 import { mentionsBrand } from '@/lib/brand';
+import { isBrandIcon, LOGO_PATH } from '@/lib/brand-look';
 import { dbErrorKey, type ActionState } from '@/lib/action-state';
 import type { VisitLocation } from '@/lib/types';
 
@@ -162,7 +163,15 @@ export async function saveJob(_prev: ActionState, formData: FormData): Promise<A
     }
   }
 
+  // A logo would reveal a disguised brand, so it is only kept when the real name is shown.
+  const logo = text(formData.get('brand_logo'));
+  if (logo && !LOGO_PATH.test(logo)) return { error: 'invalid', fields: { brand_logo: 'invalid' } };
+  if (logo && alias) return { error: 'logo_with_alias', fields: { brand_logo: 'logo_with_alias' } };
+  const icon = text(formData.get('brand_icon'));
+
   const row = { ...parsed.data, brand_name: alias || realName,
+    brand_logo: logo || null,
+    brand_icon: isBrandIcon(icon) ? icon : 'store',
     fee: parsed.data.fee_type === 'fixed' ? parsed.data.fee : null,
     rate_cap: parsed.data.fee_type === 'open' ? parsed.data.rate_cap : null,
     tier_fees: parsed.data.fee_type === 'tier' ? tierFees : {},

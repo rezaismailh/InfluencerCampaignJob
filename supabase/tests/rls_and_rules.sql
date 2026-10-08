@@ -419,3 +419,13 @@ set role anon;
 select tests.check((select top_mode = 'monthly' and pay_day = 21 and require_insight from public.public_open_jobs('20000000-0000-0000-0000-0000000000b1')),
   'teaser has payment terms');
 reset role;
+
+-- Brand logo and stand-in icon
+reset role;
+select tests.expect_error($$update public.jobs set brand_logo = '../x.png' where id = '20000000-0000-0000-0000-0000000000b1'$$, 'jobs_brand_logo_path');
+select tests.expect_error($$update public.jobs set brand_icon = 'rocket' where id = '20000000-0000-0000-0000-0000000000b1'$$, 'jobs_brand_icon_known');
+update public.jobs set brand_icon = 'food', brand_logo = 'jobs/20000000-0000-0000-0000-0000000000b1.png' where id = '20000000-0000-0000-0000-0000000000b1';
+set role anon;
+select tests.check((select brand_icon = 'food' and brand_logo like 'jobs/%' from public.public_open_jobs('20000000-0000-0000-0000-0000000000b1')),
+  'teaser has brand look');
+reset role;

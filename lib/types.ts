@@ -77,6 +77,8 @@ export type Job = {
   pay_day: number;
   cutoff_day: number;
   require_insight: boolean;
+  brand_logo: string | null;
+  brand_icon: string;
   status: JobStatus;
   created_at: string;
 };
@@ -162,5 +164,5 @@ export type Notification = {
 export type PublicJob = Pick<Job,
   'id' | 'brand_name' | 'title' | 'product' | 'job_type' | 'platforms' | 'deliverables' | 'requirements' | 'tiers' | 'niches'
   | 'personas' | 'min_followers' | 'fee_type' | 'fee' | 'rate_cap' | 'tier_fees' | 'tier_basis' | 'primary_platform' | 'quota' | 'review_days' | 'product_option'
-  | 'require_purchase_proof' | 'apply_deadline' | 'content_deadline' | 'top_days' | 'top_mode' | 'pay_day' | 'cutoff_day' | 'require_insight' | 'created_at'
+  | 'require_purchase_proof' | 'apply_deadline' | 'content_deadline' | 'top_days' | 'top_mode' | 'pay_day' | 'cutoff_day' | 'require_insight' | 'brand_logo' | 'brand_icon' | 'created_at'
 > & { visit_location_names: string[] };

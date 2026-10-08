@@ -507,7 +507,7 @@
       "requireInsight": "Insight required after posting",
       "requireInsightHint": "When on, the payout date counts from the day the insight is sent (once approved), not from post confirmation.",
       "brandLogo": "Brand logo (optional)",
-      "brandLogoHint": "PNG, JPG or WebP, up to 1 MB. Shown only when the real name is shown; disguised brands use an icon.",
+      "brandLogoHint": "PNG, JPG or WebP. Resized and compressed automatically on upload. Shown only when the real name is shown; disguised brands use an icon.",
       "brandLogoUpload": "Upload logo",
       "brandIcon": "Stand-in icon",
       "brandIconHint": "Used for disguised brands, or when there is no logo. Pick the closest product category.",

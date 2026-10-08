@@ -6,7 +6,32 @@ import { ImagePlus, X } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { LOGO_BUCKET, LOGO_MAX_BYTES, logoUrl } from '@/lib/brand-look';
 
-/** Uploads one logo to the public brand-logos bucket and keeps its path in a hidden "brand_logo" input. */
+const LOGO_SIZE = 256;
+const RAW_MAX_BYTES = 15 * 1024 * 1024;
+
+/**
+ * Shrinks the image to fit 256×256 and re-encodes it as WebP (PNG where the browser
+ * can't write WebP), keeping transparency. Logos show at 40–48px, so this is plenty.
+ */
+async function compressLogo(file: File): Promise<Blob | null> {
+  try {
+    const bitmap = await createImageBitmap(file);
+    const scale = Math.min(1, LOGO_SIZE / Math.max(bitmap.width, bitmap.height));
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.max(1, Math.round(bitmap.width * scale));
+    canvas.height = Math.max(1, Math.round(bitmap.height * scale));
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return null;
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+    bitmap.close();
+    return await new Promise((resolve) => canvas.toBlob(resolve, 'image/webp', 0.9));
+  } catch {
+    return null;
+  }
+}
+
+/** Compresses one logo, uploads it to the public brand-logos bucket and keeps its path in a hidden "brand_logo" input. */
 export function BrandLogoUpload({ initial, label }: { initial: string | null; label: string }) {
   const t = useTranslations('errors');
   const [path, setPath] = useState(initial ?? '');
@@ -20,15 +45,17 @@ export function BrandLogoUpload({ initial, label }: { initial: string | null; la
     if (!file) return;
     setError(null);
     if (!/^image\/(jpeg|png|webp)$/.test(file.type)) return setError(t('upload_failed'));
-    if (file.size > LOGO_MAX_BYTES) return setError(t('file_too_large'));
+    if (file.size > RAW_MAX_BYTES) return setError(t('file_too_large'));
     setBusy(true);
-    const ext = file.type === 'image/png' ? 'png' : file.type === 'image/webp' ? 'webp' : 'jpg';
+    const blob = await compressLogo(file);
+    if (!blob || blob.size > LOGO_MAX_BYTES) { setBusy(false); return setError(t(blob ? 'file_too_large' : 'upload_failed')); }
+    const ext = blob.type === 'image/webp' ? 'webp' : blob.type === 'image/jpeg' ? 'jpg' : 'png';
     const next = `jobs/${crypto.randomUUID()}.${ext}`;
-    const { error } = await createClient().storage.from(LOGO_BUCKET).upload(next, file, { contentType: file.type });
+    const { error } = await createClient().storage.from(LOGO_BUCKET).upload(next, blob, { contentType: blob.type });
     setBusy(false);
     if (error) return setError(t('upload_failed'));
     setPath(next);
-    setPreview(URL.createObjectURL(file));
+    setPreview(URL.createObjectURL(blob));
   }
 
   return (

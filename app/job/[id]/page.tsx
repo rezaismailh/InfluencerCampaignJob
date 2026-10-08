@@ -1,23 +1,24 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getLocale, getTranslations } from 'next-intl/server';
-import { Lock, MapPin } from 'lucide-react';
+import { CalendarCheck, CalendarClock, ChevronDown, ChevronLeft, Lock, MapPin, Users, Wallet, type LucideIcon } from 'lucide-react';
 import { ActionForm, FieldError } from '@/components/action-form';
 import { Alert } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button, ButtonLink } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Field, Input } from '@/components/ui/field';
-import { PageHeader } from '@/components/ui/page';
+import { RupiahInput } from '@/components/ui/rupiah-input';
+import { BrandAvatar } from '@/components/brand-avatar';
 import { SubmitButton } from '@/components/ui/submit-button';
-import { feeLabel } from '@/components/creator/job-card';
+import { feeLabel, payoutLabel } from '@/components/creator/job-card';
 import { ShareButton } from '@/components/share-button';
 import { applyToJob, respondInvite } from '@/app/(creator)/actions';
 import { getViewer, type Viewer } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
 import { loadTaxonomy } from '@/lib/taxonomy';
 import { creatorTier, tierFeeList } from '@/lib/tiers';
-import { formatDate } from '@/lib/dates';
+import { formatDate, formatDayMonth, monthlyPaymentExample, todayWib } from '@/lib/dates';
+import { cn } from '@/lib/cn';
 import { formatRupiah } from '@/lib/money';
 import type { Job, Participation, PublicJob, SocialAccount } from '@/lib/types';
 import { visibleBrand, type BrandEmbed } from '@/lib/brand';
@@ -56,19 +57,32 @@ export default async function JobDetail({ params }: { params: Promise<{ id: stri
   const full = viewer ? (await viewer.supabase.from('jobs').select('*, job_brands(real_name)').eq('id', id).maybeSingle<Job & { job_brands: BrandEmbed }>()).data : null;
   const job: Job | PublicJob | null = full ?? await publicJob(id);
   if (!job) notFound();
+  const fee = await feeLabel(job);
   const locations = full ? full.visit_locations : (job as PublicJob).visit_location_names.map((name) => ({ name }));
 
+  const pay = paymentRows(job);
+  const hasRequirements = job.requirements || job.min_followers > 0 || job.tiers.length > 0 || job.niches.length > 0 || job.personas.length > 0;
+
   return (
-    <div className="space-y-5">
-      <PageHeader back={{ href: '/job', label: tn('jobs') }} title={job.title} subtitle={full ? visibleBrand(full) : job.brand_name} />
-      {/* Shares the public name (alias for disguised brands), never the real one. */}
-      <ShareButton path={`/job/${job.id}`} title={`${job.title} · ${job.brand_name}`}
-        text={t('shareText', { title: job.title, brand: job.brand_name, fee: await feeLabel(job) })} />
+    <div className="space-y-4">
+      <Link href="/job" className="-ml-2 inline-flex min-h-11 items-center gap-1 px-2 text-[15px] font-bold text-nila-800">
+        <ChevronLeft className="size-5" strokeWidth={2} aria-hidden /> {tn('jobs')}
+      </Link>
+      <header className="flex items-start gap-3">
+        <BrandAvatar logo={job.brand_logo} icon={job.brand_icon} size={48} />
+        <div className="min-w-0">
+          <p className="text-[13px] font-medium text-teks-redup">{full ? visibleBrand(full) : job.brand_name}</p>
+          <h1 className="text-[22px] font-bold leading-7">{job.title}</h1>
+        </div>
+      </header>
 
       <Card className="space-y-3">
-        <p className="text-[13px] font-medium text-teks-redup">{t('fee')}</p>
-        <p className="text-[32px] font-extrabold leading-10 tabular">{await feeLabel(job)}</p>
-        {job.platforms.length > 1 && <p className="text-[13px] text-teks-redup">{t('feeCombined')}</p>}
+        <div>
+          <p className="text-[13px] font-medium text-teks-redup">{t('fee')}</p>
+          <p className="text-[28px] font-extrabold leading-9 tabular">{job.fee_type === 'open' ? t('openRate') : fee}</p>
+          {job.fee_type === 'open' && job.rate_cap && <p className="text-[15px] font-bold tabular">{t('rateCapShort', { amount: formatRupiah(job.rate_cap) })}</p>}
+          {job.platforms.length > 1 && <p className="text-[13px] text-teks-redup">{t('feeCombined')}</p>}
+        </div>
         {job.fee_type === 'tier' && (
           <div className="space-y-2">
             <ul className="divide-y divide-garis rounded-xl border border-garis">
@@ -90,33 +104,31 @@ export default async function JobDetail({ params }: { params: Promise<{ id: stri
           <Badge tone="info">{tt(job.job_type)}</Badge>
           {job.platforms.map((p) => <Badge key={p}>{tp(p)}</Badge>)}
         </div>
-        <div className="rounded-xl bg-latar p-3 text-[15px]">
-          <p className="font-bold">{t('payment')}</p>
-          <p className="text-teks-redup">
-            {job.top_mode === 'monthly'
-              ? t(job.require_insight ? 'paymentMonthlyInsight' : 'paymentMonthly', { pay: job.pay_day, cutoff: job.cutoff_day })
-              : t(job.require_insight ? 'paymentBodyInsight' : 'paymentBody', { days: job.top_days })}
-          </p>
-        </div>
-        <ul className="space-y-0.5 text-[15px] text-teks-redup">
-          {job.content_deadline && <li>{t('contentDeadline', { date: formatDate(job.content_deadline, locale) })}</li>}
-          {job.apply_deadline && <li>{t('applyDeadline', { date: formatDate(job.apply_deadline, locale) })}</li>}
-          <li>{t('quota', { count: job.quota })}</li>
-          {job.review_days && <li>{t('reviewDays', { days: job.review_days })}</li>}
+        <ul className="space-y-2 border-t border-garis pt-3 text-[15px]">
+          <Fact icon={Wallet}>{await payoutLabel(job)}</Fact>
+          {job.apply_deadline && <Fact icon={CalendarClock}>{t('applyDeadline', { date: formatDate(job.apply_deadline, locale) })}</Fact>}
+          {job.content_deadline && <Fact icon={CalendarCheck}>{t('contentDeadline', { date: formatDate(job.content_deadline, locale) })}</Fact>}
+          <Fact icon={Users}>{t('quota', { count: job.quota })}</Fact>
         </ul>
       </Card>
 
-      {creator && full ? <JoinBlock job={full} viewer={creator} /> : <SignInBlock viewer={viewer} jobId={job.id} />}
+      <Card className="space-y-3">
+        <h2 className="font-bold">{t('payment')}</h2>
+        <p className="text-[15px]">{pay.intro}</p>
+        <ul className="divide-y divide-garis rounded-xl bg-latar">
+          {pay.rows.map((row) => (
+            <li key={row.label} className="flex items-center justify-between gap-3 px-3 py-2 text-[15px]">
+              <span className="text-teks-redup">{row.label}</span>
+              <span className="shrink-0 font-bold">{row.value}</span>
+            </li>
+          ))}
+        </ul>
+        <p className="text-[13px] text-teks-redup">{t('paymentTransfer')}</p>
+      </Card>
 
       <Card className="space-y-4">
         <InfoRow title={t('deliverables')} body={job.deliverables} />
-        {full ? <InfoRow title={t('brief')} body={full.brief} /> : (
-          <div className="flex gap-2 rounded-xl bg-latar p-3 text-[15px] text-teks-redup">
-            <Lock className="mt-0.5 size-5 shrink-0" aria-hidden />
-            <p>{t('briefLocked')}</p>
-          </div>
-        )}
-        {(job.requirements || job.min_followers > 0 || job.tiers.length > 0 || job.niches.length > 0 || job.personas.length > 0) && (
+        {hasRequirements && (
           <div>
             <h2 className="font-bold">{t('requirements')}</h2>
             <ul className="mt-1 list-disc space-y-0.5 pl-5 text-[15px]">
@@ -124,44 +136,99 @@ export default async function JobDetail({ params }: { params: Promise<{ id: stri
               {job.tiers.length > 0 && <li>{t('tiers')}: {job.tiers.map((x) => (ttier.has(x) ? ttier(x) : x)).join(', ')}</li>}
               {job.niches.length > 0 && <li>{t('niches')}: {job.niches.map((x) => tax.name('niche', x)).join(', ')}</li>}
               {job.personas.length > 0 && <li>{t('personas')}: {job.personas.map((x) => tax.name('persona', x)).join(', ')}</li>}
+              {job.require_purchase_proof && <li>{t('purchaseProof')}</li>}
             </ul>
             {job.requirements && <p className="mt-2 whitespace-pre-line text-[15px]">{job.requirements}</p>}
           </div>
         )}
-        <InfoRow title={t('product')} body={[job.product, tpo(job.product_option)].filter(Boolean).join(' · ')} />
-        {job.require_purchase_proof && <p className="text-[15px]">{t('purchaseProof')}</p>}
-        {job.job_type === 'visit' && locations.length > 0 && (
-          <div>
-            <h2 className="font-bold">{t('visitLocations')}</h2>
-            <ul className="mt-1 space-y-2">
-              {locations.map((loc: { name: string; address?: string; maps_url?: string }, i) => (
-                <li key={i} className="flex gap-2 text-[15px]">
-                  <MapPin className="mt-0.5 size-5 shrink-0 text-nila-800" aria-hidden />
-                  <div>
-                    <p className="font-medium">{loc.name}</p>
-                    {loc.address && <p className="text-teks-redup">{loc.address}</p>}
-                    {loc.maps_url && <a href={loc.maps_url} target="_blank" rel="noreferrer" className="font-bold text-nila-800 underline underline-offset-4">{t('maps')}</a>}
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
       </Card>
+
+      <details className="group rounded-2xl border border-garis bg-kertas">
+        <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 px-4 font-bold [&::-webkit-details-marker]:hidden">
+          {t('moreDetails')}
+          <ChevronDown className="size-5 transition-transform group-open:rotate-180" aria-hidden />
+        </summary>
+        <div className="space-y-4 border-t border-garis p-4">
+          {full ? <InfoRow title={t('brief')} body={full.brief} /> : (
+            <div className="flex gap-2 rounded-xl bg-latar p-3 text-[15px] text-teks-redup">
+              <Lock className="mt-0.5 size-5 shrink-0" aria-hidden />
+              <p>{t('briefLocked')}</p>
+            </div>
+          )}
+          <InfoRow title={t('product')} body={[job.product, tpo(job.product_option)].filter(Boolean).join(' · ')} />
+          {job.job_type === 'visit' && locations.length > 0 && (
+            <div>
+              <h2 className="font-bold">{t('visitLocations')}</h2>
+              <ul className="mt-1 space-y-2">
+                {locations.map((loc: { name: string; address?: string; maps_url?: string }, i) => (
+                  <li key={i} className="flex gap-2 text-[15px]">
+                    <MapPin className="mt-0.5 size-5 shrink-0 text-nila-800" aria-hidden />
+                    <div>
+                      <p className="font-medium">{loc.name}</p>
+                      {loc.address && <p className="text-teks-redup">{loc.address}</p>}
+                      {loc.maps_url && <a href={loc.maps_url} target="_blank" rel="noreferrer" className="font-bold text-nila-800 underline underline-offset-4">{t('maps')}</a>}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {job.review_days && <p className="text-[15px] text-teks-redup">{t('reviewDays', { days: job.review_days })}</p>}
+        </div>
+      </details>
+
+      {/* Shares the public name (alias for disguised brands), never the real one. */}
+      <ShareButton path={`/job/${job.id}`} title={`${job.title} · ${job.brand_name}`}
+        text={t('shareText', { title: job.title, brand: job.brand_name, fee })} />
+
+      {creator && full ? <JoinBlock job={full} viewer={creator} /> : <SignInBlock viewer={viewer} jobId={job.id} />}
     </div>
   );
+
+  /** Concrete payout dates: the next cut-off for monthly terms, a worked example for H+N. */
+  function paymentRows(job: Job | PublicJob) {
+    const today = todayWib();
+    const when = (date: string) => t('paymentOn', { date: formatDayMonth(date, locale) });
+    if (job.top_mode === 'monthly') {
+      const ex = monthlyPaymentExample(today, job.pay_day, job.cutoff_day);
+      const cutoff = formatDayMonth(ex.cutoff, locale);
+      return {
+        intro: t(job.require_insight ? 'paymentMonthlyInsight' : 'paymentMonthly', { pay: job.pay_day }),
+        rows: [
+          { label: t(job.require_insight ? 'paymentBeforeInsight' : 'paymentBeforePost', { cutoff }), value: when(ex.before) },
+          { label: t(job.require_insight ? 'paymentAfterInsight' : 'paymentAfterPost', { cutoff }), value: when(ex.after) },
+        ],
+      };
+    }
+    const ref = job.content_deadline && job.content_deadline > today ? job.content_deadline : today;
+    const ready = new Date(`${ref}T00:00:00Z`);
+    ready.setUTCDate(ready.getUTCDate() + job.top_days);
+    return {
+      intro: t(job.require_insight ? 'paymentBodyInsight' : 'paymentBody', { days: job.top_days }),
+      rows: [{ label: t(job.require_insight ? 'paymentDaysInsight' : 'paymentDaysPost', { date: formatDayMonth(ref, locale) }), value: when(ready.toISOString().slice(0, 10)) }],
+    };
+  }
+
+  /** Action area pinned above the bottom nav (creators) or the screen edge (guests). */
+  function ActionBar({ children }: { children: React.ReactNode }) {
+    return (
+      <div className={cn('sticky z-10 -mx-4 space-y-3 border-t border-garis bg-kertas/95 px-4 py-3 backdrop-blur',
+        creator ? 'bottom-[calc(57px+env(safe-area-inset-bottom))]' : 'bottom-0 pb-[calc(0.75rem+env(safe-area-inset-bottom))]')}>
+        {children}
+      </div>
+    );
+  }
 
   async function SignInBlock({ viewer, jobId }: { viewer: Viewer | null; jobId: string }) {
     if (viewer && viewer.profile.role !== 'creator') return null;
     const next = encodeURIComponent(`/job/${jobId}`);
     return (
-      <Card className="space-y-3">
-        <p className="font-bold">{viewer ? t('completeProfileTitle') : t('signInTitle')}</p>
-        <p className="text-[15px] text-teks-redup">{viewer ? t('completeProfileBody') : t('signInBody')}</p>
+      <ActionBar>
+        <p className="text-[13px] text-teks-redup">{viewer ? t('completeProfileBody') : t('signInBody')}</p>
         <ButtonLink href={viewer ? `/onboarding?next=${next}` : `/masuk?next=${next}`} className="w-full">
           {viewer ? t('completeProfileCta') : t('signInCta')}
         </ButtonLink>
-      </Card>
+      </ActionBar>
     );
   }
 
@@ -175,10 +242,11 @@ export default async function JobDetail({ params }: { params: Promise<{ id: stri
     const eligible = matching.length > 0;
     const pendingOnly = eligible && matching.every((a) => a.status === 'pending');
     const best = matching.reduce<SocialAccount | null>((top, a) => (!top || a.followers > top.followers ? a : top), null);
+    const link = 'font-bold underline underline-offset-4';
     if (part) {
       if (part.status === 'invited') {
         return (
-          <Card className="space-y-3">
+          <ActionBar>
             <p className="font-bold">{t('inviteFee', { amount: formatRupiah(part.agreed_fee ?? 0) })}</p>
             <div className="flex gap-2">
               <form action={respondInvite} className="flex-1">
@@ -192,66 +260,96 @@ export default async function JobDetail({ params }: { params: Promise<{ id: stri
                 <Button variant="outline">{t('declineInvite')}</Button>
               </form>
             </div>
-          </Card>
+          </ActionBar>
         );
       }
       return (
-        <Card className="space-y-3">
+        <ActionBar>
           <p className="font-bold">{t('yourStatus', { status: tps(part.status) })}</p>
-          {part.status === 'applied' && <p className="text-[15px] text-teks-redup">{t('applied')}</p>}
+          {part.status === 'applied' && <p className="text-[13px] text-teks-redup">{t('applied')}</p>}
           {part.status === 'approved' && <ButtonLink href={`/partisipasi/${part.id}`} className="w-full">{t('openParticipation')}</ButtonLink>}
-        </Card>
+        </ActionBar>
       );
     }
     if (job.status !== 'open') return null;
     if (!eligible) {
       return (
-        <Alert tone="warning">
-          {t('needAccount', { platforms: job.platforms.map((p) => tp(p)).join(' / ') })}{' '}
-          <Link href="/profil" className="font-bold underline underline-offset-4">{t('addAccount')}</Link>
-        </Alert>
+        <ActionBar>
+          <Alert tone="warning">
+            {t('needAccount', { platforms: job.platforms.map((p) => tp(p)).join(' / ') })}{' '}
+            <Link href="/profil" className={link}>{t('addAccount')}</Link>
+          </Alert>
+        </ActionBar>
       );
     }
     // Per-tier fee: show the creator their own fee, or why their tier can't join.
     const tier = job.fee_type === 'tier' ? creatorTier(job, matching) : null;
     if (job.fee_type === 'tier' && !tier && job.tier_basis === 'primary' && job.primary_platform) {
       return (
-        <Alert tone="warning">
-          {t('needPrimaryAccount', { platform: tp(job.primary_platform) })}{' '}
-          <Link href="/profil#field-social" className="font-bold underline underline-offset-4">{t('addAccount')}</Link>
-        </Alert>
+        <ActionBar>
+          <Alert tone="warning">
+            {t('needPrimaryAccount', { platform: tp(job.primary_platform) })}{' '}
+            <Link href="/profil#field-social" className={link}>{t('addAccount')}</Link>
+          </Alert>
+        </ActionBar>
       );
     }
     if (tier && !(tier in (job.tier_fees ?? {}))) {
-      return <Alert tone="warning">{t('tierNotOffered', { tier: ttier(tier) })}</Alert>;
+      return <ActionBar><Alert tone="warning">{t('tierNotOffered', { tier: ttier(tier) })}</Alert></ActionBar>;
     }
     if (best && best.followers < job.min_followers) {
       return (
-        <Alert tone="warning">
-          {t('followersBelowMin', {
-            min: job.min_followers.toLocaleString('id-ID'),
-            platform: tp(best.platform),
-            count: best.followers.toLocaleString('id-ID'),
-          })}{' '}
-          <Link href="/profil#field-social" className="font-bold underline underline-offset-4">{t('updateFollowersCta')}</Link>
-        </Alert>
+        <ActionBar>
+          <Alert tone="warning">
+            {t('followersBelowMin', {
+              min: job.min_followers.toLocaleString('id-ID'),
+              platform: tp(best.platform),
+              count: best.followers.toLocaleString('id-ID'),
+            })}{' '}
+            <Link href="/profil#field-social" className={link}>{t('updateFollowersCta')}</Link>
+          </Alert>
+        </ActionBar>
       );
     }
     return (
-      <ActionForm action={applyToJob} className="space-y-4 rounded-2xl border border-garis bg-kertas p-4">
-        <input type="hidden" name="job_id" value={job.id} />
-        {tier && <p className="text-[15px]">{t.rich('yourTierFee', { fee: formatRupiah(job.tier_fees[tier]), tier: ttier(tier), b: (c) => <b className="tabular">{c}</b> })}</p>}
-        {pendingOnly && <p className="text-[15px] text-teks-redup">{t('pendingAccountNote')}</p>}
-        {job.fee_type === 'open' && (
-          <Field label={t('rate')} hint={job.rate_cap ? `${t('rateHint')} ${t('rateCapHint', { amount: formatRupiah(job.rate_cap) })}` : t('rateHint')} htmlFor="rate">
-            <Input id="rate" name="rate" inputMode="numeric" placeholder="250000" required className="tabular" />
-            <FieldError name="rate" />
-          </Field>
-        )}
-        <SubmitButton pendingLabel={t('joining')} className="w-full">{t('join')}</SubmitButton>
-      </ActionForm>
+      <ActionBar>
+        <ActionForm action={applyToJob} className="space-y-2">
+          <input type="hidden" name="job_id" value={job.id} />
+          {pendingOnly && <p className="text-[13px] text-teks-redup">{t('pendingAccountNote')}</p>}
+          {job.fee_type === 'open' ? (
+            <>
+              <label htmlFor="rate" className="block text-[15px] font-bold">{t('rate')}</label>
+              <div className="flex gap-2">
+                <RupiahInput id="rate" name="rate" placeholder="250.000" required className="flex-1" />
+                <SubmitButton pendingLabel={t('joining')}>{t('join')}</SubmitButton>
+              </div>
+              <FieldError name="rate" />
+              <p className="text-[13px] text-teks-redup">
+                {job.rate_cap ? `${t('rateHint')} ${t('rateCapHint', { amount: formatRupiah(job.rate_cap) })}` : t('rateHint')}
+              </p>
+            </>
+          ) : (
+            <div className="flex items-center justify-between gap-3">
+              <div className="min-w-0">
+                <p className="text-[13px] text-teks-redup">{tier ? `${t('feeYours')} · ${ttier(tier)}` : t('fee')}</p>
+                <p className="text-lg font-extrabold tabular">{tier ? formatRupiah(job.tier_fees[tier]) : fee}</p>
+              </div>
+              <SubmitButton pendingLabel={t('joining')} className="shrink-0">{t('join')}</SubmitButton>
+            </div>
+          )}
+        </ActionForm>
+      </ActionBar>
     );
   }
+}
+
+function Fact({ icon: Icon, children }: { icon: LucideIcon; children: React.ReactNode }) {
+  return (
+    <li className="flex items-center gap-2">
+      <Icon className="size-5 shrink-0 text-nila-800" strokeWidth={2} aria-hidden />
+      <span>{children}</span>
+    </li>
+  );
 }
 
 function InfoRow({ title, body }: { title: string; body: string | null }) {

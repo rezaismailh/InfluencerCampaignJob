@@ -6,6 +6,9 @@ import { saveJob } from '@/app/admin/actions';
 import { PLATFORMS } from '@/lib/social';
 import { loadTaxonomy } from '@/lib/taxonomy';
 import { TIERS } from '@/lib/tiers';
+import { BRAND_ICONS } from '@/lib/brand-look';
+import { BRAND_ICON_COMPONENTS } from '@/components/brand-avatar';
+import { BrandLogoUpload } from '@/components/admin/brand-logo-upload';
 import type { Job } from '@/lib/types';
 
 
@@ -62,6 +65,26 @@ export async function JobForm({ job, realBrand, clients }: { job?: Job; realBran
           <Input id="brand_alias" name="brand_alias" defaultValue={realBrand ? job?.brand_name : ''} placeholder={t('brandAliasPlaceholder')} />
           <FieldError name="brand_alias" />
         </Field>
+        <Field label={t('brandLogo')} hint={t('brandLogoHint')}>
+          <BrandLogoUpload initial={job?.brand_logo ?? null} label={t('brandLogoUpload')} />
+          <FieldError name="brand_logo" />
+        </Field>
+        <fieldset className="space-y-1.5 md:col-span-2">
+          <legend className="text-[15px] font-bold">{t('brandIcon')}</legend>
+          <p className="text-[13px] text-teks-redup">{t('brandIconHint')}</p>
+          <div className="flex flex-wrap gap-2">
+            {BRAND_ICONS.map((key) => {
+              const Icon = BRAND_ICON_COMPONENTS[key];
+              return (
+                <label key={key} className="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-full border border-garis bg-kertas px-3 has-[:checked]:border-nila-800 has-[:checked]:bg-nila-50">
+                  <input type="radio" name="brand_icon" value={key} defaultChecked={(job?.brand_icon ?? 'store') === key} className="sr-only" />
+                  <Icon className="size-5 text-nila-800" strokeWidth={2} aria-hidden />
+                  <span className="text-[15px]">{t(`brandIcons.${key}`)}</span>
+                </label>
+              );
+            })}
+          </div>
+        </fieldset>
         <Field label={t('title')} htmlFor="title">
           <Input id="title" name="title" defaultValue={job?.title ?? ''} required /><FieldError name="title" />
         </Field>

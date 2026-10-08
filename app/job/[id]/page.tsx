@@ -11,6 +11,7 @@ import { Field, Input } from '@/components/ui/field';
 import { PageHeader } from '@/components/ui/page';
 import { SubmitButton } from '@/components/ui/submit-button';
 import { feeLabel } from '@/components/creator/job-card';
+import { ShareButton } from '@/components/share-button';
 import { applyToJob, respondInvite } from '@/app/(creator)/actions';
 import { getViewer, type Viewer } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
@@ -58,6 +59,9 @@ export default async function JobDetail({ params }: { params: Promise<{ id: stri
   return (
     <div className="space-y-5">
       <PageHeader back={{ href: '/job', label: tn('jobs') }} title={job.title} subtitle={full ? visibleBrand(full) : job.brand_name} />
+      {/* Shares the public name (alias for disguised brands), never the real one. */}
+      <ShareButton path={`/job/${job.id}`} title={`${job.title} · ${job.brand_name}`}
+        text={t('shareText', { title: job.title, brand: job.brand_name, fee: await feeLabel(job) })} />
 
       <Card className="space-y-3">
         <p className="text-[13px] font-medium text-teks-redup">{t('fee')}</p>

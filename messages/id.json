@@ -207,7 +207,11 @@
     "addRow": "Tambah akun media sosial",
     "hint_unsupported_link": "Link belum dikenali. Tempel link profil atau ketik username saja.",
     "hint_platform_mismatch": "Link ini bukan dari platform yang dipilih.",
-    "hint_username_required": "Username belum terbaca. Ketik username-nya saja, misalnya @namakamu."
+    "hint_username_required": "Username belum terbaca. Ketik username-nya saja, misalnya @namakamu.",
+    "updateFollowers": "Perbarui",
+    "saveFollowers": "Simpan",
+    "followersInvalid": "Isi angka followers yang benar.",
+    "followersRecheck": "Setelah diperbarui, tim Tali mengecek ulang angkanya."
   },
   "home": {
     "greeting": "Halo, {name}",
@@ -273,7 +277,8 @@
     "briefLocked": "Brief lengkap dan alamat lokasi terlihat setelah kamu masuk.",
     "needAccount": "Tambahkan akun {platforms} kamu dulu untuk gabung job ini.",
     "addAccount": "Tambah di Profil",
-    "pendingAccountNote": "Akun media sosialmu sedang diverifikasi. Kamu tetap bisa daftar sekarang; tim Tali memverifikasinya saat menyeleksi pelamar."
+    "pendingAccountNote": "Akun media sosialmu sedang diverifikasi. Kamu tetap bisa daftar sekarang; tim Tali memverifikasinya saat menyeleksi pelamar.",
+    "shareText": "Ada campaign {title} dari {brand} di Tali, fee {fee}. Cek detailnya:"
   },
   "work": {
     "title": "Kerjaan",
@@ -534,9 +539,10 @@
     "holidaysEmpty": "Belum ada hari libur.",
     "onlyFinance": "Halaman ini khusus admin keuangan.",
     "onlyCurator": "Halaman ini khusus kurator.",
-    "verifyNow": "Verifikasi",
-    "verifyBeforeApprove": "Verifikasi akun di platform job ini (dan pastikan followers memenuhi syarat) sebelum menerima pelamar.",
-    "brandShownAs": "{real} · tampil sebagai “{alias}”"
+    "brandShownAs": "{real} · tampil sebagai “{alias}”",
+    "acceptVerifies": "Menerima pelamar ini sekaligus memverifikasi akunnya. Buka link profilnya dulu untuk mengecek.",
+    "cannotAccept": "Belum bisa diterima: akun di platform job ini ditolak, belum ada, atau followers-nya di bawah syarat.",
+    "socialQueueHint": "Tidak wajib memverifikasi semua akun. Akun pelamar otomatis terverifikasi saat kamu menerima lamarannya."
   },
   "errors": {
     "generic": "Ada yang belum berhasil. Coba lagi sebentar lagi.",
@@ -588,7 +594,7 @@
     "needSocial": "Tambahkan minimal satu akun media sosial.",
     "inviteNotFound": "Creator dengan email itu belum terdaftar.",
     "no_social_account": "Tambahkan akun media sosial di platform job ini dulu, lewat halaman Profil.",
-    "account_not_verified": "Akun pelamar di platform job ini belum terverifikasi atau followers-nya di bawah syarat. Verifikasi dulu, lalu terima.",
+    "account_not_verified": "Pelamar belum bisa diterima: akun di platform job ini ditolak atau followers-nya di bawah syarat.",
     "brand_in_text": "Nama brand asli masih tertulis di sini. Hapus dulu supaya samarannya tidak bocor.",
     "incomplete": "Data belum lengkap. Lengkapi yang berikut:",
     "platform_mismatch": "Link ini bukan dari platform yang dipilih. Ganti platformnya atau tempel link yang sesuai.",
@@ -793,5 +799,11 @@
         ]
       }
     ]
+  },
+  "share": {
+    "share": "Bagikan",
+    "copied": "Link disalin",
+    "whatsapp": "WhatsApp",
+    "copyPrompt": "Salin link ini:"
   }
 }

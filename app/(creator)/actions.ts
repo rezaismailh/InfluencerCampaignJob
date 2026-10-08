@@ -129,6 +129,17 @@ export async function saveProfile(_prev: ActionState, formData: FormData): Promi
   return { ok: true, success: 'saved' };
 }
 
+/** A creator updates their follower count; the account goes back to "pending" (database trigger) for a recheck. */
+export async function updateFollowers(id: string, value: string): Promise<{ ok: boolean }> {
+  const viewer = await requireCreator({ allowIncomplete: true });
+  const followers = parseRupiah(value);
+  if (followers === null) return { ok: false };
+  const { error } = await viewer.supabase.from('social_accounts').update({ followers }).eq('id', id).eq('creator_id', viewer.id);
+  if (error) return { ok: false };
+  revalidatePath('/', 'layout');
+  return { ok: true };
+}
+
 export async function removeSocialAccount(formData: FormData) {
   const viewer = await requireCreator({ allowIncomplete: true });
   await viewer.supabase.from('social_accounts').delete().eq('id', text(formData.get('id'))).eq('creator_id', viewer.id);

@@ -22,7 +22,7 @@ export default async function SocialQueue() {
 
   return (
     <div>
-      <PageHeader title={t('socialQueue')} />
+      <PageHeader title={t('socialQueue')} subtitle={t('socialQueueHint')} />
       {!data?.length && <EmptyState title={t('socialEmpty')} />}
       <div className="grid gap-3 lg:grid-cols-2">
         {data?.map((a) => (

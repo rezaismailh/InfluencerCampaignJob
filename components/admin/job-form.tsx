@@ -4,6 +4,7 @@ import { Field, Input, Select, Textarea } from '@/components/ui/field';
 import { SubmitButton } from '@/components/ui/submit-button';
 import { saveJob } from '@/app/admin/actions';
 import { PLATFORMS } from '@/lib/social';
+import { TIERS } from '@/lib/tiers';
 import type { Job } from '@/lib/types';
 
 const PERSONAS = ['genz', 'student', 'foodies', 'lifestyle', 'parent', 'professional', 'other'];
@@ -85,7 +86,7 @@ export async function JobForm({ job, realBrand, clients }: { job?: Job; realBran
       <Field label={t('requirements')} htmlFor="requirements"><Textarea id="requirements" name="requirements" defaultValue={job?.requirements ?? ''} /><FieldError name="requirements" /></Field>
 
       <div className="grid gap-4 md:grid-cols-2">
-        <Chips name="tiers" label={t('tiers')} checked={job?.tiers ?? []} options={['nano', 'micro'].map((v) => ({ value: v, label: ttier(v) }))} />
+        <Chips name="tiers" label={t('tiers')} checked={job?.tiers ?? []} options={TIERS.map((v) => ({ value: v, label: ttier(v) }))} />
         <Field label={t('minFollowers')} htmlFor="min_followers">
           <Input id="min_followers" name="min_followers" inputMode="numeric" defaultValue={job?.min_followers ?? 0} className="tabular" />
         </Field>

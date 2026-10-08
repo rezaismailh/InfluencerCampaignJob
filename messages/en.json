@@ -56,8 +56,10 @@
     "other": "Other"
   },
   "tier": {
-    "nano": "Nano",
-    "micro": "Micro"
+    "nano": "Nano (1K–10K)",
+    "micro": "Micro (10K–100K)",
+    "macro": "Macro (100K–1M)",
+    "mega": "Mega (1M+)"
   },
   "verification": {
     "pending": "Awaiting verification",

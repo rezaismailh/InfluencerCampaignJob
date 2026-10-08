@@ -8,6 +8,7 @@ import { requireStaff } from '@/lib/auth';
 import { parseRupiah } from '@/lib/money';
 import { deliverPending } from '@/lib/notify';
 import { PLATFORMS } from '@/lib/social';
+import { TIERS } from '@/lib/tiers';
 import { mentionsBrand } from '@/lib/brand';
 import { dbErrorKey, type ActionState } from '@/lib/action-state';
 import type { VisitLocation } from '@/lib/types';
@@ -62,7 +63,7 @@ const jobSchema = z.object({
   deliverables: z.string().min(3),
   brief: z.string().min(3),
   requirements: z.string().nullable(),
-  tiers: z.array(z.enum(['nano', 'micro'])),
+  tiers: z.array(z.enum(TIERS)),
   personas: z.array(z.string()),
   min_followers: z.number().int().min(0),
   fee_type: z.enum(['fixed', 'open']),

@@ -56,8 +56,10 @@
     "other": "Lainnya"
   },
   "tier": {
-    "nano": "Nano",
-    "micro": "Micro"
+    "nano": "Nano (1rb–10rb)",
+    "micro": "Micro (10rb–100rb)",
+    "macro": "Macro (100rb–1jt)",
+    "mega": "Mega (>1jt)"
   },
   "verification": {
     "pending": "Menunggu verifikasi",

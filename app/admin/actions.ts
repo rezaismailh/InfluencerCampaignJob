@@ -12,6 +12,7 @@ import { taxonomyKey } from '@/lib/taxonomy';
 import { TIERS } from '@/lib/tiers';
 import { mentionsBrand } from '@/lib/brand';
 import { isBrandIcon, LOGO_PATH } from '@/lib/brand-look';
+import { ACCOUNT_TYPES, GENDERS, HIJAB } from '@/lib/visit';
 import { dbErrorKey, type ActionState } from '@/lib/action-state';
 import type { VisitLocation } from '@/lib/types';
 
@@ -59,7 +60,7 @@ const jobSchema = z.object({
   brand_name: z.string().min(1).max(120),
   title: z.string().min(3).max(160),
   product: z.string().max(160).nullable(),
-  job_type: z.enum(['non_visit', 'visit']),
+  job_type: z.enum(['non_visit', 'visit', 'both']),
   phase: z.string().max(60).nullable(),
   platforms: z.array(z.enum(PLATFORMS)).min(1),
   deliverables: z.string().min(3),
@@ -68,10 +69,15 @@ const jobSchema = z.object({
   tiers: z.array(z.enum(TIERS)),
   niches: z.array(z.string()),
   personas: z.array(z.string()),
+  genders: z.array(z.enum(GENDERS)),
+  hijab: z.enum(HIJAB).nullable(),
+  account_types: z.array(z.enum(ACCOUNT_TYPES)),
   min_followers: z.number().int().min(0),
   fee_type: z.enum(['fixed', 'open', 'tier']),
   fee: z.number().int().positive().nullable(),
+  fee_visit: z.number().int().positive().nullable(),
   rate_cap: z.number().int().positive().nullable(),
+  rate_cap_visit: z.number().int().positive().nullable(),
   quota: z.number().int().positive(),
   review_days: z.number().int().positive().nullable(),
   product_option: z.enum(['shipped', 'self_purchase', 'none']),
@@ -104,10 +110,15 @@ export async function saveJob(_prev: ActionState, formData: FormData): Promise<A
     tiers: formData.getAll('tiers').map(String),
     niches: formData.getAll('niches').map(String),
     personas: formData.getAll('personas').map(String),
+    genders: formData.getAll('genders').map(String),
+    hijab: text(formData.get('hijab')) || null,
+    account_types: formData.getAll('account_types').map(String),
     min_followers: optionalInt(formData.get('min_followers')) ?? 0,
     fee_type: text(formData.get('fee_type')),
     fee: optionalInt(formData.get('fee')),
+    fee_visit: optionalInt(formData.get('fee_visit')),
     rate_cap: optionalInt(formData.get('rate_cap')),
+    rate_cap_visit: optionalInt(formData.get('rate_cap_visit')),
     quota: optionalInt(formData.get('quota')) ?? 0,
     review_days: optionalInt(formData.get('review_days')),
     product_option: text(formData.get('product_option')),
@@ -154,6 +165,18 @@ export async function saveJob(_prev: ActionState, formData: FormData): Promise<A
     const fee = optionalInt(formData.get(`tier_fee_${tier}`));
     if (fee && fee > 0) tierFees[tier] = fee;
   }
+  const tierFeesVisit: Record<string, number> = {};
+  for (const tier of TIERS) {
+    const fee = optionalInt(formData.get(`tier_fee_visit_${tier}`));
+    if (fee && fee > 0) tierFeesVisit[tier] = fee;
+  }
+  const both = parsed.data.job_type === 'both';
+  if (both && parsed.data.fee_type === 'fixed' && !parsed.data.fee_visit) return { error: 'invalid', fields: { fee_visit: 'required' } };
+  if (both && parsed.data.fee_type === 'tier' && !Object.keys(tierFeesVisit).length) {
+    return { error: 'invalid', fields: { tier_fees_visit: 'tier_fee_required' } };
+  }
+  // A hijab requirement only makes sense for women.
+  if (parsed.data.hijab && parsed.data.genders.includes('male')) return { error: 'invalid', fields: { hijab: 'hijab_needs_female' } };
   const tierBasis = text(formData.get('tier_basis')) === 'primary' ? 'primary' : 'largest';
   const primaryPlatform = text(formData.get('primary_platform')) || null;
   if (parsed.data.fee_type === 'tier') {
@@ -175,6 +198,10 @@ export async function saveJob(_prev: ActionState, formData: FormData): Promise<A
     fee: parsed.data.fee_type === 'fixed' ? parsed.data.fee : null,
     rate_cap: parsed.data.fee_type === 'open' ? parsed.data.rate_cap : null,
     tier_fees: parsed.data.fee_type === 'tier' ? tierFees : {},
+    fee_visit: both && parsed.data.fee_type === 'fixed' ? parsed.data.fee_visit : null,
+    rate_cap_visit: both && parsed.data.fee_type === 'open' ? parsed.data.rate_cap_visit : null,
+    tier_fees_visit: both && parsed.data.fee_type === 'tier' ? tierFeesVisit : {},
+    genders: parsed.data.hijab && !parsed.data.genders.length ? ['female' as const] : parsed.data.genders,
     tier_basis: tierBasis,
     primary_platform: primaryPlatform && parsed.data.platforms.includes(primaryPlatform as Platform) ? primaryPlatform : null };
 
@@ -198,6 +225,7 @@ export async function decideApplication(_prev: ActionState, formData: FormData):
     p_part: part,
     p_approve: text(formData.get('decision')) === 'approve',
     p_fee: optionalInt(formData.get('fee')),
+    p_mode: text(formData.get('work_mode')) || null,
   });
   if (error) return { error: dbErrorKey(error) };
   deliverLater();
@@ -211,7 +239,9 @@ export async function inviteCreator(_prev: ActionState, formData: FormData): Pro
   const email = text(formData.get('email')).toLowerCase();
   const { data: creator } = await viewer.supabase.from('profiles').select('id').eq('role', 'creator').ilike('email', email).maybeSingle();
   if (!creator) return { error: 'inviteNotFound' };
-  const { error } = await viewer.supabase.rpc('invite_creator', { p_job: jobId, p_creator: creator.id, p_fee: optionalInt(formData.get('fee')) });
+  const { error } = await viewer.supabase.rpc('invite_creator', {
+    p_job: jobId, p_creator: creator.id, p_fee: optionalInt(formData.get('fee')), p_mode: text(formData.get('work_mode')) || null,
+  });
   if (error) return { error: dbErrorKey(error) };
   deliverLater();
   revalidatePath(`/admin/job/${jobId}`);
@@ -339,6 +369,36 @@ export async function confirmPost(_prev: ActionState, formData: FormData): Promi
   if (error) return { error: dbErrorKey(error) };
   deliverLater();
   revalidatePath('/admin', 'layout');
+  return { ok: true, success: 'updated' };
+}
+
+/** Approves a content idea, draft or caption agreed outside the app (no creator submission needed). */
+export async function markOfflineApproved(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const viewer = await requireStaff('curator');
+  const part = text(formData.get('participation_id'));
+  const { error } = await viewer.supabase.rpc('mark_offline_approved', {
+    p_part: part, p_kind: text(formData.get('kind')), p_note: text(formData.get('note')) || null,
+  });
+  if (error) return { error: dbErrorKey(error) };
+  deliverLater();
+  revalidatePath('/admin', 'layout');
+  revalidatePath(`/partisipasi/${part}`);
+  return { ok: true, success: 'updated' };
+}
+
+/** Post link the creator sent outside the app. */
+export async function staffSubmitPost(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const viewer = await requireStaff('curator');
+  const part = text(formData.get('participation_id'));
+  const { error } = await viewer.supabase.rpc('staff_submit_post', {
+    p_part: part, p_url: text(formData.get('post_url')), p_posted_on: text(formData.get('posted_on')) || null,
+  });
+  if (error) {
+    const key = dbErrorKey(error);
+    return { error: key, fields: key === 'invalid_url' ? { post_url: key } : key === 'invalid_date' ? { posted_on: key } : undefined };
+  }
+  revalidatePath('/admin', 'layout');
+  revalidatePath(`/partisipasi/${part}`);
   return { ok: true, success: 'updated' };
 }
 

@@ -435,3 +435,88 @@ reset role;
 select tests.expect_error($$update public.job_brands set logo = 'x.png'$$, 'job_brands_logo_check');
 update public.job_brands set logo = 'jobs/20000000-0000-0000-0000-000000000001.png' where job_id = '20000000-0000-0000-0000-000000000001';
 select tests.check((select count(*) = 1 from public.job_brands where logo is not null), 'hidden logo stored');
+
+-- Visit + non-visit in one job, and creator traits ------------------------------
+reset role;
+insert into public.jobs (id, brand_name, title, platforms, deliverables, brief, job_type, fee_type, fee, fee_visit, quota, top_days, status,
+  genders, hijab, account_types)
+values ('20000000-0000-0000-0000-0000000000c1', 'Hijab brand', 'Review gamis', '{tiktok}', '1 video', 'Brief', 'both', 'fixed', 100000, 200000, 5, 7, 'open',
+  '{female}', 'hijab', '{personal}');
+insert into public.jobs (id, brand_name, title, platforms, deliverables, brief, job_type, fee_type, rate_cap, rate_cap_visit, quota, top_days, status)
+values ('20000000-0000-0000-0000-0000000000c2', 'Cafe', 'Coba menu', '{tiktok}', '1 video', 'Brief', 'both', 'open', 300000, 500000, 5, 7, 'open');
+insert into public.jobs (id, brand_name, title, platforms, deliverables, brief, job_type, fee_type, fee, quota, top_days, status)
+values ('20000000-0000-0000-0000-0000000000c3', 'Klinik', 'Facial', '{tiktok}', '1 video', 'Brief', 'visit', 'fixed', 400000, 5, 7, 'open');
+select tests.expect_error($$update public.jobs set genders = '{other}' where id = '20000000-0000-0000-0000-0000000000c1'$$, 'jobs_genders_check');
+set role authenticated;
+
+-- Creator A: traits are asked step by step until they match the job
+select tests.act_as('00000000-0000-0000-0000-00000000000a');
+select tests.expect_error($$update public.profiles set gender = 'male', hijab = 'hijab' where id = auth.uid()$$, 'profiles_hijab_women_only');
+select tests.expect_error($$select public.apply_to_job('20000000-0000-0000-0000-0000000000c1')$$, 'profile_gender_required');
+update public.profiles set gender = 'female' where id = auth.uid();
+select tests.expect_error($$select public.apply_to_job('20000000-0000-0000-0000-0000000000c1')$$, 'profile_hijab_required');
+update public.profiles set hijab = 'non_hijab' where id = auth.uid();
+select tests.expect_error($$select public.apply_to_job('20000000-0000-0000-0000-0000000000c1')$$, 'hijab_not_eligible');
+update public.profiles set hijab = 'hijab' where id = auth.uid();
+select tests.expect_error($$select public.apply_to_job('20000000-0000-0000-0000-0000000000c1')$$, 'profile_account_type_required');
+update public.profiles set account_type = 'couple' where id = auth.uid();
+select tests.expect_error($$select public.apply_to_job('20000000-0000-0000-0000-0000000000c1')$$, 'account_type_not_eligible');
+update public.profiles set account_type = 'personal' where id = auth.uid();
+select public.apply_to_job('20000000-0000-0000-0000-0000000000c1', null, true);
+select tests.check((select visit_willing from public.participations where job_id = '20000000-0000-0000-0000-0000000000c1'), 'A willing to visit');
+select tests.expect_error($$select public.apply_to_job('20000000-0000-0000-0000-0000000000c3')$$, 'visit_consent_required');
+select public.apply_to_job('20000000-0000-0000-0000-0000000000c3', null, true);
+
+-- Creator B: open fee with both modes needs a visit rate when willing
+select tests.act_as('00000000-0000-0000-0000-00000000000b');
+select tests.expect_error($$select public.apply_to_job('20000000-0000-0000-0000-0000000000c2', 250000, true)$$, 'rate_visit_required');
+select tests.expect_error($$select public.apply_to_job('20000000-0000-0000-0000-0000000000c2', 250000, true, 600000)$$, 'rate_visit_above_cap');
+select public.apply_to_job('20000000-0000-0000-0000-0000000000c2', 250000, false, 450000);
+select tests.check((select proposed_rate = 250000 and proposed_rate_visit is null and visit_willing = false
+  from public.participations where job_id = '20000000-0000-0000-0000-0000000000c2'), 'not willing: visit rate dropped');
+
+-- Curator picks the mode; the fee follows it
+select tests.act_as('00000000-0000-0000-0000-000000000002');
+select tests.expect_error($$select public.decide_application((select id from public.participations where job_id = '20000000-0000-0000-0000-0000000000c1'), true)$$, 'work_mode_required');
+select public.decide_application((select id from public.participations where job_id = '20000000-0000-0000-0000-0000000000c1'), true, null, 'visit');
+select tests.check((select agreed_fee = 200000 and work_mode = 'visit' from public.participations where job_id = '20000000-0000-0000-0000-0000000000c1'),
+  'visit fee applied');
+select tests.expect_error($$select public.decide_application((select id from public.participations where job_id = '20000000-0000-0000-0000-0000000000c2'), true, null, 'visit')$$, 'not_willing_to_visit');
+select public.decide_application((select id from public.participations where job_id = '20000000-0000-0000-0000-0000000000c2'), true, null, 'non_visit');
+select tests.check((select agreed_fee = 250000 and work_mode = 'non_visit' from public.participations where job_id = '20000000-0000-0000-0000-0000000000c2'),
+  'proposed non-visit rate applied');
+select public.decide_application((select id from public.participations where job_id = '20000000-0000-0000-0000-0000000000c3'), true);
+select tests.check((select work_mode = 'visit' and agreed_fee = 400000 from public.participations where job_id = '20000000-0000-0000-0000-0000000000c3'),
+  'visit-only job sets mode');
+reset role;
+set role anon;
+select tests.check((select fee_visit = 200000 and hijab = 'hijab' and genders = '{female}' from public.public_open_jobs('20000000-0000-0000-0000-0000000000c1')),
+  'teaser has visit fee and traits');
+reset role;
+
+-- Offline approval by the team -------------------------------------------------
+set role authenticated;
+select tests.act_as('00000000-0000-0000-0000-00000000000a');
+select tests.expect_error($$select public.mark_offline_approved((select id from public.participations where job_id = '20000000-0000-0000-0000-0000000000c1'), 'draft')$$, 'forbidden');
+select tests.act_as('00000000-0000-0000-0000-000000000002');
+select tests.expect_error($$select public.staff_submit_post((select id from public.participations where job_id = '20000000-0000-0000-0000-0000000000c1'), 'https://www.tiktok.com/@cra/video/1', public.today_wib())$$, 'content_not_approved');
+-- Marking the draft also approves the content idea first.
+select public.mark_offline_approved((select id from public.participations where job_id = '20000000-0000-0000-0000-0000000000c1'), 'draft', 'Disetujui lewat WA');
+select tests.check((select count(*) = 2 and bool_and(s.offline and s.status = 'approved') from public.submissions s
+  join public.participations p on p.id = s.participation_id where p.job_id = '20000000-0000-0000-0000-0000000000c1'), 'storyline and draft approved offline');
+select public.mark_offline_approved((select id from public.participations where job_id = '20000000-0000-0000-0000-0000000000c1'), 'draft');
+select tests.check((select count(*) = 2 from public.submissions s join public.participations p on p.id = s.participation_id
+  where p.job_id = '20000000-0000-0000-0000-0000000000c1'), 'marking again adds nothing');
+select public.mark_offline_approved((select id from public.participations where job_id = '20000000-0000-0000-0000-0000000000c1'), 'caption');
+select public.staff_submit_post((select id from public.participations where job_id = '20000000-0000-0000-0000-0000000000c1'), 'https://www.tiktok.com/@cra/video/1', public.today_wib());
+select public.confirm_post((select id from public.participations where job_id = '20000000-0000-0000-0000-0000000000c1'));
+select tests.check((select post_confirmed_at is not null and ready_at is not null from public.participations where job_id = '20000000-0000-0000-0000-0000000000c1'),
+  'post entered by the team and confirmed');
+-- A waiting submission is approved in place.
+select tests.act_as('00000000-0000-0000-0000-00000000000b');
+select public.submit_item((select id from public.participations where job_id = '20000000-0000-0000-0000-0000000000c2'), 'storyline', 'https://docs.google.com/document/d/abc');
+select tests.act_as('00000000-0000-0000-0000-000000000002');
+select public.mark_offline_approved((select id from public.participations where job_id = '20000000-0000-0000-0000-0000000000c2'), 'storyline');
+select tests.check((select count(*) = 1 and bool_and(s.offline and s.status = 'approved' and s.content is not null) from public.submissions s
+  join public.participations p on p.id = s.participation_id where p.job_id = '20000000-0000-0000-0000-0000000000c2'), 'pending submission approved in place');
+reset role;

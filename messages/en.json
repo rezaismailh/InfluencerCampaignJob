@@ -45,7 +45,8 @@
   },
   "jobType": {
     "non_visit": "From home",
-    "visit": "On location"
+    "visit": "On location",
+    "both": "From home or on location"
   },
   "productOption": {
     "shipped": "Product shipped to you",
@@ -169,7 +170,11 @@
     "socialRowField": "Social account {n}: {field}",
     "socialField_platform": "platform",
     "socialField_link": "link or username",
-    "socialField_followers": "follower count"
+    "socialField_followers": "follower count",
+    "gender": "Gender",
+    "hijab": "Wear a hijab?",
+    "accountType": "Account type",
+    "accountTypeHint": "Who usually appears in your content."
   },
   "social": {
     "title": "Social media accounts",
@@ -207,7 +212,9 @@
     "emptyActiveBody": "See the jobs open right now.",
     "seeJobs": "See jobs",
     "socialPending": "The Tali team is verifying your social accounts. You can already apply to jobs while you wait.",
-    "inviteTitle": "Job invitations"
+    "inviteTitle": "Job invitations",
+    "completeTraits": "Your profile is incomplete: some brands pick creators by gender and account type.",
+    "completeTraitsCta": "Complete it"
   },
   "jobs": {
     "title": "Open jobs",
@@ -290,7 +297,19 @@
     "feeOpen": "Fee (you name it)",
     "feeByFollowers": "Fee by follower count",
     "seeDetail": "See job details",
-    "joinShort": "Apply"
+    "joinShort": "Apply",
+    "visitConsent": "I am willing to visit the location on the schedule from the Tali team.",
+    "visitWilling": "I am also willing to visit (go on location). The client decides who visits.",
+    "rateVisit": "Rate for a visit",
+    "rateNonVisit": "Rate from home (non-visit)",
+    "genderReq": "Only for",
+    "accountTypeReq": "Account type",
+    "notEligible_gender": "This job is for a specific gender, so it does not match your profile yet.",
+    "notEligible_hijab": "This job has a hijab requirement that does not match your profile.",
+    "notEligible_account_type": "This job is looking for another account type (e.g. couple or family).",
+    "traitsTitle": "Fill this in first",
+    "traitsBody": "The brand asks for it. Only once; it is saved to your profile.",
+    "anyOf": "any of"
   },
   "work": {
     "title": "Work",
@@ -366,7 +385,8 @@
     "insightLocked": "You can send this once your post is confirmed live.",
     "versions": "{count, plural, one {# submission} other {# submissions}}",
     "needsRevision": "Needs a revision, see feedback below",
-    "payoutFailedStep": "Transfer failed, check your account"
+    "payoutFailedStep": "Transfer failed, check your account",
+    "offlineApproved": "Approved by the Tali team outside the app (WhatsApp/email)."
   },
   "balance": {
     "title": "Balance",
@@ -538,7 +558,19 @@
         "travel": "Travel",
         "sport": "Sports",
         "fun": "Entertainment"
-      }
+      },
+      "traits": "Creator requirements (optional)",
+      "traitsHint": "Checked when creators apply. Within a row, matching any one is enough (e.g. Personal OR Couple); across rows all must be met (AND). Leave empty to allow everyone. Creators who have not filled these in are asked when they apply.",
+      "genders": "Gender",
+      "hijabReq": "Hijab",
+      "hijabAny": "Any (not required)",
+      "accountTypes": "Account type",
+      "visitFees": "Visit fees (only for \"From home or on location\" jobs)",
+      "visitFeesHint": "The fees above are for non-visit. Fill in the visit fee for the fee type: fixed fee, rate cap or per tier.",
+      "feeVisit": "Fixed visit fee (Rp)",
+      "rateCapVisit": "Visit rate cap (Rp, optional)",
+      "tierFeesVisit": "Visit fee per tier",
+      "nichesHint": "For creators' information only; it does not limit who can apply. Ticking more than one means matching any of them (OR)."
     },
     "applicants": "Applicants",
     "participants": "Joined creators",
@@ -652,8 +684,34 @@
       "email": "Email",
       "whatsapp": "WhatsApp",
       "clientDecision": "Client decision (Yes/No)",
-      "clientNote": "Client note"
-    }
+      "clientNote": "Client note",
+      "gender": "Gender",
+      "hijab": "Hijab",
+      "accountType": "Account type",
+      "willingVisit": "Willing to visit",
+      "rateVisit": "Visit rate (Rp)",
+      "yes": "Yes",
+      "noAnswer": "No",
+      "proposedRateNonVisit": "Non-visit rate (Rp)",
+      "feeNonVisit": "Non-visit fee (Rp)",
+      "clientDecisionMode": "Client decision (Visit/Non-visit/No)"
+    },
+    "willingVisit": "Willing to visit",
+    "notWillingVisit": "Non-visit only",
+    "proposedRateNonVisit": "Non-visit rate {amount}",
+    "proposedRateVisit": "Visit rate {amount}",
+    "workMode": "Done as",
+    "workModeHint": "Automatic fee: non-visit {nonVisit}, visit {visit}.",
+    "workModePick": "Pick per the client decision",
+    "agreedFeeAutoHint": "Leave empty to use the fee for the choice above.",
+    "offlineApprove": "Already approved outside the app?",
+    "offlineApproveHint": "Use this when the content idea was agreed over WhatsApp or email. The creator does not need to send anything in the app.",
+    "offlineApproveHintOrder": "Use this when it was agreed over WhatsApp or email. If the content idea is not approved yet, it is approved too.",
+    "offlineNote": "Note (optional)",
+    "offlineNotePlaceholder": "E.g. client approved on WhatsApp, 9 Oct",
+    "offlineApproveCta": "Mark approved",
+    "staffPostHint": "Did the creator send the post link outside the app? Enter it here on their behalf.",
+    "staffPostCta": "Save post link"
   },
   "errors": {
     "generic": "Something didn't work. Try again in a moment.",
@@ -714,7 +772,20 @@
     "primary_platform_required": "Pick a main platform that is one of the job's platforms.",
     "tier_not_offered": "Your tier isn't included in this job.",
     "post_not_confirmed": "You can send the insight once your post is confirmed.",
-    "insight_photos_required": "Upload at least one insight screenshot."
+    "insight_photos_required": "Upload at least one insight screenshot.",
+    "hijab_needs_female": "A hijab requirement only works when the job is for women.",
+    "traits_required": "Fill in what the brand asks for first.",
+    "profile_gender_required": "Choose your gender first.",
+    "profile_hijab_required": "Choose whether you wear a hijab first.",
+    "profile_account_type_required": "Choose your account type first.",
+    "gender_not_eligible": "This job is for a specific gender.",
+    "hijab_not_eligible": "Your profile does not match this job's hijab requirement.",
+    "account_type_not_eligible": "Your account type does not fit this job.",
+    "visit_consent_required": "Tick that you are willing to visit first.",
+    "rate_visit_required": "Fill in your visit rate.",
+    "rate_visit_above_cap": "The visit rate is above the cap.",
+    "work_mode_required": "Choose visit or non-visit.",
+    "not_willing_to_visit": "This creator is not willing to visit."
   },
   "success": {
     "saved": "Saved.",
@@ -945,5 +1016,19 @@
     "body": "Get notified on your phone when your application is accepted, a revision comes in, or your fee is ready.",
     "enable": "Turn on",
     "dismiss": "Close"
+  },
+  "gender": {
+    "female": "Female",
+    "male": "Male"
+  },
+  "hijab": {
+    "hijab": "Wears hijab",
+    "non_hijab": "No hijab"
+  },
+  "accountType": {
+    "personal": "Personal",
+    "couple": "Couple",
+    "family": "Family",
+    "group": "Group"
   }
 }

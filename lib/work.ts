@@ -1,4 +1,5 @@
 import type { Job, Participation, PayoutRequest, Submission, SubmissionKind } from './types';
+import { workMode } from './visit';
 
 export type Latest = Partial<Record<SubmissionKind, Submission>>;
 
@@ -26,8 +27,9 @@ export function revisionNumeral(version: number): string | null {
 export type Step = { key: string; done: boolean; date?: string | null; optional?: boolean; attention?: boolean };
 
 export function timeline(part: Participation, job: Pick<Job, 'job_type' | 'product_option' | 'require_insight'>, latest: Latest, payout?: PayoutRequest | null): Step[] {
-  const hasPrep = job.job_type === 'visit' || job.product_option === 'shipped';
-  const prepDone = job.job_type === 'visit' ? !!part.visit_at && new Date(part.visit_at) <= new Date() : part.shipment_status === 'received';
+  const visit = workMode(job, part) === 'visit';
+  const hasPrep = visit || job.product_option === 'shipped';
+  const prepDone = visit ? !!part.visit_at && new Date(part.visit_at) <= new Date() : part.shipment_status === 'received';
   const steps: Step[] = [{ key: 'stepJoined', done: part.status === 'approved', date: part.decided_at }];
   if (hasPrep) steps.push({ key: 'stepPrep', done: prepDone, optional: true });
   steps.push(

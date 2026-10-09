@@ -11,6 +11,7 @@ import { parseRupiah } from '@/lib/money';
 import { deliverPending } from '@/lib/notify';
 import { PLATFORMS, postMatchesAccounts, profileFromInput, type Platform } from '@/lib/social';
 import { isValidRegion } from '@/lib/wilayah';
+import { ACCOUNT_TYPES, GENDERS, HIJAB } from '@/lib/visit';
 import { dbErrorKey, type ActionState } from '@/lib/action-state';
 
 
@@ -30,15 +31,18 @@ const profileSchema = z.object({
   city: z.string().min(1),
   categories: z.array(z.string()).max(3),
   persona: z.string().nullable(),
+  gender: z.enum(GENDERS),
+  hijab: z.enum(HIJAB).nullable(),
+  account_type: z.enum(ACCOUNT_TYPES),
   address: z.string().max(500),
 });
 
 // Field order on the form, so missing items are listed (and scrolled to) top-down.
 const MAX_SOCIAL_ROWS = 10;
-const PROFILE_FIELDS = ['full_name', 'phone', 'province', 'city', 'categories', 'persona', 'address'] as const;
+const PROFILE_FIELDS = ['full_name', 'phone', 'province', 'city', 'categories', 'persona', 'gender', 'hijab', 'account_type', 'address'] as const;
 const FIELD_LABEL: Record<string, string> = {
   full_name: 'fullName', phone: 'phone', province: 'province', city: 'city', categories: 'categories',
-  persona: 'persona', address: 'address', social: 'socialLabel',
+  persona: 'persona', gender: 'gender', hijab: 'hijab', account_type: 'accountType', address: 'address', social: 'socialLabel',
 };
 
 async function socialCount(viewer: Awaited<ReturnType<typeof requireCreator>>) {
@@ -61,6 +65,9 @@ export async function saveProfile(_prev: ActionState, formData: FormData): Promi
     city: text(formData.get('city')),
     categories: formData.getAll('categories').map(String),
     persona: text(formData.get('persona')) || null,
+    gender: text(formData.get('gender')),
+    hijab: text(formData.get('gender')) === 'female' ? text(formData.get('hijab')) || null : null,
+    account_type: text(formData.get('account_type')),
     address: text(formData.get('address')),
   });
 
@@ -68,9 +75,13 @@ export async function saveProfile(_prev: ActionState, formData: FormData): Promi
   if (!parsed.success) {
     for (const issue of parsed.error.issues) {
       const key = String(issue.path[0]);
-      problems[key] = key === 'categories' ? 'max_categories' : issue.code === 'too_small' && Number(issue.minimum) <= 2 ? 'required' : 'invalid';
+      problems[key] = key === 'categories' ? 'max_categories'
+        : (key === 'gender' || key === 'account_type') || (issue.code === 'too_small' && Number(issue.minimum) <= 2) ? 'required' : 'invalid';
     }
-  } else {
+  }
+  // Hijab is asked of women only.
+  if (text(formData.get('gender')) === 'female' && !text(formData.get('hijab'))) problems.hijab = 'required';
+  if (parsed.success) {
     if (!isValidRegion(parsed.data.province, parsed.data.city)) problems.city = 'required';
     // Niches/personas must exist in the managed list (active, or already on the profile).
     const { data: tax } = await viewer.supabase.from('taxonomy').select('kind, key');
@@ -124,6 +135,9 @@ export async function saveProfile(_prev: ActionState, formData: FormData): Promi
     city: d.city,
     categories: d.categories,
     persona: d.persona,
+    gender: d.gender,
+    hijab: d.hijab,
+    account_type: d.account_type,
     address_enc: d.address ? encrypt(d.address) : null,
     ...(finish ? { onboarded_at: new Date().toISOString() } : {}),
   }).eq('id', viewer.id);
@@ -170,8 +184,38 @@ export async function applyToJob(_prev: ActionState, formData: FormData): Promis
   const viewer = await requireCreator();
   const jobId = text(formData.get('job_id'));
   const rate = parseRupiah(text(formData.get('rate')));
-  const { error } = await viewer.supabase.rpc('apply_to_job', { p_job: jobId, p_rate: rate });
-  if (error) return { error: dbErrorKey(error) };
+  const rateVisit = parseRupiah(text(formData.get('rate_visit')));
+  const visit = formData.has('visit_shown') ? formData.get('visit') === 'on' : null;
+
+  // Traits the job asks for and the profile lacks are answered in the apply form; keep them on the profile.
+  const traits: Record<string, string | null> = {};
+  const fields: Record<string, string> = {};
+  if (formData.has('trait_gender')) {
+    const g = text(formData.get('gender'));
+    if (!(GENDERS as string[]).includes(g)) fields.gender = 'required'; else traits.gender = g;
+  }
+  const gender = (traits.gender ?? viewer.profile.gender) as string | null;
+  if (formData.has('trait_hijab') && gender === 'female') {
+    const h = text(formData.get('hijab'));
+    if (!(HIJAB as string[]).includes(h)) fields.hijab = 'required'; else traits.hijab = h;
+  }
+  if (traits.gender === 'male') traits.hijab = null;
+  if (formData.has('trait_account_type')) {
+    const a = text(formData.get('account_type'));
+    if (!(ACCOUNT_TYPES as string[]).includes(a)) fields.account_type = 'required'; else traits.account_type = a;
+  }
+  if (Object.keys(fields).length) return { error: 'traits_required', fields };
+  if (Object.keys(traits).length) {
+    const { error } = await viewer.supabase.from('profiles').update(traits).eq('id', viewer.id);
+    if (error) return { error: dbErrorKey(error) };
+  }
+
+  const { error } = await viewer.supabase.rpc('apply_to_job', { p_job: jobId, p_rate: rate, p_visit: visit, p_rate_visit: rateVisit });
+  if (error) {
+    revalidatePath(`/job/${jobId}`);
+    const key = dbErrorKey(error);
+    return { error: key, fields: key === 'rate_visit_required' || key === 'rate_visit_above_cap' ? { rate_visit: key } : key === 'visit_consent_required' ? { visit: 'required' } : undefined };
+  }
   revalidatePath(`/job/${jobId}`);
   revalidatePath('/beranda');
   // The job page then shows the application status; ?pasang=lamaran opens the install sheet once.

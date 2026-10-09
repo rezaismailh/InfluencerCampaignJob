@@ -11,11 +11,12 @@ import { participationTone, reviewTone, verificationTone } from '@/components/st
 import { ReviewForm } from '@/components/admin/review-form';
 import { SubmissionHistory } from '@/components/work/submission-history';
 import { Timeline } from '@/components/work/timeline';
-import { cancelParticipation, confirmPost, setShipment, setVisit } from '@/app/admin/actions';
+import { cancelParticipation, confirmPost, markOfflineApproved, setShipment, setVisit, staffSubmitPost } from '@/app/admin/actions';
 import { requireStaff } from '@/lib/auth';
 import { realBrand, type BrandEmbed } from '@/lib/brand';
 import { decrypt } from '@/lib/crypto';
-import { formatDate, formatDateTime } from '@/lib/dates';
+import { workMode } from '@/lib/visit';
+import { formatDate, formatDateTime, todayWib } from '@/lib/dates';
 import { formatRupiah } from '@/lib/money';
 import { signedUrls } from '@/lib/storage';
 import { latestByKind, timeline } from '@/lib/work';
@@ -75,6 +76,20 @@ export default async function AdminWork({ params }: { params: Promise<{ id: stri
                 </div>
                 {!items.length && <p className="text-[15px] text-teks-redup">{c('none')}</p>}
                 {last && (last.status === 'pending_review' || last.status === 'sent_to_brand') && <ReviewForm submission={last} />}
+                {part.status === 'approved' && kind !== 'insight' && last?.status !== 'approved' && (
+                  <details className="rounded-xl border border-dashed border-garis p-3">
+                    <summary className="cursor-pointer text-[15px] font-bold text-nila-800">{t('offlineApprove')}</summary>
+                    <ActionForm action={markOfflineApproved} className="mt-3 space-y-3">
+                      <input type="hidden" name="participation_id" value={part.id} />
+                      <input type="hidden" name="kind" value={kind} />
+                      <p className="text-[13px] text-teks-redup">{kind === 'storyline' ? t('offlineApproveHint') : t('offlineApproveHintOrder')}</p>
+                      <Field label={t('offlineNote')} htmlFor={`note-${kind}`}>
+                        <Input id={`note-${kind}`} name="note" placeholder={t('offlineNotePlaceholder')} />
+                      </Field>
+                      <SubmitButton variant="outline">{t('offlineApproveCta')}</SubmitButton>
+                    </ActionForm>
+                  </details>
+                )}
                 <SubmissionHistory items={items} photoUrls={photos} />
               </Card>
             );
@@ -83,7 +98,22 @@ export default async function AdminWork({ params }: { params: Promise<{ id: stri
           <Card className="space-y-3">
             <CardTitle>{t('post')}</CardTitle>
             {!part.post_url ? (
-              <p className="text-[15px] text-teks-redup">{t('postNotYet')}</p>
+              <>
+                <p className="text-[15px] text-teks-redup">{t('postNotYet')}</p>
+                {part.status === 'approved' && latest.draft?.status === 'approved' && latest.caption?.status === 'approved' && (
+                  <ActionForm action={staffSubmitPost} className="space-y-3">
+                    <input type="hidden" name="participation_id" value={part.id} />
+                    <p className="text-[13px] text-teks-redup">{t('staffPostHint')}</p>
+                    <Field label={tw('postUrl')} htmlFor="post_url">
+                      <Input id="post_url" name="post_url" type="url" inputMode="url" required /><FieldError name="post_url" />
+                    </Field>
+                    <Field label={tw('postedOn')} htmlFor="posted_on">
+                      <Input id="posted_on" name="posted_on" type="date" max={todayWib()} defaultValue={todayWib()} required /><FieldError name="posted_on" />
+                    </Field>
+                    <SubmitButton variant="outline">{t('staffPostCta')}</SubmitButton>
+                  </ActionForm>
+                )}
+              </>
             ) : (
               <>
                 <a href={part.post_url} target="_blank" rel="noreferrer" className="break-all font-bold text-nila-800 underline underline-offset-4">{part.post_url}</a>
@@ -130,7 +160,7 @@ export default async function AdminWork({ params }: { params: Promise<{ id: stri
             </Card>
           )}
 
-          {(job.product_option === 'shipped' || job.job_type === 'visit') && part.status === 'approved' && (
+          {(job.product_option === 'shipped' || workMode(job, part) === 'visit') && part.status === 'approved' && (
             <Card className="space-y-3">
               <CardTitle>{t('logistics')}</CardTitle>
               {job.product_option === 'shipped' && (
@@ -147,7 +177,7 @@ export default async function AdminWork({ params }: { params: Promise<{ id: stri
                   <SubmitButton variant="outline" className="w-full">{t('setShipment')}</SubmitButton>
                 </ActionForm>
               )}
-              {job.job_type === 'visit' && (
+              {workMode(job, part) === 'visit' && (
                 <ActionForm action={setVisit}>
                   <input type="hidden" name="participation_id" value={part.id} />
                   <Field label={t('visitLocation')} htmlFor="visit_location">

@@ -9,16 +9,26 @@ import { formatRupiah } from '@/lib/money';
 import { tierFeeList } from '@/lib/tiers';
 import type { Job, PublicJob } from '@/lib/types';
 
-export async function feeLabel(job: Pick<Job, 'fee_type' | 'fee' | 'rate_cap' | 'tier_fees'>) {
+export async function feeLabel(job: Pick<Job, 'job_type' | 'fee_type' | 'fee' | 'fee_visit' | 'rate_cap' | 'rate_cap_visit' | 'tier_fees' | 'tier_fees_visit'>) {
   const t = await getTranslations('jobs');
-  if (job.fee_type === 'fixed' && job.fee) return formatRupiah(job.fee);
-  if (job.fee_type === 'tier') {
-    const fees = tierFeeList(job.tier_fees ?? {}).map((x) => x.fee);
+  const both = job.job_type === 'both';
+  const range = (fees: number[]) => {
     if (!fees.length) return t('openRate');
     const [min, max] = [Math.min(...fees), Math.max(...fees)];
     return min === max ? formatRupiah(min) : t('feeRange', { min: formatRupiah(min), max: formatRupiah(max) });
+  };
+  if (job.fee_type === 'fixed' && job.fee) return range([job.fee, ...(both && job.fee_visit ? [job.fee_visit] : [])]);
+  if (job.fee_type === 'tier') {
+    return range([...tierFeeList(job.tier_fees ?? {}), ...(both ? tierFeeList(job.tier_fees_visit ?? {}) : [])].map((x) => x.fee));
   }
-  return job.rate_cap ? t('rateCapLabel', { amount: formatRupiah(job.rate_cap) }) : t('openRate');
+  const cap = openCap(job);
+  return cap ? t('rateCapLabel', { amount: formatRupiah(cap) }) : t('openRate');
+}
+
+/** Highest rate cap across the job's modes, or null when any mode is uncapped. */
+export function openCap(job: Pick<Job, 'job_type' | 'rate_cap' | 'rate_cap_visit'>): number | null {
+  const caps = [job.rate_cap, ...(job.job_type === 'both' ? [job.rate_cap_visit] : [])];
+  return caps.every((c) => c) ? Math.max(...(caps as number[])) : null;
 }
 
 /** Short "when you get paid" line for cards and the job summary. */
@@ -44,13 +54,13 @@ export async function JobCard({ job }: { job: Job | PublicJob }) {
         </div>
       </div>
       <div className="flex flex-wrap gap-1.5">
-        <Badge tone={job.job_type === 'visit' ? 'warning' : 'success'}>{tt(job.job_type)}</Badge>
+        <Badge tone={job.job_type === 'non_visit' ? 'success' : job.job_type === 'visit' ? 'warning' : 'info'}>{tt(job.job_type)}</Badge>
         {job.platforms.map((p) => <Badge key={p}>{tp(p)}</Badge>)}
       </div>
       <div className="rounded-xl bg-latar p-3">
         <p className="text-[13px] text-teks-redup">{feeKind}</p>
         <p className="text-xl font-extrabold leading-7 tabular">{job.fee_type === 'open' ? t('openRate') : await feeLabel(job)}</p>
-        {job.fee_type === 'open' && job.rate_cap && <p className="text-[13px] font-bold tabular">{t('rateCapShort', { amount: formatRupiah(job.rate_cap) })}</p>}
+        {job.fee_type === 'open' && openCap(job) && <p className="text-[13px] font-bold tabular">{t('rateCapShort', { amount: formatRupiah(openCap(job)!) })}</p>}
       </div>
       <ul className="space-y-1 text-[13px] text-teks-redup">
         <CardFact icon={Wallet}>{await payoutLabel(job)}</CardFact>

@@ -27,7 +27,7 @@ const form = (entries: Record<string, string>) => {
   for (const [k, v] of Object.entries(entries)) f.append(k, v);
   return f;
 };
-const filled = { full_name: 'Reza', phone: '081234567890', province: 'Jawa Barat', city: 'Kota Bandung' };
+const filled = { full_name: 'Reza', phone: '081234567890', province: 'Jawa Barat', city: 'Kota Bandung', gender: 'female', hijab: 'hijab', account_type: 'personal' };
 
 beforeEach(() => {
   process.env.DATA_ENCRYPTION_KEY = randomBytes(32).toString('base64');
@@ -39,9 +39,17 @@ describe('saveProfile', () => {
     const { saveProfile } = await import('@/app/(creator)/actions');
     const res = await saveProfile({}, form({ finish: '1', full_name: '', phone: '', province: 'Jawa Barat', city: '' }));
     expect(res.error).toBe('incomplete');
-    expect(Object.keys(res.fields!)).toEqual(['full_name', 'phone', 'city', 'social']);
-    expect(res.missing).toEqual(['fullName', 'phone', 'city', 'socialLabel']);
+    expect(Object.keys(res.fields!)).toEqual(['full_name', 'phone', 'city', 'gender', 'account_type', 'social']);
+    expect(res.missing).toEqual(['fullName', 'phone', 'city', 'gender', 'accountType', 'socialLabel']);
     expect(db.updated).toBeNull();
+  });
+
+  it('asks women whether they wear a hijab, and never stores it for men', async () => {
+    const { saveProfile } = await import('@/app/(creator)/actions');
+    const asked = await saveProfile({}, form({ ...filled, hijab: '' }));
+    expect(asked.fields).toEqual({ hijab: 'required' });
+    await saveProfile({}, form({ ...filled, gender: 'male', hijab: 'hijab' }));
+    expect(db.updated).toMatchObject({ gender: 'male', hijab: null, account_type: 'personal' });
   });
 
   it('flags an incomplete social row instead of asking for an account', async () => {

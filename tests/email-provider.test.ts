@@ -4,7 +4,7 @@ import { parseFrom, sendEmail } from '@/lib/notify';
 afterEach(() => { vi.unstubAllEnvs(); vi.unstubAllGlobals(); });
 
 function stubFetch() {
-  const fetch = vi.fn(async (..._args: unknown[]) => new Response('{}', { status: 201 }));
+  const fetch = vi.fn<(url: string, init?: RequestInit) => Promise<Response>>(async () => new Response('{}', { status: 201 }));
   vi.stubGlobal('fetch', fetch);
   return fetch;
 }

@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { ButtonLink, buttonClass } from '@/components/ui/button';
 import { Download } from 'lucide-react';
 import { Card, CardTitle } from '@/components/ui/card';
-import { Field, Input } from '@/components/ui/field';
+import { Field, Input, Select } from '@/components/ui/field';
 import { PageHeader } from '@/components/ui/page';
 import { SubmitButton } from '@/components/ui/submit-button';
 import { participationTone, verificationTone } from '@/components/status';
@@ -17,10 +17,11 @@ import { realBrand, type BrandEmbed } from '@/lib/brand';
 import { formatRupiah } from '@/lib/money';
 import { loadTaxonomy } from '@/lib/taxonomy';
 import { creatorTier } from '@/lib/tiers';
+import { modeFee, offersVisit } from '@/lib/visit';
 import { latestByKind, timeline } from '@/lib/work';
 import type { Job, Participation, Profile, SocialAccount, Submission } from '@/lib/types';
 
-type Row = Participation & { profiles: Pick<Profile, 'full_name' | 'city' | 'email' | 'persona' | 'categories'> };
+type Row = Participation & { profiles: Pick<Profile, 'full_name' | 'city' | 'email' | 'persona' | 'categories' | 'gender' | 'hijab' | 'account_type'> };
 
 export default async function AdminJob({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -33,12 +34,17 @@ export default async function AdminJob({ params }: { params: Promise<{ id: strin
   const tv = await getTranslations('verification');
   const tw = await getTranslations('work');
   const ttier = await getTranslations('tier');
+  const tg = await getTranslations('gender');
+  const th = await getTranslations('hijab');
+  const ta = await getTranslations('accountType');
+  const tt = await getTranslations('jobType');
   const tax = await loadTaxonomy();
 
   const { data: job } = await viewer.supabase.from('jobs').select('*, job_brands(real_name)').eq('id', id).maybeSingle<Job & { job_brands: BrandEmbed }>();
   if (!job) notFound();
+  const both = job.job_type === 'both';
   const { data: rows } = await viewer.supabase
-    .from('participations').select('*, profiles!participations_creator_id_fkey(full_name, city, email, persona, categories)')
+    .from('participations').select('*, profiles!participations_creator_id_fkey(full_name, city, email, persona, categories, gender, hijab, account_type)')
     .eq('job_id', id).order('applied_at').returns<Row[]>();
   const all = rows ?? [];
   const creatorIds = all.map((r) => r.creator_id);
@@ -99,6 +105,11 @@ export default async function AdminJob({ params }: { params: Promise<{ id: strin
                       {[...r.profiles.categories.map((k) => tax.name('niche', k)), r.profiles.persona && tax.name('persona', r.profiles.persona)].filter(Boolean).join(' · ')}
                     </p>
                   )}
+                  {(r.profiles.gender || r.profiles.account_type) && (
+                    <p className="text-[13px] text-teks-redup">
+                      {[r.profiles.gender && tg(r.profiles.gender), r.profiles.hijab && th(r.profiles.hijab), r.profiles.account_type && ta(r.profiles.account_type)].filter(Boolean).join(' · ')}
+                    </p>
+                  )}
                 </div>
                 <ul className="space-y-1">
                   {accs.map((a) => (
@@ -111,15 +122,43 @@ export default async function AdminJob({ params }: { params: Promise<{ id: strin
                 </ul>
                 {pending && <p className="text-[13px] text-teks-redup">{t('acceptVerifies')}</p>}
                 {!ready && !pending && <p className="text-[13px] text-peringatan">{t('cannotAccept')}</p>}
-                {r.proposed_rate && <p className="font-bold">{t('proposedRate', { amount: formatRupiah(r.proposed_rate) })}</p>}
+                {offersVisit(job) && (
+                  <Badge tone={r.visit_willing ? 'success' : 'neutral'}>{r.visit_willing ? t('willingVisit') : t('notWillingVisit')}</Badge>
+                )}
+                {r.proposed_rate && <p className="font-bold">{t(both ? 'proposedRateNonVisit' : 'proposedRate', { amount: formatRupiah(r.proposed_rate) })}</p>}
+                {r.proposed_rate_visit && <p className="font-bold">{t('proposedRateVisit', { amount: formatRupiah(r.proposed_rate_visit) })}</p>}
                 <ActionForm action={decideApplication} className="space-y-3">
                   <input type="hidden" name="participation_id" value={r.id} />
-                  {job.fee_type === 'open' && (
+                  {both && (() => {
+                    const tier = creatorTier(job, accs.filter((a) => a.status !== 'rejected'));
+                    const fees = (['non_visit', 'visit'] as const).map((m) => modeFee(job, m, tier, r));
+                    return (
+                      <Field label={t('workMode')} htmlFor={`mode-${r.id}`}
+                        hint={t('workModeHint', { nonVisit: fees[0] ? formatRupiah(fees[0]) : '—', visit: fees[1] ? formatRupiah(fees[1]) : '—' })}>
+                        <Select id={`mode-${r.id}`} name="work_mode" defaultValue={r.visit_willing ? '' : 'non_visit'}>
+                          <option value="">{t('workModePick')}</option>
+                          <option value="non_visit">{tt('non_visit')}</option>
+                          <option value="visit" disabled={!r.visit_willing}>{tt('visit')}</option>
+                        </Select>
+                      </Field>
+                    );
+                  })()}
+                  {job.fee_type === 'open' && both && (
+                    <Field label={t('agreedFee')} hint={t('agreedFeeAutoHint')} htmlFor={`fee-${r.id}`}>
+                      <Input id={`fee-${r.id}`} name="fee" inputMode="numeric" className="tabular" />
+                    </Field>
+                  )}
+                  {job.fee_type === 'open' && !both && (
                     <Field label={t('agreedFee')} htmlFor={`fee-${r.id}`}>
                       <Input id={`fee-${r.id}`} name="fee" inputMode="numeric" defaultValue={r.proposed_rate ?? ''} className="tabular" />
                     </Field>
                   )}
-                  {job.fee_type === 'tier' && (() => {
+                  {job.fee_type === 'tier' && both && (
+                    <Field label={t('agreedFee')} hint={t('agreedFeeAutoHint')} htmlFor={`fee-${r.id}`}>
+                      <Input id={`fee-${r.id}`} name="fee" inputMode="numeric" className="tabular" />
+                    </Field>
+                  )}
+                  {job.fee_type === 'tier' && !both && (() => {
                     // Suggested fee from the applicant's tier (verified or pending accounts); editable.
                     const tier = creatorTier(job, accs.filter((a) => a.status !== 'rejected'));
                     const fee = tier ? job.tier_fees[tier] : undefined;
@@ -155,6 +194,7 @@ export default async function AdminJob({ params }: { params: Promise<{ id: strin
                     <p className="text-[13px] text-teks-redup">{next ? tw(next.key) : tw('stepPaid')}</p>
                   </div>
                   <div className="flex items-center gap-2">
+                    {both && r.work_mode && <Badge tone={r.work_mode === 'visit' ? 'warning' : 'success'}>{tt(r.work_mode)}</Badge>}
                     {r.agreed_fee && <span className="font-bold tabular">{formatRupiah(r.agreed_fee)}</span>}
                     <Badge tone={participationTone[r.status]}>{tps(r.status)}</Badge>
                   </div>
@@ -170,6 +210,15 @@ export default async function AdminJob({ params }: { params: Promise<{ id: strin
         <ActionForm action={inviteCreator} resetOnSuccess>
           <input type="hidden" name="job_id" value={job.id} />
           <Field label={t('inviteEmail')} htmlFor="invite-email"><Input id="invite-email" name="email" type="email" required /></Field>
+          {both && (
+            <Field label={t('workMode')} htmlFor="invite-mode">
+              <Select id="invite-mode" name="work_mode" required defaultValue="">
+                <option value="" disabled>{t('workModePick')}</option>
+                <option value="non_visit">{tt('non_visit')}</option>
+                <option value="visit">{tt('visit')}</option>
+              </Select>
+            </Field>
+          )}
           {job.fee_type === 'open' && (
             <Field label={t('inviteFee')} htmlFor="invite-fee"><Input id="invite-fee" name="fee" inputMode="numeric" required className="tabular" /></Field>
           )}

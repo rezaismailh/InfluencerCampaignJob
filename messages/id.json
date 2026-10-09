@@ -819,7 +819,8 @@
         ],
         "items": [
           "Akun: alamat email. Kalau masuk dengan Google, kami menerima nama, email, dan foto profil dari Google.",
-          "Profil: nama lengkap, nomor HP, kota, kategori konten, dan persona.",
+          "Profil: nama lengkap, nomor HP, provinsi dan kota, kategori konten (niche), persona, gender, dan jenis akun (personal, couple, family, atau grup). Kalau kamu perempuan, kami juga menanyakan apakah kamu berhijab.",
+          "Status berhijab hanya dipakai untuk mencocokkan kamu dengan job yang mensyaratkannya, misalnya campaign busana muslim. Data ini tidak dipakai untuk hal lain, tidak ditampilkan ke creator lain, dan hanya dibagikan ke klien dari job yang kamu daftar. Kamu bisa mengubahnya kapan saja di halaman Profil.",
           "Alamat pengiriman, kalau job mengharuskan produk dikirim ke kamu.",
           "Akun media sosial: link profil, username, dan jumlah followers yang kamu isi.",
           "Pekerjaan campaign: link storyline (Google Docs), link atau foto draft, caption, link postingan, foto bukti pembelian, serta catatan revisi.",
@@ -851,7 +852,7 @@
         "title": "Siapa yang bisa melihat datamu",
         "body": [
           "Di dalam Tali, akses dibatasi sesuai peran. Tim kurator melihat profil, akun media sosial, dan hasil kerjamu. Nomor rekening lengkap hanya bisa dilihat tim keuangan saat memproses pencairan; di layarmu sendiri nomor rekening selalu ditampilkan tersamar.",
-          "Ke brand pemilik campaign, kami membagikan nama atau username, link dan jumlah followers akun media sosial, hasil kerja yang kamu kirim, dan link postingan. Kalau produk dikirim langsung oleh brand, nama, nomor HP, dan alamat pengirimanmu juga dibagikan untuk keperluan pengiriman. Nomor rekeningmu tidak pernah dibagikan ke brand."
+          "Ke brand pemilik campaign, kami membagikan nama atau username, kota, niche, persona, gender, jenis akun, status berhijab (kalau kamu mengisinya), link dan jumlah followers akun media sosial, hasil kerja yang kamu kirim, dan link postingan. Kalau produk dikirim langsung oleh brand, nama, nomor HP, dan alamat pengirimanmu juga dibagikan untuk keperluan pengiriman. Email dan nomor rekeningmu tidak pernah dibagikan ke brand."
         ]
       },
       {

@@ -7,8 +7,8 @@ import { formatDate } from '@/lib/dates';
 
 type Section = { title: string; body: string[]; items?: string[] };
 
-// Effective date of the current privacy policy and terms.
-const UPDATED = '2026-10-07';
+// Effective date of the current version of each document.
+const UPDATED = { privacy: '2026-10-09', terms: '2026-10-07' } as const;
 
 export async function LegalPage({ doc }: { doc: 'privacy' | 'terms' }) {
   const t = await getTranslations('legal');
@@ -23,7 +23,7 @@ export async function LegalPage({ doc }: { doc: 'privacy' | 'terms' }) {
         <Wordmark height={40} />
       </Link>
       <h1 className="mt-8 text-[28px] font-extrabold leading-9 tracking-[-0.5px]">{t(doc === 'privacy' ? 'privacyTitle' : 'termsTitle')}</h1>
-      <p className="mt-1 text-sm text-teks-redup">{t('updated', { date: formatDate(UPDATED, locale) })}</p>
+      <p className="mt-1 text-sm text-teks-redup">{t('updated', { date: formatDate(UPDATED[doc], locale) })}</p>
 
       <div className="mt-8 space-y-7">
         {sections.map((s, i) => (

@@ -248,7 +248,7 @@
     "rate": "Your proposed rate",
     "rateHint": "Total for everything you make in this job.",
     "rateCapHint": "Max {amount}.",
-    "applied": "Your application is in. The Tali team will let you know if you are picked.",
+    "applied": "Your application is in and being reviewed by the client. The Tali team will let you know if you are picked.",
     "yourStatus": "Your status: {status}",
     "openParticipation": "See your progress",
     "acceptInvite": "Accept invitation",
@@ -309,7 +309,9 @@
     "notEligible_account_type": "This job is looking for another account type (e.g. couple or family).",
     "traitsTitle": "Fill this in first",
     "traitsBody": "The brand asks for it. Only once; it is saved to your profile.",
-    "anyOf": "any of"
+    "anyOf": "any of",
+    "reviewDisclaimerTitle": "Everything is reviewed by the client",
+    "reviewDisclaimer": "Your application and the content you send are reviewed by the Tali team and the client (brand) before a decision. The client has the final say. Your email, phone number and address are not shared with the client."
   },
   "work": {
     "title": "Work",

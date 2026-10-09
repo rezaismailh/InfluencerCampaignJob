@@ -248,7 +248,7 @@
     "rate": "Rate yang kamu ajukan",
     "rateHint": "Total untuk semua yang perlu kamu buat di job ini.",
     "rateCapHint": "Maksimal {amount}.",
-    "applied": "Pendaftaranmu sudah terkirim. Tim Tali akan mengabari kalau kamu terpilih.",
+    "applied": "Pendaftaranmu sudah terkirim dan sedang direview klien. Tim Tali akan mengabari kalau kamu terpilih.",
     "yourStatus": "Status kamu: {status}",
     "openParticipation": "Lihat progres kerjaan",
     "acceptInvite": "Terima undangan",
@@ -309,7 +309,9 @@
     "notEligible_account_type": "Job ini mencari jenis akun lain (misalnya couple atau family).",
     "traitsTitle": "Lengkapi dulu data ini",
     "traitsBody": "Brand job ini memintanya. Cukup sekali, tersimpan di profilmu.",
-    "anyOf": "salah satu"
+    "anyOf": "salah satu",
+    "reviewDisclaimerTitle": "Semua melalui review klien",
+    "reviewDisclaimer": "Pendaftaran dan konten yang kamu kirim direview tim Tali dan klien (brand) sebelum diputuskan. Keputusan akhir ada di klien. Email, nomor HP, dan alamatmu tidak dibagikan ke klien."
   },
   "work": {
     "title": "Kerjaan",

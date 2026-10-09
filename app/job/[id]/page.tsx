@@ -201,6 +201,15 @@ export default async function JobDetail({ params }: { params: Promise<{ id: stri
         )}
       </Card>
 
+      {/* Every application and submission goes past the client before a decision. */}
+      <div className="flex gap-3 rounded-2xl border border-nila-100 bg-nila-50 p-4 text-[13px] leading-5">
+        <ShieldCheck className="size-5 shrink-0 text-nila-800" strokeWidth={2} aria-hidden />
+        <div>
+          <p className="font-bold text-nila-800">{t('reviewDisclaimerTitle')}</p>
+          <p className="text-teks-redup">{t('reviewDisclaimer')}</p>
+        </div>
+      </div>
+
       <details className="group rounded-2xl border border-garis bg-kertas">
         <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 px-4 font-bold [&::-webkit-details-marker]:hidden">
           <span className="flex items-center gap-2"><Info className="size-5 text-nila-800" strokeWidth={2} aria-hidden /> {t('moreDetails')}</span>

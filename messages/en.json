@@ -819,7 +819,8 @@
         ],
         "items": [
           "Account: your email address. If you sign in with Google, we receive your name, email and profile photo from Google.",
-          "Profile: full name, phone number, city, content categories and persona.",
+          "Profile: full name, phone number, province and city, content categories (niche), persona, gender and account type (personal, couple, family or group). If you are a woman, we also ask whether you wear a hijab.",
+          "Whether you wear a hijab is used only to match you with jobs that require it, such as modest-fashion campaigns. It is not used for anything else, not shown to other creators, and only shared with the client of a job you apply to. You can change it any time on your Profile page.",
           "Shipping address, when a job requires a product to be sent to you.",
           "Social media accounts: profile link, username and the follower count you enter.",
           "Campaign work: storyline links (Google Docs), draft links or photos, captions, post links, purchase proof photos and revision notes.",
@@ -851,7 +852,7 @@
         "title": "Who can see your data",
         "body": [
           "Inside Tali, access is limited by role. Curators see your profile, social accounts and work. Your full account number is visible only to the finance team while processing a payout; on your own screen it is always masked.",
-          "With the brand running a campaign, we share your name or username, social media links and follower counts, the work you submit and your post links. If the brand ships the product directly, your name, phone number and shipping address are shared for delivery. Your bank account number is never shared with brands."
+          "With the brand running a campaign, we share your name or username, city, niche, persona, gender, account type, whether you wear a hijab (if you filled it in), social media links and follower counts, the work you submit and your post links. If the brand ships the product directly, your name, phone number and shipping address are shared for delivery. Your email and bank account number are never shared with brands."
         ]
       },
       {

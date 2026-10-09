@@ -21,7 +21,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   const { data: job } = await viewer.supabase.from('jobs').select('*').eq('id', id).maybeSingle<Job>();
   if (!job) return new NextResponse('Not found', { status: 404 });
   let query = viewer.supabase.from('participations')
-    .select('*, profiles!participations_creator_id_fkey(full_name, city, email, persona, categories, phone_enc)')
+    .select('*, profiles!participations_creator_id_fkey(full_name, city, email, persona, categories, gender, hijab, account_type, phone_enc)')
     .eq('job_id', id).order('applied_at');
   if (!internal) query = query.eq('status', 'applied');
   const { data } = await query.returns<(Omit<ExportRow, 'profiles'> & { profiles: ExportRow['profiles'] & Pick<Profile, 'phone_enc'> })[]>();
@@ -40,13 +40,19 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   const ttier = await getTranslations('tier');
   const tv = await getTranslations('verification');
   const tps = await getTranslations('participationStatus');
+  const tg = await getTranslations('gender');
+  const th = await getTranslations('hijab');
+  const ta = await getTranslations('accountType');
+  const both = job.job_type === 'both';
   const tax = await loadTaxonomy();
   const { header, body, widths } = applicantSheet(job, rows, accounts ?? [], {
+    gender: t('gender'), hijab: t('hijab'), accountType: t('accountType'), willingVisit: t('willingVisit'), rateVisit: t('rateVisit'),
+    yes: t('yes'), no_: t('noAnswer'), genderName: (g) => tg(g), hijabName: (h) => th(h), accountTypeName: (a) => ta(a),
     no: t('no'), id: t('id'), name: t('name'), city: t('city'), niche: t('niche'), persona: t('persona'), tier: t('tier'),
     username: (p) => t('username', { platform: p }), link: (p) => t('link', { platform: p }),
     followers: (p) => t('followers', { platform: p }), accountStatus: (p) => t('accountStatus', { platform: p }),
-    fee: job.fee_type === 'open' ? t('proposedRate') : t('fee'), appliedAt: t('appliedAt'), status: t('status'),
-    email: t('email'), whatsapp: t('whatsapp'), clientDecision: t('clientDecision'), clientNote: t('clientNote'),
+    fee: job.fee_type === 'open' ? t(both ? 'proposedRateNonVisit' : 'proposedRate') : t(both ? 'feeNonVisit' : 'fee'), appliedAt: t('appliedAt'), status: t('status'),
+    email: t('email'), whatsapp: t('whatsapp'), clientDecision: t(both ? 'clientDecisionMode' : 'clientDecision'), clientNote: t('clientNote'),
     platform: (p) => tp(p), tierName: (x) => ttier(x), verification: (s) => tv(s), participation: (s) => tps(s),
     nicheName: (k) => tax.name('niche', k), personaName: (k) => tax.name('persona', k),
   }, internal);

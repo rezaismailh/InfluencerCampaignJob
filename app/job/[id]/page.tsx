@@ -16,7 +16,10 @@ import { applyToJob, respondInvite } from '@/app/(creator)/actions';
 import { getViewer, type Viewer } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
 import { loadTaxonomy } from '@/lib/taxonomy';
-import { creatorTier, tierFeeList } from '@/lib/tiers';
+import { creatorTier, TIERS, tierFeeList } from '@/lib/tiers';
+import { offersVisit, traitCheck } from '@/lib/visit';
+import { TraitFields } from '@/components/creator/trait-fields';
+import { VisitChoice } from '@/components/creator/visit-choice';
 import { formatDate, formatDayMonth, monthlyPaymentExample, todayWib } from '@/lib/dates';
 import { cn } from '@/lib/cn';
 import { formatRupiah } from '@/lib/money';
@@ -50,6 +53,9 @@ export default async function JobDetail({ params }: { params: Promise<{ id: stri
   const tps = await getTranslations('participationStatus');
   const tn = await getTranslations('nav');
   const ttier = await getTranslations('tier');
+  const tg = await getTranslations('gender');
+  const th = await getTranslations('hijab');
+  const ta = await getTranslations('accountType');
   const tax = await loadTaxonomy();
   const locale = await getLocale();
 
@@ -61,7 +67,9 @@ export default async function JobDetail({ params }: { params: Promise<{ id: stri
   const locations = full ? full.visit_locations : (job as PublicJob).visit_location_names.map((name) => ({ name }));
 
   const pay = paymentRows(job);
-  const hasRequirements = job.requirements || job.min_followers > 0 || job.tiers.length > 0 || job.niches.length > 0 || job.personas.length > 0;
+  const both = job.job_type === 'both';
+  const hasRequirements = job.requirements || job.min_followers > 0 || job.tiers.length > 0 || job.niches.length > 0 || job.personas.length > 0
+    || job.genders?.length > 0 || !!job.hijab || job.account_types?.length > 0;
 
   return (
     <div className="space-y-4">
@@ -82,19 +90,51 @@ export default async function JobDetail({ params }: { params: Promise<{ id: stri
             {job.fee_type === 'tier' ? t('feeByFollowers') : job.fee_type === 'open' ? t('feeOpen') : t('feeFixed')}
           </p>
           <p className="text-[28px] font-extrabold leading-9 text-nila-800 tabular">{job.fee_type === 'open' ? t('openRate') : fee}</p>
-          {job.fee_type === 'open' && job.rate_cap && <p className="text-[15px] font-bold tabular">{t('rateCapShort', { amount: formatRupiah(job.rate_cap) })}</p>}
+          {job.fee_type === 'open' && !both && job.rate_cap && <p className="text-[15px] font-bold tabular">{t('rateCapShort', { amount: formatRupiah(job.rate_cap) })}</p>}
+          {both && job.fee_type !== 'tier' && (
+            <ul className="mt-2 space-y-1 text-[15px]">
+              {(['non_visit', 'visit'] as const).map((m) => {
+                const amount = job.fee_type === 'fixed' ? (m === 'visit' ? job.fee_visit : job.fee) : (m === 'visit' ? job.rate_cap_visit : job.rate_cap);
+                return (
+                  <li key={m} className="flex items-center justify-between gap-3">
+                    <span>{tt(m)}</span>
+                    <span className="shrink-0 font-bold tabular">
+                      {amount ? (job.fee_type === 'open' ? t('rateCapShort', { amount: formatRupiah(amount) }) : formatRupiah(amount)) : '—'}
+                    </span>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
           {job.platforms.length > 1 && <p className="mt-1 text-[13px] text-teks-redup">{t('feeCombined')}</p>}
         </div>
         {job.fee_type === 'tier' && (
           <div className="space-y-2">
-            <ul className="divide-y divide-garis rounded-xl border border-garis">
-              {tierFeeList(job.tier_fees).map(({ tier, fee }) => (
-                <li key={tier} className="flex items-center justify-between gap-3 px-3 py-2 text-[15px]">
-                  <span>{ttier(tier)}</span>
-                  <span className="font-bold tabular">{formatRupiah(fee)}</span>
-                </li>
-              ))}
-            </ul>
+            {both ? (
+              <table className="w-full overflow-hidden rounded-xl border border-garis text-[15px]">
+                <thead className="bg-latar text-[13px] text-teks-redup">
+                  <tr><th className="px-3 py-2 text-left font-medium">{t('tiers')}</th><th className="px-3 py-2 text-right font-medium">{tt('non_visit')}</th><th className="px-3 py-2 text-right font-medium">{tt('visit')}</th></tr>
+                </thead>
+                <tbody className="divide-y divide-garis">
+                  {TIERS.filter((x) => job.tier_fees?.[x] || job.tier_fees_visit?.[x]).map((x) => (
+                    <tr key={x}>
+                      <td className="px-3 py-2">{ttier(x)}</td>
+                      <td className="px-3 py-2 text-right font-bold tabular">{job.tier_fees?.[x] ? formatRupiah(job.tier_fees[x]) : '—'}</td>
+                      <td className="px-3 py-2 text-right font-bold tabular">{job.tier_fees_visit?.[x] ? formatRupiah(job.tier_fees_visit[x]) : '—'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <ul className="divide-y divide-garis rounded-xl border border-garis">
+                {tierFeeList(job.tier_fees).map(({ tier, fee }) => (
+                  <li key={tier} className="flex items-center justify-between gap-3 px-3 py-2 text-[15px]">
+                    <span>{ttier(tier)}</span>
+                    <span className="font-bold tabular">{formatRupiah(fee)}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
             <p className="text-[13px] text-teks-redup">
               {job.tier_basis === 'primary' && job.primary_platform
                 ? t('tierBasisPrimaryNote', { platform: tp(job.primary_platform) })
@@ -103,7 +143,7 @@ export default async function JobDetail({ params }: { params: Promise<{ id: stri
           </div>
         )}
         <div className="flex flex-wrap gap-1.5">
-          <Badge tone={job.job_type === 'visit' ? 'warning' : 'success'}>{tt(job.job_type)}</Badge>
+          <Badge tone={job.job_type === 'non_visit' ? 'success' : job.job_type === 'visit' ? 'warning' : 'info'}>{tt(job.job_type)}</Badge>
           {job.platforms.map((p) => <Badge key={p}>{tp(p)}</Badge>)}
         </div>
         <ul className="space-y-2.5 text-[15px]">
@@ -148,8 +188,12 @@ export default async function JobDetail({ params }: { params: Promise<{ id: stri
             <ul className="mt-2 space-y-1.5 text-[15px]">
               {job.min_followers > 0 && <Check>{t('minFollowers', { count: job.min_followers.toLocaleString('id-ID') })}</Check>}
               {job.tiers.length > 0 && <Check>{t('tiers')}: {job.tiers.map((x) => (ttier.has(x) ? ttier(x) : x)).join(', ')}</Check>}
-              {job.niches.length > 0 && <Check>{t('niches')}: {job.niches.map((x) => tax.name('niche', x)).join(', ')}</Check>}
-              {job.personas.length > 0 && <Check>{t('personas')}: {job.personas.map((x) => tax.name('persona', x)).join(', ')}</Check>}
+              {job.niches.length > 0 && <Check>{t('niches')}{job.niches.length > 1 ? ` (${t('anyOf')})` : ''}: {job.niches.map((x) => tax.name('niche', x)).join(', ')}</Check>}
+              {job.personas.length > 0 && <Check>{t('personas')}{job.personas.length > 1 ? ` (${t('anyOf')})` : ''}: {job.personas.map((x) => tax.name('persona', x)).join(', ')}</Check>}
+              {(job.genders?.length > 0 || job.hijab) && (
+                <Check>{t('genderReq')}: {[...(job.genders?.length ? job.genders : ['female' as const]).map((g) => tg(g)), job.hijab && th(job.hijab)].filter(Boolean).join(', ')}</Check>
+              )}
+              {job.account_types?.length > 0 && <Check>{t('accountTypeReq')}{job.account_types.length > 1 ? ` (${t('anyOf')})` : ''}: {job.account_types.map((a) => ta(a)).join(', ')}</Check>}
               {job.require_purchase_proof && <Check>{t('purchaseProof')}</Check>}
             </ul>
             {job.requirements && <p className="mt-2 whitespace-pre-line text-[15px]">{job.requirements}</p>}
@@ -170,7 +214,7 @@ export default async function JobDetail({ params }: { params: Promise<{ id: stri
             </div>
           )}
           <InfoRow title={t('product')} body={[job.product, tpo(job.product_option)].filter(Boolean).join(' · ')} />
-          {job.job_type === 'visit' && locations.length > 0 && (
+          {offersVisit(job) && locations.length > 0 && (
             <div>
               <h2 className="font-bold">{t('visitLocations')}</h2>
               <ul className="mt-1 space-y-2">
@@ -224,7 +268,9 @@ export default async function JobDetail({ params }: { params: Promise<{ id: stri
   }
 
   /** Action area pinned above the bottom nav (creators) or the screen edge (guests). */
-  function ActionBar({ children }: { children: React.ReactNode }) {
+  function ActionBar({ children, inline }: { children: React.ReactNode; inline?: boolean }) {
+    // A long form (extra profile questions) stays in the page flow instead of covering the screen.
+    if (inline) return <Card className="space-y-3 border-nila-300">{children}</Card>;
     return (
       <div className={cn('sticky z-10 -mx-4 space-y-3 border-t border-garis bg-kertas/95 px-4 py-3 backdrop-blur',
         creator ? 'bottom-[calc(57px+env(safe-area-inset-bottom))]' : 'bottom-0 pb-[calc(0.75rem+env(safe-area-inset-bottom))]')}>
@@ -308,7 +354,7 @@ export default async function JobDetail({ params }: { params: Promise<{ id: stri
         </ActionBar>
       );
     }
-    if (tier && !(tier in (job.tier_fees ?? {}))) {
+    if (tier && !(tier in (job.tier_fees ?? {})) && !(both && tier in (job.tier_fees_visit ?? {}))) {
       return <ActionBar><Alert tone="warning">{t('tierNotOffered', { tier: ttier(tier) })}</Alert></ActionBar>;
     }
     if (best && best.followers < job.min_followers) {
@@ -325,12 +371,46 @@ export default async function JobDetail({ params }: { params: Promise<{ id: stri
         </ActionBar>
       );
     }
+    // This creator's fee for their tier, across modes on jobs that offer both.
+    const tierRange = (x: NonNullable<typeof tier>) => {
+      const fees = [job.tier_fees?.[x], both ? job.tier_fees_visit?.[x] : undefined].filter((f): f is number => !!f);
+      const [min, max] = [Math.min(...fees), Math.max(...fees)];
+      return min === max ? formatRupiah(min) : t('feeRange', { min: formatRupiah(min), max: formatRupiah(max) });
+    };
+    // Gender, hijab and account type the brand asked for.
+    const traits = traitCheck(job, viewer.profile);
+    if (traits.ineligible) {
+      return <ActionBar><Alert tone="warning">{t(`notEligible_${traits.ineligible}`)}</Alert></ActionBar>;
+    }
+    const asking = traits.missing.length > 0;
     return (
-      <ActionBar>
-        <ActionForm action={applyToJob} className="space-y-2">
+      <ActionBar inline={asking}>
+        <ActionForm action={applyToJob} className="space-y-3">
           <input type="hidden" name="job_id" value={job.id} />
           {pendingOnly && <p className="text-[13px] text-teks-redup">{t('pendingAccountNote')}</p>}
-          {job.fee_type === 'open' ? (
+          {asking && (
+            <div className="space-y-3">
+              <div>
+                <p className="font-bold">{t('traitsTitle')}</p>
+                <p className="text-[13px] text-teks-redup">{t('traitsBody')}</p>
+              </div>
+              {traits.missing.map((m) => <input key={m} type="hidden" name={`trait_${m}`} value="1" />)}
+              <TraitFields gender={viewer.profile.gender} hijab={viewer.profile.hijab} accountType={viewer.profile.account_type} ask={traits.missing} />
+            </div>
+          )}
+          {offersVisit(job) && !(both && job.fee_type === 'open') && <VisitChoice visitOnly={job.job_type === 'visit'} askRate={false} />}
+          {job.fee_type === 'open' && both ? (
+            <>
+              <label htmlFor="rate" className="block text-[15px] font-bold">{t('rateNonVisit')}</label>
+              <RupiahInput id="rate" name="rate" placeholder="250.000" required />
+              <FieldError name="rate" />
+              <p className="text-[13px] text-teks-redup">
+                {job.rate_cap ? `${t('rateHint')} ${t('rateCapHint', { amount: formatRupiah(job.rate_cap) })}` : t('rateHint')}
+              </p>
+              <VisitChoice visitOnly={false} askRate capHint={job.rate_cap_visit ? t('rateCapHint', { amount: formatRupiah(job.rate_cap_visit) }) : undefined} />
+              <SubmitButton pendingLabel={t('joining')} className="w-full">{t('join')}</SubmitButton>
+            </>
+          ) : job.fee_type === 'open' ? (
             <>
               <label htmlFor="rate" className="block text-[15px] font-bold">{t('rate')}</label>
               <div className="flex gap-2">
@@ -346,7 +426,7 @@ export default async function JobDetail({ params }: { params: Promise<{ id: stri
             <div className="flex items-center justify-between gap-3">
               <div className="min-w-0">
                 <p className="text-[13px] text-teks-redup">{tier ? `${t('feeYours')} · ${ttier(tier)}` : t('fee')}</p>
-                <p className="text-lg font-extrabold tabular">{tier ? formatRupiah(job.tier_fees[tier]) : fee}</p>
+                <p className="text-lg font-extrabold tabular">{tier ? tierRange(tier) : fee}</p>
               </div>
               <SubmitButton pendingLabel={t('joining')} className="shrink-0">{t('join')}</SubmitButton>
             </div>

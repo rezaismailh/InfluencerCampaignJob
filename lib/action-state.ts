@@ -21,6 +21,9 @@ const KNOWN = [
   'already_posted', 'content_not_approved', 'invalid_url', 'invalid_date', 'payout_account_required',
   'nothing_selected', 'not_ready', 'below_minimum', 'feedback_required', 'invalid_transition',
   'transfer_date_required', 'reason_required', 'not_allowed',
+  'profile_gender_required', 'profile_hijab_required', 'profile_account_type_required', 'gender_not_eligible',
+  'hijab_not_eligible', 'account_type_not_eligible', 'visit_consent_required', 'rate_visit_required', 'rate_visit_above_cap',
+  'work_mode_required', 'not_willing_to_visit',
 ];
 
 export function dbErrorKey(error: { message?: string; code?: string } | null | undefined): string {

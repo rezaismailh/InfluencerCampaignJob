@@ -45,7 +45,8 @@
   },
   "jobType": {
     "non_visit": "Dari rumah",
-    "visit": "Datang ke lokasi"
+    "visit": "Datang ke lokasi",
+    "both": "Dari rumah atau ke lokasi"
   },
   "productOption": {
     "shipped": "Produk dikirim ke alamatmu",
@@ -169,7 +170,11 @@
     "socialRowField": "Akun media sosial {n}: {field}",
     "socialField_platform": "platform",
     "socialField_link": "link atau username",
-    "socialField_followers": "jumlah followers"
+    "socialField_followers": "jumlah followers",
+    "gender": "Gender",
+    "hijab": "Berhijab?",
+    "accountType": "Jenis akun",
+    "accountTypeHint": "Siapa yang biasanya tampil di kontenmu."
   },
   "social": {
     "title": "Akun media sosial",
@@ -207,7 +212,9 @@
     "emptyActiveBody": "Lihat job yang buka sekarang.",
     "seeJobs": "Lihat job",
     "socialPending": "Akun media sosialmu masih dicek tim Tali. Sambil menunggu, kamu sudah bisa daftar job.",
-    "inviteTitle": "Undangan job"
+    "inviteTitle": "Undangan job",
+    "completeTraits": "Profilmu belum lengkap: gender dan jenis akun dipakai beberapa brand untuk memilih creator.",
+    "completeTraitsCta": "Lengkapi"
   },
   "jobs": {
     "title": "Job yang buka",
@@ -290,7 +297,19 @@
     "feeOpen": "Fee (kamu yang menentukan)",
     "feeByFollowers": "Fee sesuai jumlah followers",
     "seeDetail": "Lihat detail job",
-    "joinShort": "Daftar"
+    "joinShort": "Daftar",
+    "visitConsent": "Saya bersedia datang ke lokasi sesuai jadwal dari tim Tali.",
+    "visitWilling": "Saya juga bersedia visit (datang ke lokasi). Klien yang memilih siapa yang visit.",
+    "rateVisit": "Rate kalau visit",
+    "rateNonVisit": "Rate dari rumah (non-visit)",
+    "genderReq": "Khusus",
+    "accountTypeReq": "Jenis akun",
+    "notEligible_gender": "Job ini khusus untuk gender tertentu, jadi belum cocok dengan profilmu.",
+    "notEligible_hijab": "Job ini punya syarat hijab yang belum cocok dengan profilmu.",
+    "notEligible_account_type": "Job ini mencari jenis akun lain (misalnya couple atau family).",
+    "traitsTitle": "Lengkapi dulu data ini",
+    "traitsBody": "Brand job ini memintanya. Cukup sekali, tersimpan di profilmu.",
+    "anyOf": "salah satu"
   },
   "work": {
     "title": "Kerjaan",
@@ -366,7 +385,8 @@
     "insightLocked": "Bisa dikirim setelah postinganmu dikonfirmasi tayang.",
     "versions": "{count, plural, one {# kiriman} other {# kiriman}}",
     "needsRevision": "Perlu revisi, cek feedback di bawah",
-    "payoutFailedStep": "Transfer gagal, cek rekeningmu"
+    "payoutFailedStep": "Transfer gagal, cek rekeningmu",
+    "offlineApproved": "Disetujui tim Tali di luar aplikasi (WA/email)."
   },
   "balance": {
     "title": "Saldo",
@@ -538,7 +558,19 @@
         "travel": "Travel",
         "sport": "Olahraga",
         "fun": "Hiburan"
-      }
+      },
+      "traits": "Syarat creator (opsional)",
+      "traitsHint": "Syarat ini dicek saat creator daftar. Dalam satu baris cukup cocok salah satu (mis. Personal ATAU Couple); antar baris semuanya harus terpenuhi (DAN). Kosongkan kalau semua boleh. Creator yang belum mengisi datanya diminta mengisi saat daftar.",
+      "genders": "Gender",
+      "hijabReq": "Hijab",
+      "hijabAny": "Semua (tidak disyaratkan)",
+      "accountTypes": "Jenis akun",
+      "visitFees": "Fee visit (khusus job \"Dari rumah atau ke lokasi\")",
+      "visitFeesHint": "Fee di atas dipakai untuk non-visit. Isi fee visit sesuai jenis fee: fee tetap, batas rate, atau per tier.",
+      "feeVisit": "Fee tetap visit (Rp)",
+      "rateCapVisit": "Batas rate visit (Rp, opsional)",
+      "tierFeesVisit": "Fee visit per tier",
+      "nichesHint": "Hanya info untuk creator, tidak membatasi siapa yang bisa daftar. Kalau dicentang lebih dari satu, artinya cukup cocok salah satu (ATAU)."
     },
     "applicants": "Pelamar",
     "participants": "Creator bergabung",
@@ -652,8 +684,34 @@
       "email": "Email",
       "whatsapp": "WhatsApp",
       "clientDecision": "Keputusan klien (Ya/Tidak)",
-      "clientNote": "Catatan klien"
-    }
+      "clientNote": "Catatan klien",
+      "gender": "Gender",
+      "hijab": "Hijab",
+      "accountType": "Jenis akun",
+      "willingVisit": "Bersedia visit",
+      "rateVisit": "Rate visit (Rp)",
+      "yes": "Ya",
+      "noAnswer": "Tidak",
+      "proposedRateNonVisit": "Rate non-visit (Rp)",
+      "feeNonVisit": "Fee non-visit (Rp)",
+      "clientDecisionMode": "Keputusan klien (Visit/Non-visit/Tidak)"
+    },
+    "willingVisit": "Bersedia visit",
+    "notWillingVisit": "Hanya non-visit",
+    "proposedRateNonVisit": "Rate non-visit {amount}",
+    "proposedRateVisit": "Rate visit {amount}",
+    "workMode": "Dikerjakan sebagai",
+    "workModeHint": "Fee otomatis: non-visit {nonVisit}, visit {visit}.",
+    "workModePick": "Pilih sesuai keputusan klien",
+    "agreedFeeAutoHint": "Kosongkan untuk memakai fee sesuai pilihan di atas.",
+    "offlineApprove": "Sudah disetujui di luar aplikasi?",
+    "offlineApproveHint": "Pakai ini kalau ide konten sudah disepakati lewat WA atau email. Creator tidak perlu mengirim apa pun di aplikasi.",
+    "offlineApproveHintOrder": "Pakai ini kalau sudah disepakati lewat WA atau email. Kalau ide konten belum disetujui, ikut ditandai disetujui.",
+    "offlineNote": "Catatan (opsional)",
+    "offlineNotePlaceholder": "Contoh: disetujui klien lewat WA 9 Okt",
+    "offlineApproveCta": "Tandai disetujui",
+    "staffPostHint": "Creator mengirim link postingannya di luar aplikasi? Isi di sini atas namanya.",
+    "staffPostCta": "Simpan link postingan"
   },
   "errors": {
     "generic": "Ada yang belum berhasil. Coba lagi sebentar lagi.",
@@ -714,7 +772,20 @@
     "primary_platform_required": "Pilih platform utama yang termasuk platform job ini.",
     "tier_not_offered": "Tier kamu belum termasuk di job ini.",
     "post_not_confirmed": "Insight bisa dikirim setelah postingan dikonfirmasi.",
-    "insight_photos_required": "Unggah minimal satu screenshot insight."
+    "insight_photos_required": "Unggah minimal satu screenshot insight.",
+    "hijab_needs_female": "Syarat hijab hanya bisa dipakai kalau gender yang dicari perempuan.",
+    "traits_required": "Lengkapi data yang diminta brand dulu.",
+    "profile_gender_required": "Pilih gendermu dulu.",
+    "profile_hijab_required": "Pilih berhijab atau tidak dulu.",
+    "profile_account_type_required": "Pilih jenis akunmu dulu.",
+    "gender_not_eligible": "Job ini khusus untuk gender tertentu.",
+    "hijab_not_eligible": "Syarat hijab job ini belum cocok dengan profilmu.",
+    "account_type_not_eligible": "Jenis akunmu belum sesuai job ini.",
+    "visit_consent_required": "Centang dulu kesediaan datang ke lokasi.",
+    "rate_visit_required": "Isi rate kalau visit.",
+    "rate_visit_above_cap": "Rate visit melebihi batas.",
+    "work_mode_required": "Pilih dikerjakan sebagai visit atau non-visit.",
+    "not_willing_to_visit": "Creator ini tidak bersedia visit."
   },
   "success": {
     "saved": "Tersimpan.",
@@ -945,5 +1016,19 @@
     "body": "Dapat kabar langsung di HP saat lamaranmu diterima, ada revisi, atau fee siap dicairkan.",
     "enable": "Aktifkan",
     "dismiss": "Tutup"
+  },
+  "gender": {
+    "female": "Perempuan",
+    "male": "Laki-laki"
+  },
+  "hijab": {
+    "hijab": "Berhijab",
+    "non_hijab": "Tidak berhijab"
+  },
+  "accountType": {
+    "personal": "Personal",
+    "couple": "Couple",
+    "family": "Family",
+    "group": "Grup"
   }
 }

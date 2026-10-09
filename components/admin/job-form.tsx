@@ -6,16 +6,18 @@ import { saveJob } from '@/app/admin/actions';
 import { PLATFORMS } from '@/lib/social';
 import { loadTaxonomy } from '@/lib/taxonomy';
 import { TIERS } from '@/lib/tiers';
+import { ACCOUNT_TYPES, GENDERS, HIJAB } from '@/lib/visit';
 import { BRAND_ICONS } from '@/lib/brand-look';
 import { BRAND_ICON_COMPONENTS } from '@/components/brand-avatar';
 import { BrandLogoUpload } from '@/components/admin/brand-logo-upload';
 import type { Job } from '@/lib/types';
 
 
-function Chips({ name, options, checked, label }: { name: string; options: { value: string; label: string }[]; checked: string[]; label: string }) {
+function Chips({ name, options, checked, label, hint }: { name: string; options: { value: string; label: string }[]; checked: string[]; label: string; hint?: string }) {
   return (
     <fieldset className="space-y-1.5">
       <legend className="text-[15px] font-bold">{label}</legend>
+      {hint && <p className="text-[13px] text-teks-redup">{hint}</p>}
       <div className="flex flex-wrap gap-2">
         {options.map((o) => (
           <label key={o.value} className="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-full border border-garis bg-kertas px-3 has-[:checked]:border-nila-800 has-[:checked]:bg-nila-50">
@@ -36,6 +38,9 @@ export async function JobForm({ job, realBrand, logo, clients }: { job?: Job; re
   const tpo = await getTranslations('productOption');
   const tst = await getTranslations('jobStatus');
   const ttier = await getTranslations('tier');
+  const tg = await getTranslations('gender');
+  const th = await getTranslations('hijab');
+  const ta = await getTranslations('accountType');
   const tax = await loadTaxonomy();
   const c = await getTranslations('common');
   // New jobs are disguised by default; an existing job is disguised when it has a real name stored separately.
@@ -93,6 +98,7 @@ export async function JobForm({ job, realBrand, logo, clients }: { job?: Job; re
           <Select id="job_type" name="job_type" defaultValue={job?.job_type ?? 'non_visit'}>
             <option value="non_visit">{tt('non_visit')}</option>
             <option value="visit">{tt('visit')}</option>
+            <option value="both">{tt('both')}</option>
           </Select>
         </Field>
         <Field label={t('phase')} hint={t('phaseHint')} htmlFor="phase"><Input id="phase" name="phase" defaultValue={job?.phase ?? ''} /></Field>
@@ -114,8 +120,21 @@ export async function JobForm({ job, realBrand, logo, clients }: { job?: Job; re
           <Input id="min_followers" name="min_followers" inputMode="numeric" defaultValue={job?.min_followers ?? 0} className="tabular" />
         </Field>
       </div>
-      <Chips name="niches" label={t('niches')} checked={job?.niches ?? []} options={tax.choices('niche', job?.niches)} />
-      <Chips name="personas" label={t('personas')} checked={job?.personas ?? []} options={tax.choices('persona', job?.personas)} />
+      <Chips name="niches" label={t('niches')} hint={t('nichesHint')} checked={job?.niches ?? []} options={tax.choices('niche', job?.niches)} />
+      <Chips name="personas" label={t('personas')} hint={t('nichesHint')} checked={job?.personas ?? []} options={tax.choices('persona', job?.personas)} />
+      <fieldset className="space-y-3 rounded-2xl border border-garis p-4">
+        <legend className="px-1 text-[15px] font-bold">{t('traits')}</legend>
+        <p className="text-[13px] text-teks-redup">{t('traitsHint')}</p>
+        <Chips name="genders" label={t('genders')} checked={job?.genders ?? []} options={GENDERS.map((v) => ({ value: v, label: tg(v) }))} />
+        <Field label={t('hijabReq')} htmlFor="hijab">
+          <Select id="hijab" name="hijab" defaultValue={job?.hijab ?? ''}>
+            <option value="">{t('hijabAny')}</option>
+            {HIJAB.map((v) => <option key={v} value={v}>{th(v)}</option>)}
+          </Select>
+          <FieldError name="hijab" />
+        </Field>
+        <Chips name="account_types" label={t('accountTypes')} checked={job?.account_types ?? []} options={ACCOUNT_TYPES.map((v) => ({ value: v, label: ta(v) }))} />
+      </fieldset>
 
       <div className="grid gap-4 md:grid-cols-3">
         <Field label={t('feeType')} htmlFor="fee_type">
@@ -138,6 +157,29 @@ export async function JobForm({ job, realBrand, logo, clients }: { job?: Job; re
           <Input id="review_days" name="review_days" inputMode="numeric" defaultValue={job?.review_days ?? ''} className="tabular" />
         </Field>
       </div>
+
+      <fieldset className="space-y-3 rounded-2xl border border-garis p-4">
+        <legend className="px-1 text-[15px] font-bold">{t('visitFees')}</legend>
+        <p className="text-[13px] text-teks-redup">{t('visitFeesHint')}</p>
+        <div className="grid gap-3 md:grid-cols-2">
+          <Field label={t('feeVisit')} htmlFor="fee_visit">
+            <Input id="fee_visit" name="fee_visit" inputMode="numeric" defaultValue={job?.fee_visit ?? ''} className="tabular" /><FieldError name="fee_visit" />
+          </Field>
+          <Field label={t('rateCapVisit')} htmlFor="rate_cap_visit">
+            <Input id="rate_cap_visit" name="rate_cap_visit" inputMode="numeric" defaultValue={job?.rate_cap_visit ?? ''} className="tabular" />
+          </Field>
+        </div>
+        <p className="text-[13px] font-bold">{t('tierFeesVisit')}</p>
+        <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-4">
+          {TIERS.map((tier) => (
+            <Field key={tier} label={ttier(tier)} htmlFor={`tier_fee_visit_${tier}`}>
+              <Input id={`tier_fee_visit_${tier}`} name={`tier_fee_visit_${tier}`} inputMode="numeric" className="tabular"
+                defaultValue={job?.tier_fees_visit?.[tier] ?? ''} placeholder="—" />
+            </Field>
+          ))}
+        </div>
+        <FieldError name="tier_fees_visit" />
+      </fieldset>
 
       <fieldset className="space-y-3 rounded-2xl border border-garis p-4">
         <legend className="px-1 text-[15px] font-bold">{t('paymentTerms')}</legend>

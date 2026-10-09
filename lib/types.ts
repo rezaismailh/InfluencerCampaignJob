@@ -2,7 +2,11 @@ import type { Platform } from './social';
 
 export type Role = 'creator' | 'curator' | 'finance' | 'owner';
 export type VerificationStatus = 'pending' | 'verified' | 'rejected';
-export type JobType = 'non_visit' | 'visit';
+export type JobType = 'non_visit' | 'visit' | 'both';
+export type WorkMode = 'non_visit' | 'visit';
+export type Gender = 'female' | 'male';
+export type Hijab = 'hijab' | 'non_hijab';
+export type AccountType = 'personal' | 'couple' | 'family' | 'group';
 export type FeeType = 'fixed' | 'open' | 'tier';
 export type ProductOption = 'shipped' | 'self_purchase' | 'none';
 export type JobStatus = 'draft' | 'open' | 'closed' | 'completed';
@@ -22,6 +26,9 @@ export type Profile = {
   city: string | null;
   categories: string[];
   persona: string | null;
+  gender: Gender | null;
+  hijab: Hijab | null;
+  account_type: AccountType | null;
   address_enc: string | null;
   onboarded_at: string | null;
   app_installed_at: string | null;
@@ -58,11 +65,17 @@ export type Job = {
   tiers: string[];
   niches: string[];
   personas: string[];
+  genders: Gender[];
+  hijab: Hijab | null;
+  account_types: AccountType[];
   min_followers: number;
   fee_type: FeeType;
   fee: number | null;
+  fee_visit: number | null;
   rate_cap: number | null;
+  rate_cap_visit: number | null;
   tier_fees: Record<string, number>;
+  tier_fees_visit: Record<string, number>;
   tier_basis: 'largest' | 'primary';
   primary_platform: Platform | null;
   quota: number;
@@ -89,6 +102,9 @@ export type Participation = {
   creator_id: string;
   status: ParticipationStatus;
   proposed_rate: number | null;
+  proposed_rate_visit: number | null;
+  visit_willing: boolean | null;
+  work_mode: WorkMode | null;
   agreed_fee: number | null;
   applied_at: string;
   decided_at: string | null;
@@ -117,6 +133,7 @@ export type Submission = {
   content: string | null;
   photo_paths: string[];
   status: ReviewStatus;
+  offline: boolean;
   tali_feedback: string | null;
   brand_feedback: string | null;
   submitted_at: string;
@@ -163,6 +180,6 @@ export type Notification = {
 /** Open-job teaser returned by public_open_jobs(): no brief, visit locations by name only. */
 export type PublicJob = Pick<Job,
   'id' | 'brand_name' | 'title' | 'product' | 'job_type' | 'platforms' | 'deliverables' | 'requirements' | 'tiers' | 'niches'
-  | 'personas' | 'min_followers' | 'fee_type' | 'fee' | 'rate_cap' | 'tier_fees' | 'tier_basis' | 'primary_platform' | 'quota' | 'review_days' | 'product_option'
+  | 'personas' | 'genders' | 'hijab' | 'account_types' | 'min_followers' | 'fee_type' | 'fee' | 'fee_visit' | 'rate_cap' | 'rate_cap_visit' | 'tier_fees' | 'tier_fees_visit' | 'tier_basis' | 'primary_platform' | 'quota' | 'review_days' | 'product_option'
   | 'require_purchase_proof' | 'apply_deadline' | 'content_deadline' | 'top_days' | 'top_mode' | 'pay_day' | 'cutoff_day' | 'require_insight' | 'brand_logo' | 'brand_icon' | 'created_at'
 > & { visit_location_names: string[] };

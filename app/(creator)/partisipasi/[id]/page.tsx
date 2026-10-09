@@ -22,6 +22,7 @@ import { formatDate, formatDateTime, todayWib } from '@/lib/dates';
 import { formatRupiah } from '@/lib/money';
 import { signedUrls } from '@/lib/storage';
 import { currentStep, latestByKind, revisionCount, timeline } from '@/lib/work';
+import { workMode } from '@/lib/visit';
 import type { Job, Participation, PayoutRequest, Submission, SubmissionKind } from '@/lib/types';
 import { visibleBrand, visibleLogo, type BrandEmbed } from '@/lib/brand';
 
@@ -228,11 +229,13 @@ export default async function Work({ params }: { params: Promise<{ id: string }>
   }
 
   async function Prep() {
-    const hasShipment = job.job_type === 'non_visit' && job.product_option === 'shipped';
-    if (job.job_type === 'non_visit' && job.product_option === 'self_purchase') {
+    // Jobs with both modes follow the mode picked when the creator was accepted.
+    const visit = workMode(job, part) === 'visit';
+    const hasShipment = !visit && job.product_option === 'shipped';
+    if (!visit && job.product_option === 'self_purchase') {
       return <Alert tone="info">{t('selfPurchase')}</Alert>;
     }
-    if (!hasShipment && job.job_type !== 'visit') return null;
+    if (!hasShipment && !visit) return null;
     const ts = await getTranslations('shipment');
     return (
       <Card className="space-y-3">
@@ -265,7 +268,7 @@ export default async function Work({ params }: { params: Promise<{ id: string }>
             <p className="text-[13px] text-teks-redup">{t('infoOnly')}</p>
           </>
         )}
-        {job.job_type === 'visit' && (
+        {visit && (
           <>
             <div>
               <p className="text-[15px] font-bold">{t('visitSchedule')}</p>

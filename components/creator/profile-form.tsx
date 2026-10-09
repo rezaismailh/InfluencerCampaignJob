@@ -9,6 +9,7 @@ import { loadTaxonomy } from '@/lib/taxonomy';
 import { provinceOf } from '@/lib/wilayah';
 import { SocialList } from '@/components/creator/social-list';
 import { SocialRows } from '@/components/creator/social-rows';
+import { TraitFields } from '@/components/creator/trait-fields';
 import type { Profile, SocialAccount } from '@/lib/types';
 
 
@@ -59,6 +60,7 @@ export async function ProfileForm({ profile, accounts, mode, next }: {
           {tax.choices('persona', profile.persona ? [profile.persona] : []).map(({ value, label }) => <option key={value} value={value}>{label}</option>)}
         </Select>
       </Field>
+      <TraitFields gender={profile.gender} hijab={profile.hijab} accountType={profile.account_type} />
       <Field label={<>{t('address')} <span className="font-medium text-teks-redup">({c('optional')})</span></>} hint={t('addressHint')} htmlFor="address">
         <Textarea id="address" name="address" autoComplete="street-address" defaultValue={decrypt(profile.address_enc) ?? ''} />
         <FieldError name="address" />

@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 import { Alert } from '@/components/ui/alert';
 import { ButtonLink } from '@/components/ui/button';
@@ -33,6 +34,12 @@ export default async function Home() {
       <h1 className="text-2xl font-bold leading-8">{t('greeting', { name })}</h1>
       <BalanceCard balance={bal} nextTransfer={nextTransfer} />
       {!verified && <Alert tone="warning">{t('socialPending')}</Alert>}
+      {(!viewer.profile.gender || !viewer.profile.account_type || (viewer.profile.gender === 'female' && !viewer.profile.hijab)) && (
+        <Alert tone="info">
+          {t('completeTraits')}{' '}
+          <Link href="/profil#field-gender" className="font-bold underline underline-offset-4">{t('completeTraitsCta')}</Link>
+        </Alert>
+      )}
       <InstallPrompt installed={!!viewer.profile.app_installed_at} />
       <EnablePushCard />
 

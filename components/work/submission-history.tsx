@@ -23,7 +23,9 @@ export async function SubmissionHistory({ items, photoUrls = {} }: { items: Subm
               <p className="font-bold">{numeral ? t('revisionN', { n: numeral }) : t('firstVersion')}</p>
               <Badge tone={reviewTone[s.status]}>{t(s.status)}</Badge>
             </div>
-            <p className="text-[13px] text-teks-redup">{tw('submittedAt', { date: formatDateTime(s.submitted_at, locale) })}</p>
+            {s.offline && !s.content
+              ? <p className="text-[13px] text-teks-redup">{tw('offlineApproved')}</p>
+              : <p className="text-[13px] text-teks-redup">{tw('submittedAt', { date: formatDateTime(s.submitted_at, locale) })}</p>}
             {s.content && (s.kind === 'caption'
               ? <p className="mt-2 whitespace-pre-line text-[15px]">{s.content}</p>
               : <a href={s.content} target="_blank" rel="noreferrer" className="mt-2 inline-block break-all text-[15px] font-bold text-nila-800 underline underline-offset-4">{c('openLink')}</a>)}

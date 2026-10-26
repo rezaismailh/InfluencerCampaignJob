@@ -114,7 +114,7 @@
   },
   "auth": {
     "title": "Log in to Tali",
-    "subtitle": "Use your email or Google account. No account yet? One is created automatically.",
+    "subtitle": "Use your Google account or email. No account yet? One is created automatically.",
     "email": "Email",
     "emailPlaceholder": "name@email.com",
     "sendCode": "Send code",
@@ -127,7 +127,9 @@
     "invalidEmail": "That email doesn't look right.",
     "invalidCode": "The code is wrong or expired. Request a new code and try again.",
     "sendFailed": "The code wasn't sent. Wait a minute and try again.",
-    "callbackFailed": "Login didn't go through. Try again from the login page."
+    "callbackFailed": "Login didn't go through. Try again from the login page.",
+    "googleHint": "Fastest: no code, your account is created automatically.",
+    "orEmail": "or use email"
   },
   "nav": {
     "home": "Home",
@@ -257,7 +259,7 @@
     "signIn": "Log in",
     "toAdmin": "Go to admin",
     "signInTitle": "Interested in this campaign?",
-    "signInBody": "Log in or sign up with your email or Google account. Your account is created automatically, free.",
+    "signInBody": "One tap with your Google account, no code needed. Your Tali account is created right away, free.",
     "signInCta": "Log in to apply",
     "completeProfileTitle": "Complete your profile to apply",
     "completeProfileBody": "Fill in your details and social media accounts once, then you can apply to this campaign.",
@@ -311,7 +313,14 @@
     "traitsBody": "The brand asks for it. Only once; it is saved to your profile.",
     "anyOf": "any of",
     "reviewDisclaimerTitle": "Everything is reviewed by the client",
-    "reviewDisclaimer": "Your application and the content you send are reviewed by the Tali team and the client (brand) before a decision. The client has the final say. Your email, phone number and address are not shared with the client."
+    "reviewDisclaimer": "Your application and the content you send are reviewed by the Tali team and the client (brand) before a decision. The client has the final say. Your email, phone number and address are not shared with the client.",
+    "applyWithGoogle": "Apply with Google",
+    "useEmail": "Use email instead",
+    "quickTitle": "One more step",
+    "quickBody": "Fill this in once here; it also becomes your profile for future jobs.",
+    "quickSocial": "Your {platforms} account",
+    "quickSubmit": "Send application",
+    "quickSaved": "Your details are saved to your Profile and can be changed any time."
   },
   "work": {
     "title": "Work",

@@ -7,6 +7,7 @@ import { Alert } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Field, Input } from '@/components/ui/field';
 import { createClient } from '@/lib/supabase/client';
+import { GoogleButton } from '@/components/google-button';
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -46,16 +47,21 @@ export function LoginForm({ next, callbackError }: { next: string; callbackError
     });
   }
 
-  function google() {
-    startTransition(async () => {
-      const redirectTo = `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`;
-      await createClient().auth.signInWithOAuth({ provider: 'google', options: { redirectTo } });
-    });
-  }
 
   return (
     <div className="space-y-6">
       {error && <Alert tone="danger">{error}</Alert>}
+
+      {step === 'email' && (
+        <>
+          {/* Google first: one tap, no code to copy from the inbox. */}
+          <GoogleButton next={next} label={t('google')} className="w-full" />
+          <p className="-mt-3 text-center text-[13px] text-teks-redup">{t('googleHint')}</p>
+          <div className="flex items-center gap-3 text-[13px] text-teks-redup">
+            <span className="h-px flex-1 bg-garis" />{t('orEmail')}<span className="h-px flex-1 bg-garis" />
+          </div>
+        </>
+      )}
 
       {step === 'email' ? (
         <form onSubmit={sendCode} className="space-y-4" noValidate>
@@ -63,7 +69,7 @@ export function LoginForm({ next, callbackError }: { next: string; callbackError
             <Input id="email" type="email" inputMode="email" autoComplete="email" placeholder={t('emailPlaceholder')}
               value={email} onChange={(e) => setEmail(e.target.value)} required />
           </Field>
-          <Button type="submit" className="w-full" disabled={pending}>{t('sendCode')}</Button>
+          <Button type="submit" variant="outline" className="w-full" disabled={pending}>{t('sendCode')}</Button>
         </form>
       ) : (
         <form onSubmit={verify} className="space-y-4">
@@ -79,10 +85,6 @@ export function LoginForm({ next, callbackError }: { next: string; callbackError
         </form>
       )}
 
-      <div className="flex items-center gap-3 text-[13px] text-teks-redup">
-        <span className="h-px flex-1 bg-garis" />{t('or')}<span className="h-px flex-1 bg-garis" />
-      </div>
-      <Button type="button" variant="outline" className="w-full" onClick={google} disabled={pending}>{t('google')}</Button>
     </div>
   );
 }

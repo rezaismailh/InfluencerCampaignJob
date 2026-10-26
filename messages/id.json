@@ -114,7 +114,7 @@
   },
   "auth": {
     "title": "Masuk ke Tali",
-    "subtitle": "Pakai email atau akun Google. Belum punya akun? Akun dibuat otomatis.",
+    "subtitle": "Pakai akun Google atau email. Belum punya akun? Akun dibuat otomatis.",
     "email": "Email",
     "emailPlaceholder": "nama@email.com",
     "sendCode": "Kirim kode",
@@ -127,7 +127,9 @@
     "invalidEmail": "Format email belum benar.",
     "invalidCode": "Kode salah atau sudah kedaluwarsa. Minta kode baru, lalu coba lagi.",
     "sendFailed": "Kode belum terkirim. Tunggu satu menit, lalu coba lagi.",
-    "callbackFailed": "Login belum berhasil. Coba lagi dari halaman masuk."
+    "callbackFailed": "Login belum berhasil. Coba lagi dari halaman masuk.",
+    "googleHint": "Paling cepat: tanpa kode, akun dibuat otomatis.",
+    "orEmail": "atau pakai email"
   },
   "nav": {
     "home": "Beranda",
@@ -257,7 +259,7 @@
     "signIn": "Masuk",
     "toAdmin": "Ke admin",
     "signInTitle": "Tertarik ikut campaign ini?",
-    "signInBody": "Masuk pakai email atau akun Google. Belum punya akun? Langsung dibuatkan, gratis.",
+    "signInBody": "Sekali tap pakai akun Google, tanpa kode OTP. Akun Tali langsung dibuat, gratis.",
     "signInCta": "Masuk untuk daftar",
     "completeProfileTitle": "Lengkapi profil untuk daftar",
     "completeProfileBody": "Isi data diri dan akun media sosialmu sekali saja, lalu kamu bisa daftar.",
@@ -311,7 +313,14 @@
     "traitsBody": "Brand job ini memintanya. Cukup sekali, tersimpan di profilmu.",
     "anyOf": "salah satu",
     "reviewDisclaimerTitle": "Semua melalui review klien",
-    "reviewDisclaimer": "Pendaftaran dan konten yang kamu kirim direview tim Tali dan klien (brand) sebelum diputuskan. Keputusan akhir ada di klien. Email, nomor HP, dan alamatmu tidak dibagikan ke klien."
+    "reviewDisclaimer": "Pendaftaran dan konten yang kamu kirim direview tim Tali dan klien (brand) sebelum diputuskan. Keputusan akhir ada di klien. Email, nomor HP, dan alamatmu tidak dibagikan ke klien.",
+    "applyWithGoogle": "Daftar dengan Google",
+    "useEmail": "Pakai email saja",
+    "quickTitle": "Satu langkah lagi",
+    "quickBody": "Isi sekali di sini, sekalian jadi profilmu untuk job berikutnya.",
+    "quickSocial": "Akun {platforms} kamu",
+    "quickSubmit": "Kirim lamaran",
+    "quickSaved": "Datamu tersimpan di Profil dan bisa diubah kapan saja."
   },
   "work": {
     "title": "Kerjaan",

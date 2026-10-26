@@ -19,18 +19,18 @@ const PLACEHOLDER: Record<Platform, string> = {
 };
 
 let nextId = 1;
-const emptyRow = (): Row => ({ id: nextId++, platform: '', link: '', followers: '' });
+const emptyRow = (platform: Platform | '' = ''): Row => ({ id: nextId++, platform, link: '', followers: '' });
 
 /**
  * New social accounts, entered as part of the profile form: pick the platform,
  * paste a link or type the username, fill in followers. Fields are named
  * social_<field>_<index> so the server can point at the exact row.
  */
-export function SocialRows({ startWithRow }: { startWithRow: boolean }) {
+export function SocialRows({ startWithRow, defaultPlatform }: { startWithRow: boolean; defaultPlatform?: Platform }) {
   const t = useTranslations('social');
   const tp = useTranslations('platform');
   const state = useFormState();
-  const [rows, setRows] = useState<Row[]>(() => (startWithRow ? [emptyRow()] : []));
+  const [rows, setRows] = useState<Row[]>(() => (startWithRow ? [emptyRow(defaultPlatform)] : []));
   // Clear the rows once the server has saved them (state changes only after a submit).
   const [seen, setSeen] = useState(state);
   if (state !== seen) {

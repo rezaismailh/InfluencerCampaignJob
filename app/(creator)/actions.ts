@@ -58,6 +58,26 @@ async function socialCount(viewer: Awaited<ReturnType<typeof requireCreator>>) {
 export async function saveProfile(_prev: ActionState, formData: FormData): Promise<ActionState> {
   const viewer = await requireCreator({ allowIncomplete: true });
   const finish = text(formData.get('finish')) === '1';
+  const problem = await persistProfile(viewer, formData, finish);
+  if (problem) return problem;
+  revalidatePath('/', 'layout');
+  if (finish) {
+    // ?pasang=onboarding opens the one-time "add to home screen" sheet.
+    const dest = new URL(safeNext(text(formData.get('next'))) ?? '/job', 'http://x');
+    dest.searchParams.set('pasang', 'onboarding');
+    redirect(dest.pathname + dest.search);
+  }
+  return { ok: true, success: 'saved' };
+}
+
+type Viewer = Awaited<ReturnType<typeof requireCreator>>;
+
+/**
+ * Validates and saves the profile fields and new social accounts in `formData`.
+ * With `finish`, also requires a social account and completes onboarding.
+ * Returns the problem to show, or null once saved.
+ */
+async function persistProfile(viewer: Viewer, formData: FormData, finish: boolean): Promise<ActionState | null> {
   const parsed = profileSchema.safeParse({
     full_name: text(formData.get('full_name')),
     phone: text(formData.get('phone')).replace(/[\s-]/g, ''),
@@ -142,14 +162,7 @@ export async function saveProfile(_prev: ActionState, formData: FormData): Promi
     ...(finish ? { onboarded_at: new Date().toISOString() } : {}),
   }).eq('id', viewer.id);
   if (error) return { error: dbErrorKey(error) };
-  revalidatePath('/', 'layout');
-  if (finish) {
-    // ?pasang=onboarding opens the one-time "add to home screen" sheet.
-    const dest = new URL(safeNext(text(formData.get('next'))) ?? '/job', 'http://x');
-    dest.searchParams.set('pasang', 'onboarding');
-    redirect(dest.pathname + dest.search);
-  }
-  return { ok: true, success: 'saved' };
+  return null;
 }
 
 /** Called once when the app is opened from the home screen; hides the install banner everywhere. */
@@ -182,6 +195,24 @@ export async function removeSocialAccount(formData: FormData) {
 // ---------------------------------------------------------------------------
 export async function applyToJob(_prev: ActionState, formData: FormData): Promise<ActionState> {
   const viewer = await requireCreator();
+  return applyCore(viewer, formData);
+}
+
+/**
+ * First-time applicants (usually just back from Google sign-in) fill a short profile and
+ * the application on the job page itself: one submit saves the profile, the social
+ * account, finishes onboarding and applies. If applying fails afterwards (followers
+ * too low, trait mismatch…), the profile stays saved and the job page explains why.
+ */
+export async function quickApply(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const viewer = await requireCreator({ allowIncomplete: true });
+  const problem = await persistProfile(viewer, formData, true);
+  if (problem) return problem;
+  revalidatePath('/', 'layout');
+  return applyCore(viewer, formData);
+}
+
+async function applyCore(viewer: Viewer, formData: FormData): Promise<ActionState> {
   const jobId = text(formData.get('job_id'));
   const rate = parseRupiah(text(formData.get('rate')));
   const rateVisit = parseRupiah(text(formData.get('rate_visit')));

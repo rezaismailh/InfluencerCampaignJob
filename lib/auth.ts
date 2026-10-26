@@ -16,6 +16,14 @@ export const getViewer = cache(async () => {
 
 export type Viewer = NonNullable<Awaited<ReturnType<typeof getViewer>>>;
 
+/** Name from the sign-in provider (Google sends it), to prefill the profile. */
+export async function providerName(viewer: Viewer): Promise<string | null> {
+  const { data } = await viewer.supabase.auth.getUser();
+  const meta = data.user?.user_metadata ?? {};
+  const name = typeof meta.full_name === 'string' ? meta.full_name : typeof meta.name === 'string' ? meta.name : null;
+  return name?.trim() || null;
+}
+
 export const isStaffRole = (role: Role) => role !== 'creator';
 export const canCurate = (role: Role) => role === 'curator' || role === 'owner';
 export const canFinance = (role: Role) => role === 'finance' || role === 'owner';

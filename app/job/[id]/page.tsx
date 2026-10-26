@@ -12,8 +12,15 @@ import { BrandAvatar } from '@/components/brand-avatar';
 import { SubmitButton } from '@/components/ui/submit-button';
 import { feeLabel, payoutLabel } from '@/components/creator/job-card';
 import { ShareButton } from '@/components/share-button';
-import { applyToJob, respondInvite } from '@/app/(creator)/actions';
-import { getViewer, type Viewer } from '@/lib/auth';
+import { applyToJob, quickApply, respondInvite } from '@/app/(creator)/actions';
+import { getViewer, providerName, type Viewer } from '@/lib/auth';
+import { decrypt } from '@/lib/crypto';
+import { provinceOf } from '@/lib/wilayah';
+import { GoogleButton } from '@/components/google-button';
+import { RegionSelect } from '@/components/creator/region-select';
+import { SocialList } from '@/components/creator/social-list';
+import { SocialRows } from '@/components/creator/social-rows';
+import { Field, Input } from '@/components/ui/field';
 import { createClient } from '@/lib/supabase/server';
 import { loadTaxonomy } from '@/lib/taxonomy';
 import { creatorTier, TIERS, tierFeeList } from '@/lib/tiers';
@@ -248,7 +255,7 @@ export default async function JobDetail({ params }: { params: Promise<{ id: stri
       <ShareButton path={`/job/${job.id}`} title={`${job.title} · ${job.brand_name}`}
         text={t('shareText', { title: job.title, brand: job.brand_name, fee })} />
 
-      {creator && full ? <JoinBlock job={full} viewer={creator} /> : <SignInBlock viewer={viewer} jobId={job.id} />}
+      {creator && full ? <JoinBlock job={full} viewer={creator} /> : <SignInBlock viewer={viewer} job={full ?? job} />}
     </div>
   );
 
@@ -288,15 +295,68 @@ export default async function JobDetail({ params }: { params: Promise<{ id: stri
     );
   }
 
-  async function SignInBlock({ viewer, jobId }: { viewer: Viewer | null; jobId: string }) {
+  async function SignInBlock({ viewer, job }: { viewer: Viewer | null; job: Job | PublicJob }) {
     if (viewer && viewer.profile.role !== 'creator') return null;
-    const next = encodeURIComponent(`/job/${jobId}`);
+    if (viewer) return <QuickApply viewer={viewer} job={job} />;
+    // Guests: Google first (one tap, no code), email as the alternative.
     return (
       <ActionBar>
-        <p className="text-[13px] text-teks-redup">{viewer ? t('completeProfileBody') : t('signInBody')}</p>
-        <ButtonLink href={viewer ? `/onboarding?next=${next}` : `/masuk?next=${next}`} className="w-full">
-          {viewer ? t('completeProfileCta') : t('signInCta')}
-        </ButtonLink>
+        <p className="text-[13px] text-teks-redup">{t('signInBody')}</p>
+        <GoogleButton next={`/job/${job.id}`} label={t('applyWithGoogle')} className="w-full" />
+        <Link href={`/masuk?next=${encodeURIComponent(`/job/${job.id}`)}`} className="block text-center text-[13px] font-bold text-nila-800 underline underline-offset-4">
+          {t('useEmail')}
+        </Link>
+      </ActionBar>
+    );
+  }
+
+  /** Signed in but no profile yet: profile, social account and application in one form. */
+  async function QuickApply({ viewer, job }: { viewer: Viewer; job: Job | PublicJob }) {
+    const to = await getTranslations('onboarding');
+    const [{ data: accounts }, name] = await Promise.all([
+      viewer.supabase.from('social_accounts').select('*').eq('creator_id', viewer.id).order('created_at').returns<SocialAccount[]>(),
+      providerName(viewer),
+    ]);
+    const p = viewer.profile;
+    const open = job.fee_type === 'open';
+    const capHint = (cap: number | null) => (cap ? t('rateCapHint', { amount: formatRupiah(cap) }) : undefined);
+    return (
+      <ActionBar inline>
+        <ActionForm action={quickApply} noValidate className="space-y-4">
+          <input type="hidden" name="job_id" value={job.id} />
+          <div>
+            <p className="text-lg font-bold">{t('quickTitle')}</p>
+            <p className="text-[13px] text-teks-redup">{t('quickBody')}</p>
+          </div>
+          <Field label={to('fullName')} htmlFor="full_name">
+            <Input id="full_name" name="full_name" autoComplete="name" defaultValue={p.full_name ?? name ?? ''} required />
+            <FieldError name="full_name" />
+          </Field>
+          <Field label={to('phone')} hint={to('phoneHint')} htmlFor="phone">
+            <Input id="phone" name="phone" type="tel" inputMode="tel" autoComplete="tel" placeholder="08xxxxxxxxxx" defaultValue={decrypt(p.phone_enc) ?? ''} required />
+            <FieldError name="phone" />
+          </Field>
+          <RegionSelect province={p.province ?? provinceOf(p.city)} city={p.city} />
+          <TraitFields gender={p.gender} hijab={p.hijab} accountType={p.account_type} />
+          <section id="field-social" tabIndex={-1} className="space-y-2">
+            <p className="text-[15px] font-bold">{t('quickSocial', { platforms: job.platforms.map((x) => tp(x)).join(' / ') })}</p>
+            {(accounts ?? []).length > 0 && <SocialList accounts={accounts ?? []} />}
+            <SocialRows startWithRow={!(accounts ?? []).length} defaultPlatform={job.platforms[0]} />
+            <FieldError name="social" />
+          </section>
+          {offersVisit(job) && !(both && open) && <VisitChoice visitOnly={job.job_type === 'visit'} askRate={false} />}
+          {open && (
+            <div className="space-y-1">
+              <label htmlFor="rate" className="block text-[15px] font-bold">{both ? t('rateNonVisit') : t('rate')}</label>
+              <RupiahInput id="rate" name="rate" placeholder="250.000" required />
+              <FieldError name="rate" />
+              <p className="text-[13px] text-teks-redup">{job.rate_cap ? `${t('rateHint')} ${capHint(job.rate_cap)}` : t('rateHint')}</p>
+            </div>
+          )}
+          {open && both && <VisitChoice visitOnly={false} askRate capHint={capHint(job.rate_cap_visit)} />}
+          <SubmitButton name="finish" value="1" pendingLabel={t('joining')} className="w-full">{t('quickSubmit')}</SubmitButton>
+          <p className="text-center text-[13px] text-teks-redup">{t('quickSaved')}</p>
+        </ActionForm>
       </ActionBar>
     );
   }

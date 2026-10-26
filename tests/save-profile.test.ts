@@ -2,13 +2,15 @@ import { randomBytes } from 'node:crypto';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Minimal fakes around the server action: auth, Supabase, Next helpers, translations.
-const db = { socialCount: 0, inserted: [] as unknown[], updated: null as Record<string, unknown> | null };
+const db = { socialCount: 0, inserted: [] as unknown[], updated: null as Record<string, unknown> | null,
+  rpc: null as { name: string; args: Record<string, unknown> } | null, rpcError: null as { message: string } | null };
 const supabase = {
   from: (table: string) => ({
     select: () => ({ eq: async () => ({ count: db.socialCount }) }),
     insert: async (rows: unknown[]) => { db.inserted.push(...rows); return { error: null }; },
     update: (row: Record<string, unknown>) => ({ eq: async () => { if (table === 'profiles') db.updated = row; return { error: null }; } }),
   }),
+  rpc: async (name: string, args: Record<string, unknown>) => { db.rpc = { name, args }; return { error: db.rpcError }; },
 };
 vi.mock('@/lib/auth', () => ({
   requireCreator: async () => ({ id: 'u1', supabase, profile: {} }),
@@ -31,7 +33,7 @@ const filled = { full_name: 'Reza', phone: '081234567890', province: 'Jawa Barat
 
 beforeEach(() => {
   process.env.DATA_ENCRYPTION_KEY = randomBytes(32).toString('base64');
-  db.socialCount = 0; db.inserted = []; db.updated = null;
+  db.socialCount = 0; db.inserted = []; db.updated = null; db.rpc = null; db.rpcError = null;
 });
 
 describe('saveProfile', () => {
@@ -82,5 +84,33 @@ describe('saveProfile', () => {
     db.socialCount = 1;
     const { saveProfile } = await import('@/app/(creator)/actions');
     await expect(saveProfile({}, form({ finish: '1', ...filled }))).rejects.toThrow('REDIRECT /job?pasang=onboarding');
+  });
+});
+
+describe('quickApply (sign up and apply from the job page)', () => {
+  const social = { social_platform_0: 'tiktok', social_link_0: '@isreza', social_followers_0: '5.000' };
+
+  it('saves the profile and account, finishes onboarding, then applies', async () => {
+    const { quickApply } = await import('@/app/(creator)/actions');
+    await expect(quickApply({}, form({ ...filled, ...social, job_id: 'j1', rate: '250.000' }))).rejects.toThrow('REDIRECT /job/j1?pasang=lamaran');
+    expect(db.updated).toHaveProperty('onboarded_at');
+    expect(db.inserted).toEqual([expect.objectContaining({ platform: 'tiktok', username: 'isreza', followers: 5000 })]);
+    expect(db.rpc).toEqual({ name: 'apply_to_job', args: expect.objectContaining({ p_job: 'j1', p_rate: 250000 }) });
+  });
+
+  it('stops before applying when the profile is incomplete', async () => {
+    const { quickApply } = await import('@/app/(creator)/actions');
+    const res = await quickApply({}, form({ ...filled, phone: '', job_id: 'j1' }));
+    expect(res.fields).toHaveProperty('phone');
+    expect(res.fields).toHaveProperty('social');
+    expect(db.rpc).toBeNull();
+  });
+
+  it('keeps the saved profile when the application itself is refused', async () => {
+    const { quickApply } = await import('@/app/(creator)/actions');
+    db.rpcError = { message: 'followers_below_minimum' };
+    const res = await quickApply({}, form({ ...filled, ...social, job_id: 'j1' }));
+    expect(res.error).toBe('followers_below_minimum');
+    expect(db.updated).toHaveProperty('onboarded_at');
   });
 });

@@ -3,16 +3,17 @@ import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 import { ActionForm } from '@/components/action-form';
 import { Badge } from '@/components/ui/badge';
-import { ButtonLink, buttonClass } from '@/components/ui/button';
+import { Button, ButtonLink, buttonClass } from '@/components/ui/button';
 import { Download } from 'lucide-react';
 import { Card, CardTitle } from '@/components/ui/card';
 import { Field, Input, Select } from '@/components/ui/field';
 import { PageHeader } from '@/components/ui/page';
 import { SubmitButton } from '@/components/ui/submit-button';
-import { participationTone, verificationTone } from '@/components/status';
+import { participationTone } from '@/components/status';
 import { feeLabel } from '@/components/creator/job-card';
-import { decideApplication, inviteCreator } from '@/app/admin/actions';
+import { decideApplication, inviteCreator, setJobStatus } from '@/app/admin/actions';
 import { requireStaff } from '@/lib/auth';
+import { cn } from '@/lib/cn';
 import { realBrand, type BrandEmbed } from '@/lib/brand';
 import { formatRupiah } from '@/lib/money';
 import { loadTaxonomy } from '@/lib/taxonomy';
@@ -20,6 +21,14 @@ import { creatorTier } from '@/lib/tiers';
 import { modeFee, offersVisit } from '@/lib/visit';
 import { latestByKind, timeline } from '@/lib/work';
 import type { Job, Participation, Profile, SocialAccount, Submission } from '@/lib/types';
+
+// Status buttons shown for each current status.
+const STATUS_ACTIONS: Record<Job['status'], Job['status'][]> = {
+  draft: ['open'],
+  open: ['closed'],
+  closed: ['open', 'completed'],
+  completed: ['closed'],
+};
 
 type Row = Participation & { profiles: Pick<Profile, 'full_name' | 'city' | 'email' | 'persona' | 'categories' | 'gender' | 'hijab' | 'account_type'> };
 
@@ -33,7 +42,6 @@ export default async function AdminJob({ params }: { params: Promise<{ id: strin
   const tp = await getTranslations('platform');
   const tv = await getTranslations('verification');
   const tw = await getTranslations('work');
-  const ttier = await getTranslations('tier');
   const tg = await getTranslations('gender');
   const th = await getTranslations('hijab');
   const ta = await getTranslations('accountType');
@@ -68,7 +76,18 @@ export default async function AdminJob({ params }: { params: Promise<{ id: strin
         <span className="font-bold tabular">{await feeLabel(job)}</span>
         <span className="text-[15px] text-teks-redup">{t('slots', { used: approvedCount, quota: job.quota })}</span>
         <span className="text-[15px] text-teks-redup">{job.platforms.map((p) => tp(p)).join(' · ')}</span>
+        {/* Quick status changes; everything else stays in "Edit job". */}
+        <div className="ml-auto flex flex-wrap gap-2">
+          {STATUS_ACTIONS[job.status].map((next) => (
+            <form key={next} action={setJobStatus}>
+              <input type="hidden" name="id" value={job.id} />
+              <input type="hidden" name="status" value={next} />
+              <Button type="submit" size="sm" variant={next === 'closed' || next === 'completed' ? 'outline' : 'primary'}>{t(`statusAction.${job.status}_${next}`)}</Button>
+            </form>
+          ))}
+        </div>
       </Card>
+      <p className="-mt-3 text-[13px] text-teks-redup">{t(`statusHint.${job.status}`)}</p>
 
       <Card className="space-y-3">
         <div>
@@ -89,94 +108,95 @@ export default async function AdminJob({ params }: { params: Promise<{ id: strin
       <section className="space-y-3">
         <h2 className="text-xl font-bold">{t('applicants')} ({applicants.length})</h2>
         {!applicants.length && <p className="text-[15px] text-teks-redup">{t('noApplicants')}</p>}
-        <div className="grid gap-3 lg:grid-cols-2">
-          {applicants.map((r) => {
-            const accs = (accounts ?? []).filter((a) => a.creator_id === r.creator_id);
-            const eligible = (a: SocialAccount) => job.platforms.includes(a.platform) && a.followers >= job.min_followers;
-            const ready = accs.some((a) => a.status === 'verified' && eligible(a));
-            const pending = !ready && accs.some((a) => a.status === 'pending' && eligible(a));
-            return (
-              <Card key={r.id} className="space-y-3">
-                <div>
-                  <p className="font-bold">{r.profiles.full_name ?? r.profiles.email}</p>
-                  <p className="text-[13px] text-teks-redup">{[r.profiles.city, r.profiles.email].filter(Boolean).join(' · ')}</p>
-                  {(r.profiles.categories.length > 0 || r.profiles.persona) && (
-                    <p className="text-[13px] text-teks-redup">
-                      {[...r.profiles.categories.map((k) => tax.name('niche', k)), r.profiles.persona && tax.name('persona', r.profiles.persona)].filter(Boolean).join(' · ')}
-                    </p>
+        {applicants.length > 0 && (
+          <div className="overflow-x-auto rounded-2xl border border-garis bg-kertas">
+            <table className="w-full min-w-[780px] text-left text-[13px]">
+              <thead className="bg-latar text-teks-redup">
+                <tr>
+                  <th scope="col" className="px-3 py-2 font-bold">{t('colCreator')}</th>
+                  <th scope="col" className="px-3 py-2 font-bold">{t('colAccounts')}</th>
+                  {(offersVisit(job) || job.fee_type === 'open') && (
+                    <th scope="col" className="px-3 py-2 font-bold">{offersVisit(job) && job.fee_type === 'open' ? t('colVisitRate') : offersVisit(job) ? t('colVisit') : t('colRate')}</th>
                   )}
-                  {(r.profiles.gender || r.profiles.account_type) && (
-                    <p className="text-[13px] text-teks-redup">
-                      {[r.profiles.gender && tg(r.profiles.gender), r.profiles.hijab && th(r.profiles.hijab), r.profiles.account_type && ta(r.profiles.account_type)].filter(Boolean).join(' · ')}
-                    </p>
-                  )}
-                </div>
-                <ul className="space-y-1">
-                  {accs.map((a) => (
-                    <li key={a.id} className="flex flex-wrap items-center gap-2 text-[15px]">
-                      <a href={a.url} target="_blank" rel="noreferrer" className="font-medium underline underline-offset-4">{tp(a.platform)} @{a.username}</a>
-                      <span className="tabular text-teks-redup">{a.followers.toLocaleString('id-ID')}</span>
-                      <Badge tone={verificationTone[a.status]}>{tv(a.status)}</Badge>
-                    </li>
-                  ))}
-                </ul>
-                {pending && <p className="text-[13px] text-teks-redup">{t('acceptVerifies')}</p>}
-                {!ready && !pending && <p className="text-[13px] text-peringatan">{t('cannotAccept')}</p>}
-                {offersVisit(job) && (
-                  <Badge tone={r.visit_willing ? 'success' : 'neutral'}>{r.visit_willing ? t('willingVisit') : t('notWillingVisit')}</Badge>
-                )}
-                {r.proposed_rate && <p className="font-bold">{t(both ? 'proposedRateNonVisit' : 'proposedRate', { amount: formatRupiah(r.proposed_rate) })}</p>}
-                {r.proposed_rate_visit && <p className="font-bold">{t('proposedRateVisit', { amount: formatRupiah(r.proposed_rate_visit) })}</p>}
-                <ActionForm action={decideApplication} className="space-y-3">
-                  <input type="hidden" name="participation_id" value={r.id} />
-                  {both && (() => {
-                    const tier = creatorTier(job, accs.filter((a) => a.status !== 'rejected'));
-                    const fees = (['non_visit', 'visit'] as const).map((m) => modeFee(job, m, tier, r));
-                    return (
-                      <Field label={t('workMode')} htmlFor={`mode-${r.id}`}
-                        hint={t('workModeHint', { nonVisit: fees[0] ? formatRupiah(fees[0]) : '—', visit: fees[1] ? formatRupiah(fees[1]) : '—' })}>
-                        <Select id={`mode-${r.id}`} name="work_mode" defaultValue={r.visit_willing ? '' : 'non_visit'}>
-                          <option value="">{t('workModePick')}</option>
-                          <option value="non_visit">{tt('non_visit')}</option>
-                          <option value="visit" disabled={!r.visit_willing}>{tt('visit')}</option>
-                        </Select>
-                      </Field>
-                    );
-                  })()}
-                  {job.fee_type === 'open' && both && (
-                    <Field label={t('agreedFee')} hint={t('agreedFeeAutoHint')} htmlFor={`fee-${r.id}`}>
-                      <Input id={`fee-${r.id}`} name="fee" inputMode="numeric" className="tabular" />
-                    </Field>
-                  )}
-                  {job.fee_type === 'open' && !both && (
-                    <Field label={t('agreedFee')} htmlFor={`fee-${r.id}`}>
-                      <Input id={`fee-${r.id}`} name="fee" inputMode="numeric" defaultValue={r.proposed_rate ?? ''} className="tabular" />
-                    </Field>
-                  )}
-                  {job.fee_type === 'tier' && both && (
-                    <Field label={t('agreedFee')} hint={t('agreedFeeAutoHint')} htmlFor={`fee-${r.id}`}>
-                      <Input id={`fee-${r.id}`} name="fee" inputMode="numeric" className="tabular" />
-                    </Field>
-                  )}
-                  {job.fee_type === 'tier' && !both && (() => {
-                    // Suggested fee from the applicant's tier (verified or pending accounts); editable.
-                    const tier = creatorTier(job, accs.filter((a) => a.status !== 'rejected'));
-                    const fee = tier ? job.tier_fees[tier] : undefined;
-                    return (
-                      <Field label={t('agreedFee')} hint={tier ? t('tierFeeHint', { tier: ttier(tier) }) : undefined} htmlFor={`fee-${r.id}`}>
-                        <Input id={`fee-${r.id}`} name="fee" inputMode="numeric" defaultValue={fee ?? ''} className="tabular" />
-                      </Field>
-                    );
-                  })()}
-                  <div className="flex gap-2">
-                    <SubmitButton name="decision" value="approve" className="flex-1">{t('approve')}</SubmitButton>
-                    <SubmitButton name="decision" value="reject" variant="outline">{t('reject')}</SubmitButton>
-                  </div>
-                </ActionForm>
-              </Card>
-            );
-          })}
-        </div>
+                  <th scope="col" className="px-3 py-2 font-bold">{t('colDecision')}</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-garis">
+                {applicants.map((r) => {
+                  const accs = (accounts ?? []).filter((a) => a.creator_id === r.creator_id);
+                  const eligible = (a: SocialAccount) => job.platforms.includes(a.platform) && a.followers >= job.min_followers;
+                  const ready = accs.some((a) => a.status === 'verified' && eligible(a));
+                  const pending = !ready && accs.some((a) => a.status === 'pending' && eligible(a));
+                  const tier = creatorTier(job, accs.filter((a) => a.status !== 'rejected'));
+                  const fees = (['non_visit', 'visit'] as const).map((m) => modeFee(job, m, tier, r));
+                  return (
+                    <tr key={r.id} className="align-top">
+                      <td className="min-w-44 px-3 py-2">
+                        <Link href={`/admin/creator/${r.creator_id}`} className="font-bold text-nila-800 underline-offset-4 hover:underline">
+                          {r.profiles.full_name ?? r.profiles.email}
+                        </Link>
+                        <p className="text-teks-redup">
+                          {[r.profiles.city, r.profiles.gender && tg(r.profiles.gender), r.profiles.hijab && th(r.profiles.hijab), r.profiles.account_type && ta(r.profiles.account_type)].filter(Boolean).join(' · ')}
+                        </p>
+                        <p className="text-teks-redup">{[...r.profiles.categories.map((k) => tax.name('niche', k)), r.profiles.persona && tax.name('persona', r.profiles.persona)].filter(Boolean).join(' · ')}</p>
+                      </td>
+                      <td className="px-3 py-2">
+                        <ul className="space-y-0.5">
+                          {accs.map((a) => (
+                            <li key={a.id} className="flex items-center gap-1.5 whitespace-nowrap">
+                              <a href={a.url} target="_blank" rel="noreferrer" className="underline-offset-4 hover:underline">{tp(a.platform)} @{a.username}</a>
+                              <span className="tabular text-teks-redup">{a.followers.toLocaleString('id-ID')}</span>
+                              <span className={cn('size-2 rounded-full', a.status === 'verified' ? 'bg-sukses' : a.status === 'pending' ? 'bg-peringatan' : 'bg-bahaya')} title={tv(a.status)} aria-label={tv(a.status)} />
+                            </li>
+                          ))}
+                        </ul>
+                        {pending && <p className="mt-1 text-teks-redup">{t('acceptVerifies')}</p>}
+                        {!ready && !pending && <p className="mt-1 text-peringatan">{t('cannotAcceptShort')}</p>}
+                      </td>
+                      {(offersVisit(job) || job.fee_type === 'open') && (
+                        <td className="whitespace-nowrap px-3 py-2 tabular">
+                          {offersVisit(job) && (
+                            <Badge tone={r.visit_willing ? 'success' : 'neutral'} className="mb-1">{r.visit_willing ? t('willingVisitShort') : t('notWillingVisitShort')}</Badge>
+                          )}
+                          {r.proposed_rate && <p className="font-bold">{formatRupiah(r.proposed_rate)}</p>}
+                          {r.proposed_rate_visit && <p className="text-teks-redup">{t('visitRateShort', { amount: formatRupiah(r.proposed_rate_visit) })}</p>}
+                        </td>
+                      )}
+                      <td className="w-[300px] px-3 py-2">
+                        <ActionForm action={decideApplication} className="space-y-1.5">
+                          <input type="hidden" name="participation_id" value={r.id} />
+                          {(both || job.fee_type !== 'fixed') && (
+                            <div className="flex gap-1.5">
+                              {both && (
+                                <select name="work_mode" defaultValue={r.visit_willing ? '' : 'non_visit'} aria-label={t('workMode')}
+                                  className="h-9 min-w-0 flex-1 rounded-lg border border-garis bg-kertas px-2 text-[13px] text-teks focus:border-nila-500 focus:outline-none"
+                                  title={t('workModeHint', { nonVisit: fees[0] ? formatRupiah(fees[0]) : '—', visit: fees[1] ? formatRupiah(fees[1]) : '—' })}>
+                                  <option value="">{t('workModePickShort')}</option>
+                                  <option value="non_visit">{tt('non_visit')}{fees[0] ? ` · ${formatRupiah(fees[0])}` : ''}</option>
+                                  <option value="visit" disabled={!r.visit_willing}>{tt('visit')}{fees[1] ? ` · ${formatRupiah(fees[1])}` : ''}</option>
+                                </select>
+                              )}
+                              {job.fee_type !== 'fixed' && (
+                                <input name="fee" inputMode="numeric" aria-label={t('agreedFee')}
+                                  className="h-9 w-24 shrink-0 rounded-lg border border-garis bg-kertas px-2 text-[13px] text-teks tabular placeholder:text-teks-redup/70 focus:border-nila-500 focus:outline-none"
+                                  placeholder={both ? t('feeAuto') : undefined}
+                                  defaultValue={both ? '' : job.fee_type === 'open' ? r.proposed_rate ?? '' : (tier ? job.tier_fees[tier] : undefined) ?? ''} />
+                              )}
+                            </div>
+                          )}
+                          <div className="flex gap-1.5">
+                            <SubmitButton name="decision" value="approve" size="sm">{t('approve')}</SubmitButton>
+                            <SubmitButton name="decision" value="reject" variant="outline" size="sm">{t('reject')}</SubmitButton>
+                          </div>
+                        </ActionForm>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
       </section>
 
       <section className="space-y-3">
@@ -191,7 +211,7 @@ export default async function AdminJob({ params }: { params: Promise<{ id: strin
                 <Card className="flex flex-wrap items-center justify-between gap-2 hover:border-nila-300">
                   <div>
                     <p className="font-bold">{r.profiles.full_name ?? r.profiles.email}</p>
-                    <p className="text-[13px] text-teks-redup">{next ? tw(next.key) : tw('stepPaid')}</p>
+                    <p className="text-[13px] text-teks-redup">{next ? t('waitingFor', { step: tw(next.key) }) : tw('stepPaid')}</p>
                   </div>
                   <div className="flex items-center gap-2">
                     {both && r.work_mode && <Badge tone={r.work_mode === 'visit' ? 'warning' : 'success'}>{tt(r.work_mode)}</Badge>}

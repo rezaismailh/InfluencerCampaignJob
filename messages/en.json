@@ -825,7 +825,43 @@
       "notesHint": "Only the Tali team sees these, never the creator.",
       "notePlaceholder": "E.g. responsive, tidy content, good for food jobs",
       "addNote": "Save note"
-    }
+    },
+    "colCreator": "Creator",
+    "colProfile": "Profile",
+    "colAccounts": "Social accounts",
+    "colVisit": "Visit",
+    "colRate": "Proposed rate",
+    "colDecision": "Decision",
+    "cannotAcceptShort": "Cannot be accepted yet (account rejected/missing/too few followers)",
+    "willingVisitShort": "Willing",
+    "notWillingVisitShort": "Non-visit only",
+    "visitRateShort": "visit {amount}",
+    "feeAuto": "Auto fee",
+    "colSubmitted": "Received",
+    "colJob": "Job",
+    "colKind": "Submission",
+    "colStatus": "Status",
+    "colDue": "Review due",
+    "colAction": "Action",
+    "openSubmission": "Open submission",
+    "reviewDetail": "Review",
+    "reviewQueueHint": "{count} submissions waiting. Approve here, or open Review to give feedback.",
+    "waitingFor": "Next step: {step}",
+    "colVisitRate": "Visit & rate",
+    "statusAction": {
+      "draft_open": "Open applications",
+      "open_closed": "Close applications",
+      "closed_open": "Reopen",
+      "closed_completed": "Mark as done",
+      "completed_closed": "Undo done"
+    },
+    "statusHint": {
+      "draft": "Draft: not shown to creators yet.",
+      "open": "Open: listed and creators can apply.",
+      "closed": "Closed: not listed and no new applications. Accepted creators keep working.",
+      "completed": "Done: the campaign is finished. Not listed, no applications; data and history are kept."
+    },
+    "workModePickShort": "Pick mode"
   },
   "errors": {
     "generic": "Something didn't work. Try again in a moment.",

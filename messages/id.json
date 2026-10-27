@@ -825,7 +825,43 @@
       "notesHint": "Hanya terlihat oleh tim Tali, tidak oleh creator.",
       "notePlaceholder": "Contoh: responsif, hasil konten rapi, cocok untuk job kuliner",
       "addNote": "Simpan catatan"
-    }
+    },
+    "colCreator": "Creator",
+    "colProfile": "Profil",
+    "colAccounts": "Akun sosmed",
+    "colVisit": "Visit",
+    "colRate": "Rate diajukan",
+    "colDecision": "Keputusan",
+    "cannotAcceptShort": "Belum bisa diterima (akun ditolak/belum ada/followers kurang)",
+    "willingVisitShort": "Bersedia",
+    "notWillingVisitShort": "Non-visit saja",
+    "visitRateShort": "visit {amount}",
+    "feeAuto": "Fee otomatis",
+    "colSubmitted": "Masuk",
+    "colJob": "Job",
+    "colKind": "Kiriman",
+    "colStatus": "Status",
+    "colDue": "Batas review",
+    "colAction": "Aksi",
+    "openSubmission": "Lihat kiriman",
+    "reviewDetail": "Review",
+    "reviewQueueHint": "{count} kiriman menunggu. Setujui langsung dari sini, atau buka Review untuk memberi feedback.",
+    "waitingFor": "Tahap berikutnya: {step}",
+    "colVisitRate": "Visit & rate",
+    "statusAction": {
+      "draft_open": "Buka pendaftaran",
+      "open_closed": "Tutup pendaftaran",
+      "closed_open": "Buka lagi",
+      "closed_completed": "Tandai selesai",
+      "completed_closed": "Batalkan selesai"
+    },
+    "statusHint": {
+      "draft": "Draft: belum tampil ke creator.",
+      "open": "Buka: tampil di daftar job dan creator bisa mendaftar.",
+      "closed": "Ditutup: tidak tampil di daftar job dan tidak menerima pendaftar baru. Creator yang sudah diterima tetap lanjut bekerja.",
+      "completed": "Selesai: campaign sudah beres. Tidak tampil dan tidak menerima pendaftar; data dan riwayat tetap tersimpan."
+    },
+    "workModePickShort": "Pilih mode"
   },
   "errors": {
     "generic": "Ada yang belum berhasil. Coba lagi sebentar lagi.",

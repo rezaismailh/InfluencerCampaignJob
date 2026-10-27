@@ -742,7 +742,8 @@
       "group": {
         "profile": "Profil",
         "social": "Akun sosmed",
-        "activity": "Aktivitas"
+        "activity": "Aktivitas",
+        "platforms": "Per platform"
       },
       "preset": {
         "default": "Default",
@@ -790,7 +791,40 @@
       "anyJob": "Pernah diterima: semua",
       "hasJobYes": "Pernah diterima job",
       "hasJobNo": "Belum pernah diterima",
-      "clearFilters": "Hapus filter"
+      "clearFilters": "Hapus filter",
+      "selected": "{count} creator dipilih",
+      "inviteToJob": "Undang ke job",
+      "clearSelection": "Batal pilih",
+      "selectAll": "Pilih semua yang tampil",
+      "selectOne": "Pilih {name}",
+      "noOpenJobs": "Belum ada job berstatus Buka atau Draft.",
+      "inviteJob": "Job",
+      "pickJob": "Pilih job",
+      "inviteMode": "Dikerjakan sebagai",
+      "pickMode": "Pilih mode",
+      "inviteFee": "Fee (Rp)",
+      "inviteFeeOpenHint": "Wajib untuk job open rate. Sama untuk semua yang diundang.",
+      "inviteFeeTierHint": "Kosongkan untuk fee sesuai tier masing-masing.",
+      "inviting": "Mengundang…",
+      "inviteCta": "Undang {count} creator",
+      "inviteResult": "{ok} dari {total} creator berhasil diundang.",
+      "platformsHint": "Kolom terpisah per platform, misalnya hanya TikTok username dan followers. Akun yang ditolak tidak ikut.",
+      "pcol": {
+        "username": "username",
+        "followers": "followers",
+        "link": "link"
+      },
+      "registeredOn": "Terdaftar {date}",
+      "profileTitle": "Profil",
+      "address": "Alamat",
+      "sizeLine": "Ukuran akun: {tier}, followers terbesar {followers}",
+      "historyTitle": "Riwayat job ({count})",
+      "historyEmpty": "Belum pernah daftar job.",
+      "postedOn": "tayang {date}",
+      "notesTitle": "Catatan tim",
+      "notesHint": "Hanya terlihat oleh tim Tali, tidak oleh creator.",
+      "notePlaceholder": "Contoh: responsif, hasil konten rapi, cocok untuk job kuliner",
+      "addNote": "Simpan catatan"
     }
   },
   "errors": {
@@ -865,7 +899,8 @@
     "rate_visit_required": "Isi rate kalau visit.",
     "rate_visit_above_cap": "Rate visit melebihi batas.",
     "work_mode_required": "Pilih dikerjakan sebagai visit atau non-visit.",
-    "not_willing_to_visit": "Creator ini tidak bersedia visit."
+    "not_willing_to_visit": "Creator ini tidak bersedia visit.",
+    "already_in_job": "Creator ini sudah ada di job tersebut."
   },
   "success": {
     "saved": "Tersimpan.",

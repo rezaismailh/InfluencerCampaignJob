@@ -742,7 +742,8 @@
       "group": {
         "profile": "Profile",
         "social": "Social accounts",
-        "activity": "Activity"
+        "activity": "Activity",
+        "platforms": "Per platform"
       },
       "preset": {
         "default": "Default",
@@ -790,7 +791,40 @@
       "anyJob": "Accepted before: all",
       "hasJobYes": "Accepted for a job",
       "hasJobNo": "Never accepted",
-      "clearFilters": "Clear filters"
+      "clearFilters": "Clear filters",
+      "selected": "{count} creators selected",
+      "inviteToJob": "Invite to job",
+      "clearSelection": "Clear selection",
+      "selectAll": "Select all shown",
+      "selectOne": "Select {name}",
+      "noOpenJobs": "No jobs are Open or Draft yet.",
+      "inviteJob": "Job",
+      "pickJob": "Choose a job",
+      "inviteMode": "Done as",
+      "pickMode": "Choose a mode",
+      "inviteFee": "Fee (Rp)",
+      "inviteFeeOpenHint": "Required for open-rate jobs. The same for everyone invited.",
+      "inviteFeeTierHint": "Leave empty to use each creator's tier fee.",
+      "inviting": "Inviting…",
+      "inviteCta": "Invite {count} creators",
+      "inviteResult": "{ok} of {total} creators invited.",
+      "platformsHint": "Separate columns per platform, e.g. only TikTok username and followers. Rejected accounts are left out.",
+      "pcol": {
+        "username": "username",
+        "followers": "followers",
+        "link": "link"
+      },
+      "registeredOn": "Registered {date}",
+      "profileTitle": "Profile",
+      "address": "Address",
+      "sizeLine": "Account size: {tier}, largest followers {followers}",
+      "historyTitle": "Job history ({count})",
+      "historyEmpty": "Has not applied to any job yet.",
+      "postedOn": "posted {date}",
+      "notesTitle": "Team notes",
+      "notesHint": "Only the Tali team sees these, never the creator.",
+      "notePlaceholder": "E.g. responsive, tidy content, good for food jobs",
+      "addNote": "Save note"
     }
   },
   "errors": {
@@ -865,7 +899,8 @@
     "rate_visit_required": "Fill in your visit rate.",
     "rate_visit_above_cap": "The visit rate is above the cap.",
     "work_mode_required": "Choose visit or non-visit.",
-    "not_willing_to_visit": "This creator is not willing to visit."
+    "not_willing_to_visit": "This creator is not willing to visit.",
+    "already_in_job": "This creator is already in that job."
   },
   "success": {
     "saved": "Saved.",

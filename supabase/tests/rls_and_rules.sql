@@ -520,3 +520,15 @@ select public.mark_offline_approved((select id from public.participations where 
 select tests.check((select count(*) = 1 and bool_and(s.offline and s.status = 'approved' and s.content is not null) from public.submissions s
   join public.participations p on p.id = s.participation_id where p.job_id = '20000000-0000-0000-0000-0000000000c2'), 'pending submission approved in place');
 reset role;
+
+-- Creator notes: staff only ------------------------------------------------------
+set role authenticated;
+select tests.act_as('00000000-0000-0000-0000-000000000002');
+insert into public.creator_notes (creator_id, body) values ('00000000-0000-0000-0000-00000000000a', 'Responsif, cocok untuk job kuliner');
+select tests.expect_error($$insert into public.creator_notes (creator_id, author_id, body) values ('00000000-0000-0000-0000-00000000000a', '00000000-0000-0000-0000-000000000001', 'x')$$, 'row-level security');
+select tests.act_as('00000000-0000-0000-0000-00000000000a');
+select tests.check((select count(*) = 0 from public.creator_notes), 'creator cannot read notes about them');
+select tests.expect_error($$insert into public.creator_notes (creator_id, body) values ('00000000-0000-0000-0000-00000000000a', 'x')$$, 'row-level security');
+select tests.act_as('00000000-0000-0000-0000-000000000003');
+select tests.check((select count(*) = 1 from public.creator_notes), 'finance can read notes');
+reset role;

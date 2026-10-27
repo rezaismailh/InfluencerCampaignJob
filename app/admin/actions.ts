@@ -248,6 +248,39 @@ export async function inviteCreator(_prev: ActionState, formData: FormData): Pro
   return { ok: true, success: 'submitted' };
 }
 
+/** Invites several creators to one job (Admin → Creator). Returns one result per creator. */
+export async function inviteCreators(input: { jobId: string; creatorIds: string[]; fee: string; mode: string }): Promise<{ id: string; error: string | null }[]> {
+  const viewer = await requireStaff('curator');
+  const ids = [...new Set(input.creatorIds)].slice(0, 200);
+  const results: { id: string; error: string | null }[] = [];
+  for (const id of ids) {
+    const { error } = await viewer.supabase.rpc('invite_creator', {
+      p_job: input.jobId, p_creator: id, p_fee: parseRupiah(input.fee), p_mode: input.mode || null,
+    });
+    results.push({ id, error: error ? (error.code === '23505' ? 'already_in_job' : dbErrorKey(error)) : null });
+  }
+  if (results.some((r) => !r.error)) deliverLater();
+  revalidatePath('/admin', 'layout');
+  return results;
+}
+
+export async function addCreatorNote(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const viewer = await requireStaff('curator');
+  const creator = text(formData.get('creator_id'));
+  const body = text(formData.get('body'));
+  if (!body) return { error: 'required', fields: { body: 'required' } };
+  const { error } = await viewer.supabase.from('creator_notes').insert({ creator_id: creator, body: body.slice(0, 2000), author_id: viewer.id });
+  if (error) return { error: dbErrorKey(error) };
+  revalidatePath(`/admin/creator/${creator}`);
+  return { ok: true, success: 'saved' };
+}
+
+export async function deleteCreatorNote(formData: FormData) {
+  const viewer = await requireStaff('curator');
+  await viewer.supabase.from('creator_notes').delete().eq('id', text(formData.get('id'))).eq('author_id', viewer.id);
+  revalidatePath(`/admin/creator/${text(formData.get('creator_id'))}`);
+}
+
 export async function cancelParticipation(_prev: ActionState, formData: FormData): Promise<ActionState> {
   const viewer = await requireStaff('curator');
   const part = text(formData.get('participation_id'));

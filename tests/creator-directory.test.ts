@@ -50,3 +50,16 @@ describe('sortRows and columns', () => {
     expect(cleanColumns(PRESETS.performance, PRESETS.performance.filter((k) => k !== 'paid'))).not.toContain('paid');
   });
 });
+
+describe('platform columns', () => {
+  it('reads per-platform values from the main account, skipping rejected ones', async () => {
+    const { accountOn, platformColumn } = await import('@/lib/creator-directory');
+    const a = rows.find((r) => r.id === 'a')!;
+    expect(platformColumn('tiktok_followers')).toEqual({ platform: 'tiktok', field: 'followers' });
+    expect(platformColumn('name')).toBeNull();
+    expect(accountOn(a, 'tiktok')?.username).toBe('rani');
+    expect(accountOn(a, 'instagram')).toBeNull();
+    expect(cleanColumns(['name', 'tiktok_username', 'tiktok_followers', 'myspace_followers'])).toEqual(['name', 'tiktok_username', 'tiktok_followers']);
+    expect(sortRows(rows, { key: 'tiktok_followers', dir: 'desc' })[0].id).toBe('a');
+  });
+});

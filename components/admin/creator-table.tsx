@@ -2,13 +2,13 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
-import { ArrowDown, ArrowUp, ChevronDown, ChevronUp, Columns3, Download, Search, SlidersHorizontal, X } from 'lucide-react';
+import { ArrowDown, ArrowUp, ChevronDown, ChevronUp, Columns3, Download, Search, Send, SlidersHorizontal, X } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input, Select } from '@/components/ui/field';
 import { verificationTone } from '@/components/status';
 import {
-  ALL_COLUMNS, COLUMN_GROUPS, EMPTY_FILTERS, PRESETS, cleanColumns, filterRows, sortRows,
+  ALL_COLUMNS, COLUMN_GROUPS, EMPTY_FILTERS, PLATFORM_FIELDS, PRESETS, accountOn, cleanColumns, filterRows, platformColumn, sortRows,
   type ColumnKey, type CreatorRow, type Filters, type Sort,
 } from '@/lib/creator-directory';
 import { formatDate, todayWib } from '@/lib/dates';
@@ -18,13 +18,15 @@ import { TIERS } from '@/lib/tiers';
 import { ACCOUNT_TYPES, GENDERS, HIJAB } from '@/lib/visit';
 import { xlsx, type Cell } from '@/lib/xlsx';
 import { cn } from '@/lib/cn';
+import Link from 'next/link';
+import { InvitePanel, type InviteJob } from '@/components/admin/invite-panel';
 
 const STORAGE_KEY = 'tali.admin.creatorColumns';
 const PAGE = 50;
 const NUMERIC: ColumnKey[] = ['maxFollowers', 'applied', 'approved', 'completed', 'paid'];
 
 /** All registered creators: search, filters, sortable columns, a column picker with presets, and Excel export. */
-export function CreatorTable({ rows, niches, canSeePaid }: { rows: CreatorRow[]; niches: string[]; canSeePaid: boolean }) {
+export function CreatorTable({ rows, niches, canSeePaid, jobs }: { rows: CreatorRow[]; niches: string[]; canSeePaid: boolean; jobs: InviteJob[] }) {
   const t = useTranslations('admin.creators');
   const tp = useTranslations('platform');
   const ttier = useTranslations('tier');
@@ -41,6 +43,8 @@ export function CreatorTable({ rows, niches, canSeePaid }: { rows: CreatorRow[];
   const [sort, setSort] = useState<Sort>({ key: 'createdAt', dir: 'desc' });
   const [limit, setLimit] = useState(PAGE);
   const [columns, setColumns] = useState<ColumnKey[]>(() => cleanColumns(null, allowed));
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [inviting, setInviting] = useState(false);
 
   // The column choice is a per-browser convenience; the page works without it.
   useEffect(() => {
@@ -60,9 +64,18 @@ export function CreatorTable({ rows, niches, canSeePaid }: { rows: CreatorRow[];
   const set = <K extends keyof Filters>(key: K, value: Filters[K]) => { setFilters((f) => ({ ...f, [key]: value })); setLimit(PAGE); };
 
   const count = (n: number) => n.toLocaleString('id-ID');
+  const label = (k: ColumnKey) => {
+    const pc = platformColumn(k);
+    return pc ? `${tp(pc.platform)} ${t(`pcol.${pc.field}`)}` : t(`col.${k}`);
+  };
   const yesNo = (v: boolean) => (v ? t('yes') : t('no'));
   /** Plain value for export and title attributes. */
   const text = (r: CreatorRow, k: ColumnKey): Cell => {
+    const pc = platformColumn(k);
+    if (pc) {
+      const a = accountOn(r, pc.platform);
+      return !a ? '' : pc.field === 'followers' ? a.followers : pc.field === 'username' ? `@${a.username}` : a.url;
+    }
     switch (k) {
       case 'gender': return r.gender ? tg(r.gender) : '';
       case 'hijab': return r.hijab ? th(r.hijab) : '';
@@ -74,12 +87,24 @@ export function CreatorTable({ rows, niches, canSeePaid }: { rows: CreatorRow[];
       case 'createdAt': return r.createdAt.slice(0, 10);
       case 'onboarded': case 'installed': return yesNo(r[k]);
       case 'paid': return r.paid ?? '';
-      default: return r[k] as Cell;
+      default: return r[k as keyof CreatorRow] as Cell;
     }
   };
   const cell = (r: CreatorRow, k: ColumnKey) => {
+    const pc = platformColumn(k);
+    if (pc) {
+      const a = accountOn(r, pc.platform);
+      if (!a) return <span className="text-teks-redup">—</span>;
+      if (pc.field === 'followers') return <span className="tabular">{count(a.followers)}</span>;
+      return <a href={a.url} target="_blank" rel="noreferrer" className="whitespace-nowrap underline-offset-4 hover:underline">{pc.field === 'username' ? `@${a.username}` : a.url}</a>;
+    }
     switch (k) {
-      case 'name': return <span className="font-bold">{r.name || <span className="font-normal text-teks-redup">{r.email}</span>}</span>;
+      case 'name':
+        return (
+          <Link href={`/admin/creator/${r.id}`} className="font-bold text-nila-800 underline-offset-4 hover:underline">
+            {r.name || <span className="font-normal text-teks-redup">{r.email}</span>}
+          </Link>
+        );
       case 'accounts':
         return (
           <ul className="space-y-0.5">
@@ -103,7 +128,7 @@ export function CreatorTable({ rows, niches, canSeePaid }: { rows: CreatorRow[];
   };
 
   function exportXlsx() {
-    const file = xlsx(t('sheetName'), columns.map((k) => t(`col.${k}`)), shown.map((r) => columns.map((k) => text(r, k))));
+    const file = xlsx(t('sheetName'), columns.map(label), shown.map((r) => columns.map((k) => text(r, k))));
     const url = URL.createObjectURL(new Blob([file as BlobPart], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }));
     const a = Object.assign(document.createElement('a'), { href: url, download: `creator-${todayWib()}.xlsx` });
     a.click();
@@ -186,7 +211,7 @@ export function CreatorTable({ rows, niches, canSeePaid }: { rows: CreatorRow[];
                   <label key={k} className="flex min-h-9 items-center gap-2 text-[15px]">
                     <input type="checkbox" className="size-4 accent-nila-800" checked={columns.includes(k)} disabled={k === 'name'}
                       onChange={(e) => saveColumns(e.target.checked ? [...columns, k] : columns.filter((c) => c !== k))} />
-                    {t(`col.${k}`)}
+                    {label(k)}
                   </label>
                 ))}
               </fieldset>
@@ -196,7 +221,7 @@ export function CreatorTable({ rows, niches, canSeePaid }: { rows: CreatorRow[];
               <ol className="space-y-1">
                 {columns.map((k, i) => (
                   <li key={k} className="flex items-center gap-1 rounded-lg bg-latar px-2 py-1 text-[15px]">
-                    <span className="min-w-0 flex-1 truncate">{t(`col.${k}`)}</span>
+                    <span className="min-w-0 flex-1 truncate">{label(k)}</span>
                     <button type="button" className="rounded p-1 hover:bg-kertas disabled:opacity-30" disabled={i === 0} aria-label={t('moveUp')}
                       onClick={() => saveColumns(columns.map((c, j) => (j === i - 1 ? k : j === i ? columns[i - 1] : c)))}>
                       <ChevronUp className="size-4" aria-hidden />
@@ -210,23 +235,71 @@ export function CreatorTable({ rows, niches, canSeePaid }: { rows: CreatorRow[];
               </ol>
             </div>
           </div>
+          <fieldset className="space-y-2 border-t border-garis pt-3">
+            <legend className="text-[13px] font-bold uppercase tracking-wide text-teks-redup">{t('group.platforms')}</legend>
+            <p className="text-[13px] text-teks-redup">{t('platformsHint')}</p>
+            <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+              {PLATFORMS.map((pl) => (
+                <div key={pl} className="rounded-xl bg-latar p-2">
+                  <p className="text-[13px] font-bold">{tp(pl)}</p>
+                  <div className="flex flex-wrap gap-x-3">
+                    {PLATFORM_FIELDS.map((f) => {
+                      const k = `${pl}_${f}` as ColumnKey;
+                      return (
+                        <label key={k} className="flex min-h-9 items-center gap-2 text-[15px]">
+                          <input type="checkbox" className="size-4 accent-nila-800" checked={columns.includes(k)}
+                            onChange={(e) => saveColumns(e.target.checked ? [...columns, k] : columns.filter((c) => c !== k))} />
+                          {t(`pcol.${f}`)}
+                        </label>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </fieldset>
         </div>
       )}
 
       <p className="text-[13px] text-teks-redup">{t('showing', { shown: count(shown.length), total: count(rows.length) })}</p>
 
+      {selected.size > 0 && (
+        <div className="sticky top-16 z-[2] space-y-3 rounded-2xl border border-nila-300 bg-nila-50 p-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-[15px] font-bold">{t('selected', { count: selected.size })}</span>
+            <Button type="button" size="sm" onClick={() => setInviting((v) => !v)} aria-expanded={inviting}>
+              <Send className="size-4" aria-hidden /> {t('inviteToJob')}
+            </Button>
+            <Button type="button" variant="ghost" size="sm" onClick={() => { setSelected(new Set()); setInviting(false); }}>{t('clearSelection')}</Button>
+          </div>
+          {inviting && (
+            <InvitePanel jobs={jobs} creators={rows.filter((r) => selected.has(r.id)).map((r) => ({ id: r.id, name: r.name || r.email }))}
+              onDone={() => setSelected(new Set())} />
+          )}
+        </div>
+      )}
+
       <div className="overflow-x-auto rounded-2xl border border-garis bg-kertas">
         <table className="w-full min-w-max text-left text-[13px]">
           <thead className="bg-latar text-teks-redup">
             <tr>
-              {columns.map((k, i) => {
+              <th scope="col" className="w-10 px-3 py-2">
+                <input type="checkbox" className="size-4 accent-nila-800" aria-label={t('selectAll')}
+                  checked={shown.length > 0 && shown.slice(0, limit).every((r) => selected.has(r.id))}
+                  onChange={(e) => setSelected((cur) => {
+                    const next = new Set(cur);
+                    for (const r of shown.slice(0, limit)) { if (e.target.checked) next.add(r.id); else next.delete(r.id); }
+                    return next;
+                  })} />
+              </th>
+              {columns.map((k) => {
                 const active = sort.key === k;
                 return (
-                  <th key={k} scope="col" className={cn('px-3 py-2 font-bold', i === 0 && 'sticky left-0 z-[1] bg-latar', NUMERIC.includes(k) && 'text-right')}
+                  <th key={k} scope="col" className={cn('px-3 py-2 font-bold', NUMERIC.includes(k) && 'text-right')}
                     aria-sort={active ? (sort.dir === 'asc' ? 'ascending' : 'descending') : undefined}>
                     <button type="button" className="inline-flex items-center gap-1 hover:text-teks"
                       onClick={() => setSort((s) => ({ key: k, dir: s.key === k && s.dir === 'desc' ? 'asc' : 'desc' }))}>
-                      {t(`col.${k}`)}
+                      {label(k)}
                       {active && (sort.dir === 'asc' ? <ArrowUp className="size-3.5" aria-hidden /> : <ArrowDown className="size-3.5" aria-hidden />)}
                     </button>
                   </th>
@@ -236,14 +309,18 @@ export function CreatorTable({ rows, niches, canSeePaid }: { rows: CreatorRow[];
           </thead>
           <tbody className="divide-y divide-garis">
             {shown.slice(0, limit).map((r) => (
-              <tr key={r.id} className="align-top hover:bg-latar/60">
-                {columns.map((k, i) => (
-                  <td key={k} className={cn('px-3 py-2', i === 0 && 'sticky left-0 bg-kertas', NUMERIC.includes(k) && 'text-right')}>{cell(r, k)}</td>
+              <tr key={r.id} className={cn('align-top hover:bg-latar/60', selected.has(r.id) && 'bg-nila-50/60')}>
+                <td className="px-3 py-2">
+                  <input type="checkbox" className="size-4 accent-nila-800" aria-label={t('selectOne', { name: r.name || r.email })} checked={selected.has(r.id)}
+                    onChange={(e) => setSelected((cur) => { const next = new Set(cur); if (e.target.checked) next.add(r.id); else next.delete(r.id); return next; })} />
+                </td>
+                {columns.map((k) => (
+                  <td key={k} className={cn('px-3 py-2', NUMERIC.includes(k) && 'text-right')}>{cell(r, k)}</td>
                 ))}
               </tr>
             ))}
             {!shown.length && (
-              <tr><td colSpan={columns.length} className="px-3 py-8 text-center text-[15px] text-teks-redup">{t('empty')}</td></tr>
+              <tr><td colSpan={columns.length + 1} className="px-3 py-8 text-center text-[15px] text-teks-redup">{t('empty')}</td></tr>
             )}
           </tbody>
         </table>

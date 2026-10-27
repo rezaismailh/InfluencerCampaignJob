@@ -3,7 +3,7 @@
 
 import { tierFor, type Tier } from './tiers';
 import type { AccountType, Gender, Hijab, ParticipationStatus, VerificationStatus } from './types';
-import type { Platform } from './social';
+import { PLATFORMS, type Platform } from './social';
 
 export type DirAccount = { platform: Platform; username: string; url: string; followers: number; status: VerificationStatus };
 
@@ -38,8 +38,26 @@ export const COLUMN_GROUPS = {
   social: ['accounts', 'maxFollowers', 'tier', 'verification'],
   activity: ['applied', 'approved', 'completed', 'paid', 'createdAt', 'onboarded', 'installed'],
 } as const;
-export type ColumnKey = (typeof COLUMN_GROUPS)[keyof typeof COLUMN_GROUPS][number];
-export const ALL_COLUMNS = Object.values(COLUMN_GROUPS).flat() as ColumnKey[];
+
+// One set of columns per platform (e.g. "tiktok_followers"), so an export can carry
+// just the platforms a brand cares about, each value in its own cell.
+export const PLATFORM_FIELDS = ['username', 'followers', 'link'] as const;
+export type PlatformField = (typeof PLATFORM_FIELDS)[number];
+export type PlatformColumn = `${Platform}_${PlatformField}`;
+export const PLATFORM_COLUMNS = PLATFORMS.flatMap((p) => PLATFORM_FIELDS.map((f) => `${p}_${f}` as PlatformColumn));
+
+export type ColumnKey = (typeof COLUMN_GROUPS)[keyof typeof COLUMN_GROUPS][number] | PlatformColumn;
+export const ALL_COLUMNS = [...Object.values(COLUMN_GROUPS).flat(), ...PLATFORM_COLUMNS] as ColumnKey[];
+
+export function platformColumn(key: ColumnKey): { platform: Platform; field: PlatformField } | null {
+  const m = /^([a-z]+)_(username|followers|link)$/.exec(key);
+  return m && (PLATFORMS as readonly string[]).includes(m[1]) ? { platform: m[1] as Platform, field: m[2] as PlatformField } : null;
+}
+
+/** The creator's main account on a platform: the largest one that is not rejected. */
+export function accountOn(r: CreatorRow, platform: Platform): DirAccount | null {
+  return r.accounts.find((a) => a.platform === platform && a.status !== 'rejected') ?? null;
+}
 
 export const PRESETS: Record<'default' | 'curation' | 'contact' | 'performance', ColumnKey[]> = {
   default: ['name', 'city', 'gender', 'accountType', 'niches', 'accounts', 'tier', 'verification', 'applied', 'approved', 'createdAt'],
@@ -152,6 +170,11 @@ export function filterRows(rows: CreatorRow[], f: Filters): CreatorRow[] {
 export type Sort = { key: ColumnKey; dir: 'asc' | 'desc' };
 
 function sortValue(r: CreatorRow, key: ColumnKey): string | number {
+  const pc = platformColumn(key);
+  if (pc) {
+    const a = accountOn(r, pc.platform);
+    return pc.field === 'followers' ? a?.followers ?? -1 : (pc.field === 'username' ? a?.username : a?.url)?.toLowerCase() ?? '';
+  }
   switch (key) {
     case 'accounts': case 'maxFollowers': return r.maxFollowers;
     case 'tier': return r.maxFollowers;
@@ -160,7 +183,7 @@ function sortValue(r: CreatorRow, key: ColumnKey): string | number {
     case 'applied': case 'approved': case 'completed': return r[key];
     case 'paid': return r.paid ?? 0;
     case 'onboarded': case 'installed': return r[key] ? 1 : 0;
-    default: return String(r[key] ?? '').toLowerCase();
+    default: return String(r[key as keyof CreatorRow] ?? '').toLowerCase();
   }
 }
 

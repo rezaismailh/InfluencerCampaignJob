@@ -1,6 +1,7 @@
 import { getTranslations } from 'next-intl/server';
 import { PageHeader } from '@/components/ui/page';
 import { CreatorTable } from '@/components/admin/creator-table';
+import type { InviteJob } from '@/components/admin/invite-panel';
 import { canFinance, requireStaff, type Viewer } from '@/lib/auth';
 import { buildRows, type DirAccount } from '@/lib/creator-directory';
 import { decrypt } from '@/lib/crypto';
@@ -48,7 +49,10 @@ export default async function Creators() {
   const t = await getTranslations('admin.creators');
   const tax = await loadTaxonomy();
   const finance = canFinance(viewer.profile.role);
-  const [profiles, accounts, parts, payouts] = await load(viewer, finance);
+  const [[profiles, accounts, parts, payouts], { data: jobs }] = await Promise.all([
+    load(viewer, finance),
+    viewer.supabase.from('jobs').select('id, title, job_type, fee_type').in('status', ['open', 'draft']).order('created_at', { ascending: false }).returns<InviteJob[]>(),
+  ]);
 
   const paid = payouts ? new Map<string, number>() : undefined;
   for (const p of payouts ?? []) paid!.set(p.creator_id, (paid!.get(p.creator_id) ?? 0) + p.gross);
@@ -62,7 +66,7 @@ export default async function Creators() {
   return (
     <div>
       <PageHeader title={t('title')} subtitle={t('subtitle')} />
-      <CreatorTable rows={rows} niches={tax.choices('niche', []).map((c) => c.label)} canSeePaid={finance} />
+      <CreatorTable rows={rows} niches={tax.choices('niche', []).map((c) => c.label)} canSeePaid={finance} jobs={jobs ?? []} />
     </div>
   );
 }

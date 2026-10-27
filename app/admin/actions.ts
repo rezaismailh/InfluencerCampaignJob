@@ -264,6 +264,18 @@ export async function inviteCreators(input: { jobId: string; creatorIds: string[
   return results;
 }
 
+/** Quick status change from the job page: open, close registration, or mark the job done. */
+export async function setJobStatus(formData: FormData) {
+  const viewer = await requireStaff('curator');
+  const id = text(formData.get('id'));
+  const status = text(formData.get('status'));
+  if (!['draft', 'open', 'closed', 'completed'].includes(status)) return;
+  await viewer.supabase.from('jobs').update({ status }).eq('id', id);
+  revalidatePath('/admin', 'layout');
+  revalidatePath('/job');
+  revalidatePath(`/job/${id}`);
+}
+
 export async function addCreatorNote(_prev: ActionState, formData: FormData): Promise<ActionState> {
   const viewer = await requireStaff('curator');
   const creator = text(formData.get('creator_id'));

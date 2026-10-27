@@ -322,7 +322,8 @@
     "quickBody": "Fill this in once here; it also becomes your profile for future jobs.",
     "quickSocial": "Your {platforms} account",
     "quickSubmit": "Send application",
-    "quickSaved": "Your details are saved to your Profile and can be changed any time."
+    "quickSaved": "Your details are saved to your Profile and can be changed any time.",
+    "inviteReview": "If you accept, you join the shortlist the client reviews first. The Tali team will let you know if you're selected."
   },
   "work": {
     "title": "Work",
@@ -452,7 +453,7 @@
     "markAllRead": "Mark all as read",
     "application_approved": "You were selected for {job}. Fee {fee}.",
     "application_rejected": "You weren't selected for {job}. Check other open jobs.",
-    "invited": "You're invited to {job} with a fee of {fee}.",
+    "invited": "You're invited to {job} with a fee of {fee}. Accept to join the client's selection.",
     "participation_cancelled": "The Tali team cancelled your work. {reason}",
     "submission_approved": "Your {kind} was approved.",
     "submission_revision": "Your {kind} needs a revision. See the feedback.",
@@ -829,7 +830,8 @@
       "notesTitle": "Team notes",
       "notesHint": "Only the Tali team sees these, never the creator.",
       "notePlaceholder": "E.g. responsive, tidy content, good for food jobs",
-      "addNote": "Save note"
+      "addNote": "Save note",
+      "inviteReviewHint": "Creators who accept join the applicants list and are still reviewed by the client before being accepted."
     },
     "colCreator": "Creator",
     "colProfile": "Profile",
@@ -866,7 +868,10 @@
       "closed": "Closed: not listed and no new applications. Accepted creators keep working.",
       "completed": "Done: the campaign is finished. Not listed, no applications; data and history are kept."
     },
-    "workModePickShort": "Pick mode"
+    "workModePickShort": "Pick mode",
+    "invitedBadge": "Invited",
+    "offeredFee": "Offered fee: {amount}",
+    "inviteReviewHint": "Creators who accept join the applicants list and are still reviewed by the client before being accepted."
   },
   "errors": {
     "generic": "Something didn't work. Try again in a moment.",

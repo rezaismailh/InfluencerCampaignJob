@@ -39,6 +39,7 @@ export function InvitePanel({ jobs, creators, onDone, compact }: { jobs: InviteJ
 
   return (
     <form onSubmit={submit} className="space-y-3">
+      <p className="text-[13px] text-teks-redup">{t('inviteReviewHint')}</p>
       <div className={compact ? 'grid gap-3' : 'grid gap-3 md:grid-cols-3'}>
         <Field label={t('inviteJob')} htmlFor="invite-job">
           <Select id="invite-job" value={jobId} onChange={(e) => { setJobId(e.target.value); setResults(null); }} required>

@@ -377,6 +377,7 @@ export default async function JobDetail({ params }: { params: Promise<{ id: stri
         return (
           <ActionBar>
             <p className="font-bold">{t('inviteFee', { amount: formatRupiah(part.agreed_fee ?? 0) })}</p>
+            <p className="text-[13px] text-teks-redup">{t('inviteReview')}</p>
             <div className="flex gap-2">
               <form action={respondInvite} className="flex-1">
                 <input type="hidden" name="id" value={part.id} />

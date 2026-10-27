@@ -109,6 +109,8 @@ export type Participation = {
   work_mode: WorkMode | null;
   agreed_fee: number | null;
   applied_at: string;
+  /** Set when the participation started as an invitation; it still goes through review. */
+  invited_at: string | null;
   decided_at: string | null;
   shipping_address_enc: string | null;
   shipment_status: ShipmentStatus | null;

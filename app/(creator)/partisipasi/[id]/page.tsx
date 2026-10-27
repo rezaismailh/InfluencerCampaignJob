@@ -95,6 +95,7 @@ export default async function Work({ params }: { params: Promise<{ id: string }>
       {part.status === 'invited' && (
         <Card className="space-y-3">
           <p className="font-bold">{tj('inviteFee', { amount: formatRupiah(part.agreed_fee ?? 0) })}</p>
+          <p className="text-[13px] text-teks-redup">{tj('inviteReview')}</p>
           <div className="flex gap-2">
             <form action={respondInvite} className="flex-1">
               <input type="hidden" name="id" value={part.id} /><input type="hidden" name="accept" value="1" />

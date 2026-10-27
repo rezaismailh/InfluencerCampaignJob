@@ -144,6 +144,10 @@ export default async function AdminJob({ params }: { params: Promise<{ id: strin
                         <Link href={`/admin/creator/${r.creator_id}`} className="font-bold text-nila-800 underline-offset-4 hover:underline">
                           {r.profiles.full_name ?? r.profiles.email}
                         </Link>
+                        {r.invited_at && <Badge tone="info" className="ml-1.5">{t('invitedBadge')}</Badge>}
+                        {r.invited_at && r.agreed_fee && (
+                          <p className="font-bold tabular">{t('offeredFee', { amount: formatRupiah(r.agreed_fee) })}{both && r.work_mode ? ` · ${tt(r.work_mode)}` : ''}</p>
+                        )}
                         <p className="text-teks-redup">
                           {[r.profiles.city, r.profiles.gender && tg(r.profiles.gender), r.profiles.hijab && th(r.profiles.hijab), r.profiles.account_type && ta(r.profiles.account_type)].filter(Boolean).join(' · ')}
                         </p>
@@ -177,7 +181,7 @@ export default async function AdminJob({ params }: { params: Promise<{ id: strin
                           {(both || job.fee_type !== 'fixed') && (
                             <div className="flex gap-1.5">
                               {both && (
-                                <select name="work_mode" defaultValue={r.visit_willing ? '' : 'non_visit'} aria-label={t('workMode')}
+                                <select name="work_mode" defaultValue={r.invited_at && r.work_mode ? r.work_mode : r.visit_willing ? '' : 'non_visit'} aria-label={t('workMode')}
                                   className="h-9 min-w-0 flex-1 rounded-lg border border-garis bg-kertas px-2 text-[13px] text-teks focus:border-nila-500 focus:outline-none"
                                   title={t('workModeHint', { nonVisit: fees[0] ? formatRupiah(fees[0]) : '—', visit: fees[1] ? formatRupiah(fees[1]) : '—' })}>
                                   <option value="">{t('workModePickShort')}</option>
@@ -189,7 +193,7 @@ export default async function AdminJob({ params }: { params: Promise<{ id: strin
                                 <input name="fee" inputMode="numeric" aria-label={t('agreedFee')}
                                   className="h-9 w-24 shrink-0 rounded-lg border border-garis bg-kertas px-2 text-[13px] text-teks tabular placeholder:text-teks-redup/70 focus:border-nila-500 focus:outline-none"
                                   placeholder={both ? t('feeAuto') : undefined}
-                                  defaultValue={both ? '' : job.fee_type === 'open' ? r.proposed_rate ?? '' : (tier ? job.tier_fees[tier] : undefined) ?? ''} />
+                                  defaultValue={both ? '' : r.invited_at ? r.agreed_fee ?? '' : job.fee_type === 'open' ? r.proposed_rate ?? '' : (tier ? job.tier_fees[tier] : undefined) ?? ''} />
                               )}
                             </div>
                           )}
@@ -235,7 +239,8 @@ export default async function AdminJob({ params }: { params: Promise<{ id: strin
       </section>
 
       <Card className="max-w-lg">
-        <CardTitle className="mb-3">{t('invite')}</CardTitle>
+        <CardTitle>{t('invite')}</CardTitle>
+        <p className="mb-3 text-[13px] text-teks-redup">{t('inviteReviewHint')}</p>
         <ActionForm action={inviteCreator} resetOnSuccess>
           <input type="hidden" name="job_id" value={job.id} />
           <Field label={t('inviteEmail')} htmlFor="invite-email"><Input id="invite-email" name="email" type="email" required /></Field>

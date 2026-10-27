@@ -323,7 +323,8 @@
     "quickSocial": "Your {platforms} account",
     "quickSubmit": "Send application",
     "quickSaved": "Your details are saved to your Profile and can be changed any time.",
-    "inviteReview": "If you accept, you join the shortlist the client reviews first. The Tali team will let you know if you're selected."
+    "inviteReview": "If you accept, you join the shortlist the client reviews first. The Tali team will let you know if you're selected.",
+    "applyWithEmail": "Apply with email"
   },
   "work": {
     "title": "Work",
@@ -680,7 +681,7 @@
     "inviteTierFeeHint": "Leave empty to use the fee for the creator's tier.",
     "export": {
       "title": "Export applicants",
-      "hint": "Excel file for the client to curate. The client version lists applicants still waiting for a decision, without email, phone or address, plus \"Client decision\" and \"Client note\" columns to fill in. The internal version lists everyone on this job with contact details; never send it to the client.",
+      "hint": "Excel file for the client to curate. The client version lists applicants still waiting for a decision, without email, phone or address, plus \"Client decision\" and \"Client note\" columns to fill in. The internal version lists everyone on this job with contact details; never send it to the client. Or copy it and paste into Google Sheets; numbers have no thousands separators.",
       "client": "For the client ({count} applicants)",
       "internal": "Internal (with contacts)",
       "sheetName": "Applicants",
@@ -834,7 +835,8 @@
       "inviteReviewHint": "Creators who accept join the applicants list and are still reviewed by the client before being accepted.",
       "sendWa": "Send WhatsApp",
       "noPhone": "No phone number yet",
-      "waReady": "Send the invitation from your WhatsApp:"
+      "waReady": "Send the invitation from your WhatsApp:",
+      "copySheet": "Copy to Google Sheets"
     },
     "colCreator": "Creator",
     "colProfile": "Profile",
@@ -877,7 +879,13 @@
     "inviteReviewHint": "Creators who accept join the applicants list and are still reviewed by the client before being accepted.",
     "waInvite": "{name, select, none {Hi!} other {Hi {name}!}} Tali is inviting you to the job *{job}* with a fee of {fee}.\n\nOpen this link, sign in, then tap *Accept invitation*:\n{url}\n\nOnce you accept, you join the shortlist the client reviews first. We will let you know if you are selected.",
     "sendWa": "Send WhatsApp",
-    "noPhone": "No phone number yet"
+    "noPhone": "No phone number yet",
+    "sheet": {
+      "copied": "Copied. Paste (Ctrl+V) into Google Sheets",
+      "failed": "Couldn't copy, try again",
+      "copyClient": "Copy for Google Sheets (client)",
+      "copyInternal": "Copy for Google Sheets (internal)"
+    }
   },
   "errors": {
     "generic": "Something didn't work. Try again in a moment.",
@@ -1199,5 +1207,34 @@
     "couple": "Couple",
     "family": "Family",
     "group": "Group"
+  },
+  "inApp": {
+    "titleAndroid": "Open Tali in Chrome",
+    "titleIos": "Open Tali in Safari",
+    "body": "You opened Tali in {app}'s built-in browser, where some features don't work, including Google sign-in. Open it in your phone's browser instead.",
+    "openChrome": "Open in Chrome",
+    "openSafari": "Open in Safari",
+    "manualTitle": "If the button doesn't work:",
+    "manualAndroid1": "Tap ⋮ in the top right corner.",
+    "manualAndroid2": "Choose \"Open in Chrome\" or \"Open in browser\".",
+    "manualIos1": "Tap ⋯ in the top right corner (or the compass icon at the bottom).",
+    "manualIos2": "Choose \"Open in browser\" or \"Open in Safari\".",
+    "stay": "Continue here anyway",
+    "app": {
+      "threads": "Threads",
+      "instagram": "Instagram",
+      "facebook": "Facebook",
+      "tiktok": "TikTok",
+      "line": "LINE",
+      "other": "the app"
+    }
+  },
+  "errorPage": {
+    "title": "This page couldn't open",
+    "body": "Something went wrong while loading this page. Try reloading; if it still fails, the Tali team has already received a report.",
+    "inAppAndroid": "You are in an in-app browser. Tap ⋮ in the top right corner, then \"Open in Chrome\" for a smoother experience.",
+    "inAppIos": "You are in an in-app browser. Tap ⋯ in the top right corner, then \"Open in browser\" for a smoother experience.",
+    "reload": "Reload",
+    "home": "Go to home"
   }
 }

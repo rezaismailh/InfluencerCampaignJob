@@ -1,4 +1,5 @@
 // Minimal single-sheet .xlsx writer: header row in bold, frozen, with a filter.
+// Also tsv(), the same table as text to paste into Google Sheets.
 // Opens in Excel, Google Sheets and Numbers. Avoids a spreadsheet dependency for
 // the one export we need; files are stored uncompressed inside the zip.
 
@@ -79,7 +80,8 @@ function colName(i: number): string {
 }
 
 /**
- * One sheet: `header` in bold, then `rows`. Numbers stay numbers (with thousands separators);
+ * One sheet: `header` in bold, then `rows`. Numbers stay plain numbers (no thousands separators,
+ * so they paste and import cleanly);
  * text that starts with = + - @ is written as plain text, never as a formula.
  */
 export function xlsx(sheetName: string, header: string[], rows: Cell[][], widths: number[] = []): Uint8Array {
@@ -111,9 +113,26 @@ export function xlsx(sheetName: string, header: string[], rows: Cell[][], widths
     'xl/_rels/workbook.xml.rels': `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>`,
     'xl/styles.xml': `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font></fonts><fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FFEEEDFA"/><bgColor indexed="64"/></patternFill></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="3"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1"/><xf numFmtId="3" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>`,
+<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font></fonts><fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FFEEEDFA"/><bgColor indexed="64"/></patternFill></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="3"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1"/><xf numFmtId="1" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>`,
     'xl/worksheets/sheet1.xml': sheet,
   };
   const enc = new TextEncoder();
   return zip(Object.entries(files).map(([n, d]) => ({ name: n, data: enc.encode(d) })));
+}
+
+/**
+ * The table as tab-separated text, which Google Sheets (and Excel) split into cells on paste.
+ * Cells with tabs, line breaks or quotes are quoted; text that Sheets would read as a formula
+ * or a number (= + - @, and digit-only text such as phone numbers 0812…) gets a leading
+ * apostrophe so it stays text.
+ */
+export function tsv(header: string[], rows: Cell[][]): string {
+  const cell = (value: Cell) => {
+    if (value === null || value === undefined) return '';
+    if (typeof value === 'number') return Number.isFinite(value) ? String(value) : '';
+    let s = value.replace(/\r\n?/g, '\n');
+    if (/^[=+\-@]/.test(s) || /^\d+$/.test(s)) s = `'${s}`;
+    return /[\t\n"]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+  };
+  return [header, ...rows].map((row) => row.map(cell).join('\t')).join('\n');
 }

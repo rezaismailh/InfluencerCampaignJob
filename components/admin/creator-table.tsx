@@ -16,7 +16,8 @@ import { formatRupiah } from '@/lib/money';
 import { PLATFORMS } from '@/lib/social';
 import { TIERS } from '@/lib/tiers';
 import { ACCOUNT_TYPES, GENDERS, HIJAB } from '@/lib/visit';
-import { xlsx, type Cell } from '@/lib/xlsx';
+import { tsv, xlsx, type Cell } from '@/lib/xlsx';
+import { CopySheetButton } from '@/components/admin/copy-sheet-button';
 import { cn } from '@/lib/cn';
 import Link from 'next/link';
 import { InvitePanel, type InviteJob } from '@/components/admin/invite-panel';
@@ -170,6 +171,8 @@ export function CreatorTable({ rows, niches, canSeePaid, jobs }: { rows: Creator
         <Button type="button" variant="outline" size="sm" onClick={exportXlsx} disabled={!shown.length}>
           <Download className="size-4" aria-hidden /> {t('export')}
         </Button>
+        <CopySheetButton label={t('copySheet')} disabled={!shown.length}
+          text={() => tsv(columns.map(label), shown.map((r) => columns.map((k) => text(r, k))))} />
       </div>
 
       {showFilters && (

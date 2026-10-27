@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { applicantSheet, exportFileName, type ExportLabels, type ExportRow } from '@/lib/applicant-export';
-import { xlsx } from '@/lib/xlsx';
+import { tsv, xlsx } from '@/lib/xlsx';
 import type { Job, SocialAccount } from '@/lib/types';
 
 const labels: ExportLabels = {
@@ -63,5 +63,23 @@ describe('xlsx', () => {
     expect(text).toContain('&lt;b&gt;&amp;&quot;x&quot;');
     expect(text).toContain('<t xml:space="preserve">=1+1</t>');
     expect(text).not.toContain('<f>');
+  });
+
+  it('writes numbers without thousands separators', () => {
+    const text = new TextDecoder().decode(xlsx('S', ['A'], [[250000]]));
+    expect(text).toContain('<xf numFmtId="1"');
+    expect(text).not.toContain('numFmtId="3"');
+  });
+});
+
+describe('tsv', () => {
+  it('separates cells with tabs and rows with line breaks', () => {
+    expect(tsv(['Nama', 'Fee'], [['Rina', 250000], ['Budi', null]])).toBe('Nama\tFee\nRina\t250000\nBudi\t');
+  });
+  it('quotes cells with tabs, line breaks or quotes', () => {
+    expect(tsv(['A'], [['baris 1\r\nbaris 2'], ['kata "x"\tlagi']])).toBe('A\n"baris 1\nbaris 2"\n"kata ""x""\tlagi"');
+  });
+  it('keeps formulas and phone numbers as text', () => {
+    expect(tsv(['A'], [['=1+1'], ['+6281234'], ['081234'], ['2026-10-27']])).toBe("A\n'=1+1\n'+6281234\n'081234\n2026-10-27");
   });
 });

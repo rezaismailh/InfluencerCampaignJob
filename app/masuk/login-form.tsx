@@ -11,7 +11,8 @@ import { GoogleButton } from '@/components/google-button';
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-export function LoginForm({ next, callbackError }: { next: string; callbackError: boolean }) {
+/** `google` is off in in-app browsers, where Google refuses to sign in. */
+export function LoginForm({ next, callbackError, google = true }: { next: string; callbackError: boolean; google?: boolean }) {
   const t = useTranslations('auth');
   const router = useRouter();
   const [email, setEmail] = useState('');
@@ -52,7 +53,7 @@ export function LoginForm({ next, callbackError }: { next: string; callbackError
     <div className="space-y-6">
       {error && <Alert tone="danger">{error}</Alert>}
 
-      {step === 'email' && (
+      {step === 'email' && google && (
         <>
           {/* Google first: one tap, no code to copy from the inbox. */}
           <GoogleButton next={next} label={t('google')} className="w-full" />

@@ -323,7 +323,8 @@
     "quickSocial": "Akun {platforms} kamu",
     "quickSubmit": "Kirim lamaran",
     "quickSaved": "Datamu tersimpan di Profil dan bisa diubah kapan saja.",
-    "inviteReview": "Kalau kamu terima, kamu masuk daftar kandidat yang direview klien dulu. Tim Tali akan mengabari kalau kamu terpilih."
+    "inviteReview": "Kalau kamu terima, kamu masuk daftar kandidat yang direview klien dulu. Tim Tali akan mengabari kalau kamu terpilih.",
+    "applyWithEmail": "Daftar dengan email"
   },
   "work": {
     "title": "Kerjaan",
@@ -680,7 +681,7 @@
     "inviteTierFeeHint": "Kosongkan untuk memakai fee sesuai tier creator.",
     "export": {
       "title": "Export data pelamar",
-      "hint": "File Excel untuk dikurasi klien. Versi klien berisi pelamar yang belum diputuskan, tanpa email, nomor HP, dan alamat, plus kolom \"Keputusan klien\" dan \"Catatan klien\" untuk diisi. Versi internal berisi semua creator di job ini beserta kontaknya; jangan dikirim ke klien.",
+      "hint": "File Excel untuk dikurasi klien. Versi klien berisi pelamar yang belum diputuskan, tanpa email, nomor HP, dan alamat, plus kolom \"Keputusan klien\" dan \"Catatan klien\" untuk diisi. Versi internal berisi semua creator di job ini beserta kontaknya; jangan dikirim ke klien. Atau salin langsung lalu tempel di Google Sheet; angka tanpa titik ribuan.",
       "client": "Untuk klien ({count} pelamar)",
       "internal": "Internal (dengan kontak)",
       "sheetName": "Pelamar",
@@ -834,7 +835,8 @@
       "inviteReviewHint": "Creator yang menerima undangan masuk ke daftar Pelamar dan tetap direview klien sebelum diterima.",
       "sendWa": "Kirim WA",
       "noPhone": "No. HP belum ada",
-      "waReady": "Kirim undangan lewat WhatsApp kamu:"
+      "waReady": "Kirim undangan lewat WhatsApp kamu:",
+      "copySheet": "Salin ke Google Sheet"
     },
     "colCreator": "Creator",
     "colProfile": "Profil",
@@ -877,7 +879,13 @@
     "inviteReviewHint": "Creator yang menerima undangan masuk ke daftar Pelamar dan tetap direview klien sebelum diterima.",
     "waInvite": "{name, select, none {Halo!} other {Halo {name}!}} Kamu diundang Tali ke job *{job}* dengan fee {fee}.\n\nBuka link ini, masuk, lalu klik *Terima undangan*:\n{url}\n\nSetelah kamu terima, kamu masuk daftar kandidat yang direview klien dulu. Nanti kami kabari kalau terpilih.",
     "sendWa": "Kirim WA",
-    "noPhone": "No. HP belum ada"
+    "noPhone": "No. HP belum ada",
+    "sheet": {
+      "copied": "Tersalin. Tempel (Ctrl+V) di Google Sheet",
+      "failed": "Gagal menyalin, coba lagi",
+      "copyClient": "Salin untuk Google Sheet (klien)",
+      "copyInternal": "Salin untuk Google Sheet (internal)"
+    }
   },
   "errors": {
     "generic": "Ada yang belum berhasil. Coba lagi sebentar lagi.",
@@ -1199,5 +1207,34 @@
     "couple": "Couple",
     "family": "Family",
     "group": "Grup"
+  },
+  "inApp": {
+    "titleAndroid": "Buka Tali di Chrome",
+    "titleIos": "Buka Tali di Safari",
+    "body": "Kamu membuka Tali dari browser bawaan {app}. Di sana sebagian fitur tidak jalan, termasuk login Google. Buka di browser HP-mu supaya lancar.",
+    "openChrome": "Buka di Chrome",
+    "openSafari": "Buka di Safari",
+    "manualTitle": "Kalau tombolnya tidak berhasil:",
+    "manualAndroid1": "Ketuk ⋮ di pojok kanan atas.",
+    "manualAndroid2": "Pilih \"Buka di Chrome\" atau \"Buka di browser\".",
+    "manualIos1": "Ketuk ⋯ di pojok kanan atas (atau ikon kompas di bawah).",
+    "manualIos2": "Pilih \"Buka di browser\" atau \"Buka di Safari\".",
+    "stay": "Lanjut di sini saja",
+    "app": {
+      "threads": "Threads",
+      "instagram": "Instagram",
+      "facebook": "Facebook",
+      "tiktok": "TikTok",
+      "line": "LINE",
+      "other": "aplikasi"
+    }
+  },
+  "errorPage": {
+    "title": "Halaman belum bisa dibuka",
+    "body": "Ada yang tidak beres saat memuat halaman ini. Coba muat ulang; kalau masih gagal, tim Tali sudah menerima laporannya.",
+    "inAppAndroid": "Kamu sedang di browser bawaan aplikasi. Ketuk ⋮ di pojok kanan atas, lalu \"Buka di Chrome\" supaya lebih lancar.",
+    "inAppIos": "Kamu sedang di browser bawaan aplikasi. Ketuk ⋯ di pojok kanan atas, lalu \"Buka di browser\" supaya lebih lancar.",
+    "reload": "Muat ulang",
+    "home": "Ke halaman utama"
   }
 }

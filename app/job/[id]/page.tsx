@@ -17,6 +17,7 @@ import { getViewer, providerName, type Viewer } from '@/lib/auth';
 import { decrypt } from '@/lib/crypto';
 import { provinceOf } from '@/lib/wilayah';
 import { GoogleButton } from '@/components/google-button';
+import { getInApp } from '@/lib/in-app-server';
 import { RegionSelect } from '@/components/creator/region-select';
 import { SocialList } from '@/components/creator/social-list';
 import { SocialRows } from '@/components/creator/social-rows';
@@ -298,7 +299,16 @@ export default async function JobDetail({ params }: { params: Promise<{ id: stri
   async function SignInBlock({ viewer, job }: { viewer: Viewer | null; job: Job | PublicJob }) {
     if (viewer && viewer.profile.role !== 'creator') return null;
     if (viewer) return <QuickApply viewer={viewer} job={job} />;
-    // Guests: Google first (one tap, no code), email as the alternative.
+    // Guests: Google first (one tap, no code), email as the alternative. Google refuses
+    // sign-in inside in-app browsers (Threads, Instagram…), so there it is email only.
+    if (await getInApp()) {
+      return (
+        <ActionBar>
+          <p className="text-[13px] text-teks-redup">{t('signInBody')}</p>
+          <ButtonLink href={`/masuk?next=${encodeURIComponent(`/job/${job.id}`)}`} className="w-full">{t('applyWithEmail')}</ButtonLink>
+        </ActionBar>
+      );
+    }
     return (
       <ActionBar>
         <p className="text-[13px] text-teks-redup">{t('signInBody')}</p>

@@ -831,7 +831,10 @@
       "notesHint": "Hanya terlihat oleh tim Tali, tidak oleh creator.",
       "notePlaceholder": "Contoh: responsif, hasil konten rapi, cocok untuk job kuliner",
       "addNote": "Simpan catatan",
-      "inviteReviewHint": "Creator yang menerima undangan masuk ke daftar Pelamar dan tetap direview klien sebelum diterima."
+      "inviteReviewHint": "Creator yang menerima undangan masuk ke daftar Pelamar dan tetap direview klien sebelum diterima.",
+      "sendWa": "Kirim WA",
+      "noPhone": "No. HP belum ada",
+      "waReady": "Kirim undangan lewat WhatsApp kamu:"
     },
     "colCreator": "Creator",
     "colProfile": "Profil",
@@ -871,7 +874,10 @@
     "workModePickShort": "Pilih mode",
     "invitedBadge": "Diundang",
     "offeredFee": "Fee ditawarkan: {amount}",
-    "inviteReviewHint": "Creator yang menerima undangan masuk ke daftar Pelamar dan tetap direview klien sebelum diterima."
+    "inviteReviewHint": "Creator yang menerima undangan masuk ke daftar Pelamar dan tetap direview klien sebelum diterima.",
+    "waInvite": "{name, select, none {Halo!} other {Halo {name}!}} Kamu diundang Tali ke job *{job}* dengan fee {fee}.\n\nBuka link ini, masuk, lalu klik *Terima undangan*:\n{url}\n\nSetelah kamu terima, kamu masuk daftar kandidat yang direview klien dulu. Nanti kami kabari kalau terpilih.",
+    "sendWa": "Kirim WA",
+    "noPhone": "No. HP belum ada"
   },
   "errors": {
     "generic": "Ada yang belum berhasil. Coba lagi sebentar lagi.",

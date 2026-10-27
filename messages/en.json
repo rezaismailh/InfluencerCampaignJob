@@ -831,7 +831,10 @@
       "notesHint": "Only the Tali team sees these, never the creator.",
       "notePlaceholder": "E.g. responsive, tidy content, good for food jobs",
       "addNote": "Save note",
-      "inviteReviewHint": "Creators who accept join the applicants list and are still reviewed by the client before being accepted."
+      "inviteReviewHint": "Creators who accept join the applicants list and are still reviewed by the client before being accepted.",
+      "sendWa": "Send WhatsApp",
+      "noPhone": "No phone number yet",
+      "waReady": "Send the invitation from your WhatsApp:"
     },
     "colCreator": "Creator",
     "colProfile": "Profile",
@@ -871,7 +874,10 @@
     "workModePickShort": "Pick mode",
     "invitedBadge": "Invited",
     "offeredFee": "Offered fee: {amount}",
-    "inviteReviewHint": "Creators who accept join the applicants list and are still reviewed by the client before being accepted."
+    "inviteReviewHint": "Creators who accept join the applicants list and are still reviewed by the client before being accepted.",
+    "waInvite": "{name, select, none {Hi!} other {Hi {name}!}} Tali is inviting you to the job *{job}* with a fee of {fee}.\n\nOpen this link, sign in, then tap *Accept invitation*:\n{url}\n\nOnce you accept, you join the shortlist the client reviews first. We will let you know if you are selected.",
+    "sendWa": "Send WhatsApp",
+    "noPhone": "No phone number yet"
   },
   "errors": {
     "generic": "Something didn't work. Try again in a moment.",

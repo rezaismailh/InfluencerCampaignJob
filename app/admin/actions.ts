@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation';
 import { after } from 'next/server';
 import { z } from 'zod';
 import { requireStaff } from '@/lib/auth';
+import { inviteWhatsApp } from '@/lib/invite-whatsapp';
 import { parseRupiah } from '@/lib/money';
 import { deliverPending } from '@/lib/notify';
 import { PLATFORMS, type Platform } from '@/lib/social';
@@ -249,17 +250,33 @@ export async function inviteCreator(_prev: ActionState, formData: FormData): Pro
 }
 
 /** Invites several creators to one job (Admin → Creator). Returns one result per creator. */
-export async function inviteCreators(input: { jobId: string; creatorIds: string[]; fee: string; mode: string }): Promise<{ id: string; error: string | null }[]> {
+export async function inviteCreators(input: { jobId: string; creatorIds: string[]; fee: string; mode: string }): Promise<{ id: string; error: string | null; wa?: string | null }[]> {
   const viewer = await requireStaff('curator');
   const ids = [...new Set(input.creatorIds)].slice(0, 200);
-  const results: { id: string; error: string | null }[] = [];
+  const results: { id: string; error: string | null; wa?: string | null }[] = [];
   for (const id of ids) {
     const { error } = await viewer.supabase.rpc('invite_creator', {
       p_job: input.jobId, p_creator: id, p_fee: parseRupiah(input.fee), p_mode: input.mode || null,
     });
     results.push({ id, error: error ? (error.code === '23505' ? 'already_in_job' : dbErrorKey(error)) : null });
   }
-  if (results.some((r) => !r.error)) deliverLater();
+  const invited = results.filter((r) => !r.error).map((r) => r.id);
+  if (invited.length) {
+    deliverLater();
+    // A ready-made WhatsApp message per invited creator, sent from the curator's own WhatsApp.
+    const [{ data: job }, { data: rows }] = await Promise.all([
+      viewer.supabase.from('jobs').select('title, short_code').eq('id', input.jobId).single<{ title: string; short_code: string }>(),
+      viewer.supabase.from('participations').select('creator_id, agreed_fee, profiles!participations_creator_id_fkey(full_name, phone_enc)')
+        .eq('job_id', input.jobId).in('creator_id', invited)
+        .returns<{ creator_id: string; agreed_fee: number | null; profiles: { full_name: string | null; phone_enc: string | null } }[]>(),
+    ]);
+    if (job) {
+      for (const row of rows ?? []) {
+        const r = results.find((x) => x.id === row.creator_id);
+        if (r) r.wa = await inviteWhatsApp(row.profiles, job, row.agreed_fee);
+      }
+    }
+  }
   revalidatePath('/admin', 'layout');
   return results;
 }

@@ -129,6 +129,7 @@
     "sendFailed": "Kode belum terkirim. Tunggu satu menit, lalu coba lagi.",
     "callbackFailed": "Login belum berhasil. Coba lagi dari halaman masuk.",
     "googleHint": "Paling cepat: tanpa kode, akun dibuat otomatis.",
+    "signingIn": "Sedang masuk…",
     "orEmail": "atau pakai email"
   },
   "nav": {

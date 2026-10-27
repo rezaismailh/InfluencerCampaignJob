@@ -476,6 +476,10 @@
     "insight_approved": "Insight approved. Your fee can be withdrawn from {ready_at}."
   },
   "admin": {
+    "shortLink": {
+      "title": "Short link",
+      "hint": "For WhatsApp, Instagram or a bio. It opens this job page."
+    },
     "title": "Tali admin",
     "overview": "Overview",
     "pendingReviews": "Submissions awaiting review",
@@ -1144,6 +1148,7 @@
     "share": "Share",
     "copied": "Link copied",
     "whatsapp": "WhatsApp",
+    "copy": "Copy",
     "copyPrompt": "Copy this link:"
   },
   "install": {

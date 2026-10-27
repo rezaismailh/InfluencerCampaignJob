@@ -252,7 +252,7 @@ export default async function JobDetail({ params }: { params: Promise<{ id: stri
       </details>
 
       {/* Shares the public name (alias for disguised brands), never the real one. */}
-      <ShareButton path={`/job/${job.id}`} title={`${job.title} · ${job.brand_name}`}
+      <ShareButton path={`/j/${job.short_code}`} title={`${job.title} · ${job.brand_name}`}
         text={t('shareText', { title: job.title, brand: job.brand_name, fee })} />
 
       {creator && full ? <JoinBlock job={full} viewer={creator} /> : <SignInBlock viewer={viewer} job={full ?? job} />}

@@ -10,6 +10,7 @@ import { Field, Input, Select } from '@/components/ui/field';
 import { PageHeader } from '@/components/ui/page';
 import { SubmitButton } from '@/components/ui/submit-button';
 import { participationTone } from '@/components/status';
+import { CopyLink } from '@/components/admin/copy-link';
 import { feeLabel } from '@/components/creator/job-card';
 import { decideApplication, inviteCreator, setJobStatus } from '@/app/admin/actions';
 import { requireStaff } from '@/lib/auth';
@@ -88,6 +89,14 @@ export default async function AdminJob({ params }: { params: Promise<{ id: strin
         </div>
       </Card>
       <p className="-mt-3 text-[13px] text-teks-redup">{t(`statusHint.${job.status}`)}</p>
+
+      {job.status !== 'draft' && (
+        <Card className="space-y-2">
+          <CardTitle>{t('shortLink.title')}</CardTitle>
+          <CopyLink path={`/j/${job.short_code}`} />
+          <p className="text-[13px] text-teks-redup">{t('shortLink.hint')}</p>
+        </Card>
+      )}
 
       <Card className="space-y-3">
         <div>

@@ -476,6 +476,10 @@
     "insight_approved": "Insight disetujui. Fee bisa dicairkan mulai {ready_at}."
   },
   "admin": {
+    "shortLink": {
+      "title": "Link pendek",
+      "hint": "Untuk dibagikan di WhatsApp, Instagram, atau bio. Link langsung membuka halaman job ini."
+    },
     "title": "Admin Tali",
     "overview": "Ringkasan",
     "pendingReviews": "Kiriman menunggu review",
@@ -1144,6 +1148,7 @@
     "share": "Bagikan",
     "copied": "Link disalin",
     "whatsapp": "WhatsApp",
+    "copy": "Salin",
     "copyPrompt": "Salin link ini:"
   },
   "install": {

@@ -532,3 +532,14 @@ select tests.expect_error($$insert into public.creator_notes (creator_id, body) 
 select tests.act_as('00000000-0000-0000-0000-000000000003');
 select tests.check((select count(*) = 1 from public.creator_notes), 'finance can read notes');
 reset role;
+
+-- Short share codes ----------------------------------------------------------------
+select tests.check((select bool_and(short_code ~ '^[a-hj-km-np-z2-9]{6}$') and count(distinct short_code) = count(*) from public.jobs), 'every job has a unique short code');
+set role anon;
+select tests.check((select public.job_id_by_code(j.short_code) = j.id from public.public_open_jobs() j limit 1), 'guest resolves short code');
+select tests.check((select public.job_id_by_code(upper(j.short_code)) = j.id from public.public_open_jobs() j limit 1), 'short code ignores case');
+select tests.check(public.job_id_by_code('zzzzzz') is null, 'unknown code resolves to nothing');
+reset role;
+update public.jobs set status = 'draft' where id = '20000000-0000-0000-0000-000000000001';
+select tests.check(public.job_id_by_code((select short_code from public.jobs where id = '20000000-0000-0000-0000-000000000001')) is null, 'draft code is not resolved');
+update public.jobs set status = 'open' where id = '20000000-0000-0000-0000-000000000001';

@@ -323,7 +323,8 @@
     "quickSocial": "Your {platforms} account",
     "quickSubmit": "Send application",
     "quickSaved": "Your details are saved to your Profile and can be changed any time.",
-    "inviteReview": "If you accept, you join the shortlist the client reviews first. The Tali team will let you know if you're selected."
+    "inviteReview": "If you accept, you join the shortlist the client reviews first. The Tali team will let you know if you're selected.",
+    "applyWithEmail": "Apply with email"
   },
   "work": {
     "title": "Work",
@@ -1206,5 +1207,34 @@
     "couple": "Couple",
     "family": "Family",
     "group": "Group"
+  },
+  "inApp": {
+    "titleAndroid": "Open Tali in Chrome",
+    "titleIos": "Open Tali in Safari",
+    "body": "You opened Tali in {app}'s built-in browser, where some features don't work, including Google sign-in. Open it in your phone's browser instead.",
+    "openChrome": "Open in Chrome",
+    "openSafari": "Open in Safari",
+    "manualTitle": "If the button doesn't work:",
+    "manualAndroid1": "Tap ⋮ in the top right corner.",
+    "manualAndroid2": "Choose \"Open in Chrome\" or \"Open in browser\".",
+    "manualIos1": "Tap ⋯ in the top right corner (or the compass icon at the bottom).",
+    "manualIos2": "Choose \"Open in browser\" or \"Open in Safari\".",
+    "stay": "Continue here anyway",
+    "app": {
+      "threads": "Threads",
+      "instagram": "Instagram",
+      "facebook": "Facebook",
+      "tiktok": "TikTok",
+      "line": "LINE",
+      "other": "the app"
+    }
+  },
+  "errorPage": {
+    "title": "This page couldn't open",
+    "body": "Something went wrong while loading this page. Try reloading; if it still fails, the Tali team has already received a report.",
+    "inAppAndroid": "You are in an in-app browser. Tap ⋮ in the top right corner, then \"Open in Chrome\" for a smoother experience.",
+    "inAppIos": "You are in an in-app browser. Tap ⋯ in the top right corner, then \"Open in browser\" for a smoother experience.",
+    "reload": "Reload",
+    "home": "Go to home"
   }
 }

@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 import { Wordmark } from '@/components/wordmark';
+import { getInApp } from '@/lib/in-app-server';
 import { LoginForm } from './login-form';
 
 export async function generateMetadata() {
@@ -19,7 +20,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
       <h1 className="mt-8 text-[32px] font-extrabold leading-10 tracking-[-0.5px]">{t('title')}</h1>
       <p className="mt-2 text-teks-redup">{t('subtitle')}</p>
       <div className="mt-8">
-        <LoginForm next={safeNext} callbackError={error === 'callback'} />
+        <LoginForm next={safeNext} callbackError={error === 'callback'} google={!(await getInApp())} />
       </div>
       <p className="mt-8 text-[13px] leading-5 text-teks-redup">
         {tl.rich('loginConsent', {

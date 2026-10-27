@@ -2,7 +2,7 @@ import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 import { publicOrigin } from '@/lib/public-origin';
 
-const PUBLIC_PATHS = ['/', '/masuk', '/auth', '/offline', '/privasi', '/ketentuan', '/job', '/j', '/api/cron'];
+const PUBLIC_PATHS = ['/', '/masuk', '/auth', '/offline', '/privasi', '/ketentuan', '/job', '/j', '/api/cron', '/api/inapp-stay', '/api/client-error'];
 
 function isPublic(pathname: string) {
   return PUBLIC_PATHS.some((p) => (p === '/' ? pathname === '/' : pathname === p || pathname.startsWith(`${p}/`)));

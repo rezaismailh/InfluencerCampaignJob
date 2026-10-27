@@ -323,7 +323,8 @@
     "quickSocial": "Akun {platforms} kamu",
     "quickSubmit": "Kirim lamaran",
     "quickSaved": "Datamu tersimpan di Profil dan bisa diubah kapan saja.",
-    "inviteReview": "Kalau kamu terima, kamu masuk daftar kandidat yang direview klien dulu. Tim Tali akan mengabari kalau kamu terpilih."
+    "inviteReview": "Kalau kamu terima, kamu masuk daftar kandidat yang direview klien dulu. Tim Tali akan mengabari kalau kamu terpilih.",
+    "applyWithEmail": "Daftar dengan email"
   },
   "work": {
     "title": "Kerjaan",
@@ -1206,5 +1207,34 @@
     "couple": "Couple",
     "family": "Family",
     "group": "Grup"
+  },
+  "inApp": {
+    "titleAndroid": "Buka Tali di Chrome",
+    "titleIos": "Buka Tali di Safari",
+    "body": "Kamu membuka Tali dari browser bawaan {app}. Di sana sebagian fitur tidak jalan, termasuk login Google. Buka di browser HP-mu supaya lancar.",
+    "openChrome": "Buka di Chrome",
+    "openSafari": "Buka di Safari",
+    "manualTitle": "Kalau tombolnya tidak berhasil:",
+    "manualAndroid1": "Ketuk ⋮ di pojok kanan atas.",
+    "manualAndroid2": "Pilih \"Buka di Chrome\" atau \"Buka di browser\".",
+    "manualIos1": "Ketuk ⋯ di pojok kanan atas (atau ikon kompas di bawah).",
+    "manualIos2": "Pilih \"Buka di browser\" atau \"Buka di Safari\".",
+    "stay": "Lanjut di sini saja",
+    "app": {
+      "threads": "Threads",
+      "instagram": "Instagram",
+      "facebook": "Facebook",
+      "tiktok": "TikTok",
+      "line": "LINE",
+      "other": "aplikasi"
+    }
+  },
+  "errorPage": {
+    "title": "Halaman belum bisa dibuka",
+    "body": "Ada yang tidak beres saat memuat halaman ini. Coba muat ulang; kalau masih gagal, tim Tali sudah menerima laporannya.",
+    "inAppAndroid": "Kamu sedang di browser bawaan aplikasi. Ketuk ⋮ di pojok kanan atas, lalu \"Buka di Chrome\" supaya lebih lancar.",
+    "inAppIos": "Kamu sedang di browser bawaan aplikasi. Ketuk ⋯ di pojok kanan atas, lalu \"Buka di browser\" supaya lebih lancar.",
+    "reload": "Muat ulang",
+    "home": "Ke halaman utama"
   }
 }

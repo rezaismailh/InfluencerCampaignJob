@@ -60,6 +60,7 @@ npm run db:test   # migrasi + tes RLS/aturan bisnis di PostgreSQL lokal (butuh i
    | Variable | Keterangan |
    | --- | --- |
    | `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Dari Supabase |
+   | `NEXT_PUBLIC_GOOGLE_CLIENT_ID` | Opsional. Client ID Google (sama dengan yang di Supabase → Auth → Google). Kalau diisi, login Google berjalan di domain Tali sehingga layar Google tidak lagi menampilkan `xxxx.supabase.co`. Tambahkan domain aplikasi di *Authorized JavaScript origins* pada Google Cloud. Perlu redeploy setelah diubah |
    | `SUPABASE_SERVICE_ROLE_KEY` | Hanya untuk cron/pengiriman notifikasi; jangan dibagikan |
    | `NEXT_PUBLIC_SITE_URL` | URL publik, mis. `https://tali.up.railway.app` sampai domain final dipilih |
    | `DATA_ENCRYPTION_KEY` | `openssl rand -base64 32`. Mengenkripsi nomor rekening, HP, alamat. **Simpan cadangannya**: kalau hilang, data terenkripsi tidak bisa dibaca |

@@ -302,7 +302,7 @@ export default async function JobDetail({ params }: { params: Promise<{ id: stri
     return (
       <ActionBar>
         <p className="text-[13px] text-teks-redup">{t('signInBody')}</p>
-        <GoogleButton next={`/job/${job.id}`} label={t('applyWithGoogle')} className="w-full" />
+        <GoogleButton next={`/job/${job.id}`} label={t('applyWithGoogle')} text="signup_with" className="w-full" />
         <Link href={`/masuk?next=${encodeURIComponent(`/job/${job.id}`)}`} className="block text-center text-[13px] font-bold text-nila-800 underline underline-offset-4">
           {t('useEmail')}
         </Link>

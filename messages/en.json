@@ -129,6 +129,7 @@
     "sendFailed": "The code wasn't sent. Wait a minute and try again.",
     "callbackFailed": "Login didn't go through. Try again from the login page.",
     "googleHint": "Fastest: no code, your account is created automatically.",
+    "signingIn": "Signing you in…",
     "orEmail": "or use email"
   },
   "nav": {

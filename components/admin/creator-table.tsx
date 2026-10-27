@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { ArrowDown, ArrowUp, ChevronDown, ChevronUp, Columns3, Download, Search, Send, SlidersHorizontal, X } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
@@ -57,6 +57,23 @@ export function CreatorTable({ rows, niches, canSeePaid, jobs }: { rows: Creator
     setColumns(next);
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(next)); } catch { /* storage unavailable */ }
   }
+
+  // Fit the scroll area to the space left on screen, so its horizontal scrollbar is
+  // visible without scrolling the page first. Recomputed when panels above it open or close.
+  const scroller = useRef<HTMLDivElement>(null);
+  const [maxHeight, setMaxHeight] = useState<number | null>(null);
+  const hasSelection = selected.size > 0;
+  useLayoutEffect(() => {
+    const fit = () => {
+      const el = scroller.current;
+      if (!el) return;
+      const top = el.getBoundingClientRect().top + window.scrollY;
+      setMaxHeight(Math.max(320, window.innerHeight - top - 16));
+    };
+    fit();
+    window.addEventListener('resize', fit);
+    return () => window.removeEventListener('resize', fit);
+  }, [showFilters, showColumns, hasSelection]);
 
   const provinces = useMemo(() => [...new Set(rows.map((r) => r.province).filter(Boolean))].sort(), [rows]);
   const shown = useMemo(() => sortRows(filterRows(rows, filters), sort), [rows, filters, sort]);
@@ -279,11 +296,14 @@ export function CreatorTable({ rows, niches, canSeePaid, jobs }: { rows: Creator
         </div>
       )}
 
-      <div className="overflow-x-auto rounded-2xl border border-garis bg-kertas">
+      {/* Scroll area sized to the screen, so the horizontal scrollbar is always in view;
+          the header row and the select/name columns stay put while scrolling. */}
+      <div ref={scroller} style={maxHeight ? { maxHeight } : undefined}
+        className="max-h-[calc(100dvh-16rem)] overflow-auto overscroll-contain rounded-2xl border border-garis bg-kertas">
         <table className="w-full min-w-max text-left text-[13px]">
-          <thead className="bg-latar text-teks-redup">
+          <thead className="text-teks-redup">
             <tr>
-              <th scope="col" className="w-10 px-3 py-2">
+              <th scope="col" className="sticky left-0 top-0 z-[3] w-10 min-w-10 bg-latar px-3 py-2">
                 <input type="checkbox" className="size-4 accent-nila-800" aria-label={t('selectAll')}
                   checked={shown.length > 0 && shown.slice(0, limit).every((r) => selected.has(r.id))}
                   onChange={(e) => setSelected((cur) => {
@@ -295,7 +315,8 @@ export function CreatorTable({ rows, niches, canSeePaid, jobs }: { rows: Creator
               {columns.map((k) => {
                 const active = sort.key === k;
                 return (
-                  <th key={k} scope="col" className={cn('px-3 py-2 font-bold', NUMERIC.includes(k) && 'text-right')}
+                  <th key={k} scope="col" className={cn('sticky top-0 z-[2] bg-latar px-3 py-2 font-bold', NUMERIC.includes(k) && 'text-right',
+                    k === 'name' && columns[0] === 'name' && 'left-10 z-[3] shadow-[1px_0_0_var(--color-garis)]')}
                     aria-sort={active ? (sort.dir === 'asc' ? 'ascending' : 'descending') : undefined}>
                     <button type="button" className="inline-flex items-center gap-1 hover:text-teks"
                       onClick={() => setSort((s) => ({ key: k, dir: s.key === k && s.dir === 'desc' ? 'asc' : 'desc' }))}>
@@ -309,13 +330,16 @@ export function CreatorTable({ rows, niches, canSeePaid, jobs }: { rows: Creator
           </thead>
           <tbody className="divide-y divide-garis">
             {shown.slice(0, limit).map((r) => (
-              <tr key={r.id} className={cn('align-top hover:bg-latar/60', selected.has(r.id) && 'bg-nila-50/60')}>
-                <td className="px-3 py-2">
+              <tr key={r.id} className={cn('group align-top', selected.has(r.id) && 'bg-nila-50')}>
+                <td className={cn('sticky left-0 z-[1] px-3 py-2', selected.has(r.id) ? 'bg-nila-50' : 'bg-kertas group-hover:bg-latar')}>
                   <input type="checkbox" className="size-4 accent-nila-800" aria-label={t('selectOne', { name: r.name || r.email })} checked={selected.has(r.id)}
                     onChange={(e) => setSelected((cur) => { const next = new Set(cur); if (e.target.checked) next.add(r.id); else next.delete(r.id); return next; })} />
                 </td>
                 {columns.map((k) => (
-                  <td key={k} className={cn('px-3 py-2', NUMERIC.includes(k) && 'text-right')}>{cell(r, k)}</td>
+                  <td key={k} className={cn('px-3 py-2', NUMERIC.includes(k) && 'text-right', !selected.has(r.id) && 'group-hover:bg-latar',
+                    k === 'name' && columns[0] === 'name' && cn('sticky left-10 z-[1] shadow-[1px_0_0_var(--color-garis)]', selected.has(r.id) ? 'bg-nila-50' : 'bg-kertas'))}>
+                    {cell(r, k)}
+                  </td>
                 ))}
               </tr>
             ))}

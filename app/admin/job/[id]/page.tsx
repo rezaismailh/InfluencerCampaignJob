@@ -11,6 +11,7 @@ import { PageHeader } from '@/components/ui/page';
 import { SubmitButton } from '@/components/ui/submit-button';
 import { participationTone } from '@/components/status';
 import { CopyLink } from '@/components/admin/copy-link';
+import { CopySheetButton } from '@/components/admin/copy-sheet-button';
 import { feeLabel } from '@/components/creator/job-card';
 import { decideApplication, inviteCreator, setJobStatus } from '@/app/admin/actions';
 import { requireStaff } from '@/lib/auth';
@@ -115,6 +116,8 @@ export default async function AdminJob({ params }: { params: Promise<{ id: strin
           <a href={`/admin/job/${id}/export?internal=1`} className={buttonClass('outline', 'sm')} download>
             <Download className="size-4" aria-hidden /> {t('export.internal')}
           </a>
+          <CopySheetButton href={`/admin/job/${id}/export?format=tsv`} label={t('sheet.copyClient')} />
+          <CopySheetButton href={`/admin/job/${id}/export?format=tsv&internal=1`} label={t('sheet.copyInternal')} />
         </div>
       </Card>
 

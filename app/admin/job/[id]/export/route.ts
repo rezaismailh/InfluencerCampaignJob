@@ -5,13 +5,14 @@ import { applicantSheet, exportFileName, type ExportRow } from '@/lib/applicant-
 import { decrypt } from '@/lib/crypto';
 import { todayWib } from '@/lib/dates';
 import { loadTaxonomy } from '@/lib/taxonomy';
-import { xlsx } from '@/lib/xlsx';
+import { tsv, xlsx } from '@/lib/xlsx';
 import type { Job, Profile, SocialAccount } from '@/lib/types';
 
 /**
  * Applicant spreadsheet for a job. Default: applicants still waiting, without contact
  * details, safe to send to the client for curation. ?internal=1: everyone on the job,
- * with email and WhatsApp, for the Tali team only.
+ * with email and WhatsApp, for the Tali team only. ?format=tsv: the same table as text to
+ * paste into Google Sheets.
  */
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -57,6 +58,9 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     nicheName: (k) => tax.name('niche', k), personaName: (k) => tax.name('persona', k),
   }, internal);
 
+  if (request.nextUrl.searchParams.get('format') === 'tsv') {
+    return new NextResponse(tsv(header, body), { headers: { 'content-type': 'text/plain; charset=utf-8', 'cache-control': 'private, no-store' } });
+  }
   const file = xlsx(t('sheetName'), header, body, widths);
   return new NextResponse(file as BodyInit, {
     headers: {

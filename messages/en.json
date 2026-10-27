@@ -680,7 +680,7 @@
     "inviteTierFeeHint": "Leave empty to use the fee for the creator's tier.",
     "export": {
       "title": "Export applicants",
-      "hint": "Excel file for the client to curate. The client version lists applicants still waiting for a decision, without email, phone or address, plus \"Client decision\" and \"Client note\" columns to fill in. The internal version lists everyone on this job with contact details; never send it to the client.",
+      "hint": "Excel file for the client to curate. The client version lists applicants still waiting for a decision, without email, phone or address, plus \"Client decision\" and \"Client note\" columns to fill in. The internal version lists everyone on this job with contact details; never send it to the client. Or copy it and paste into Google Sheets; numbers have no thousands separators.",
       "client": "For the client ({count} applicants)",
       "internal": "Internal (with contacts)",
       "sheetName": "Applicants",
@@ -834,7 +834,8 @@
       "inviteReviewHint": "Creators who accept join the applicants list and are still reviewed by the client before being accepted.",
       "sendWa": "Send WhatsApp",
       "noPhone": "No phone number yet",
-      "waReady": "Send the invitation from your WhatsApp:"
+      "waReady": "Send the invitation from your WhatsApp:",
+      "copySheet": "Copy to Google Sheets"
     },
     "colCreator": "Creator",
     "colProfile": "Profile",
@@ -877,7 +878,13 @@
     "inviteReviewHint": "Creators who accept join the applicants list and are still reviewed by the client before being accepted.",
     "waInvite": "{name, select, none {Hi!} other {Hi {name}!}} Tali is inviting you to the job *{job}* with a fee of {fee}.\n\nOpen this link, sign in, then tap *Accept invitation*:\n{url}\n\nOnce you accept, you join the shortlist the client reviews first. We will let you know if you are selected.",
     "sendWa": "Send WhatsApp",
-    "noPhone": "No phone number yet"
+    "noPhone": "No phone number yet",
+    "sheet": {
+      "copied": "Copied. Paste (Ctrl+V) into Google Sheets",
+      "failed": "Couldn't copy, try again",
+      "copyClient": "Copy for Google Sheets (client)",
+      "copyInternal": "Copy for Google Sheets (internal)"
+    }
   },
   "errors": {
     "generic": "Something didn't work. Try again in a moment.",

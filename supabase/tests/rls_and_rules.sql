@@ -532,3 +532,33 @@ select tests.expect_error($$insert into public.creator_notes (creator_id, body) 
 select tests.act_as('00000000-0000-0000-0000-000000000003');
 select tests.check((select count(*) = 1 from public.creator_notes), 'finance can read notes');
 reset role;
+
+-- Short share codes ----------------------------------------------------------------
+select tests.check((select bool_and(short_code ~ '^[a-hj-km-np-z2-9]{6}$') and count(distinct short_code) = count(*) from public.jobs), 'every job has a unique short code');
+set role anon;
+select tests.check((select public.job_id_by_code(j.short_code) = j.id from public.public_open_jobs() j limit 1), 'guest resolves short code');
+select tests.check((select public.job_id_by_code(upper(j.short_code)) = j.id from public.public_open_jobs() j limit 1), 'short code ignores case');
+select tests.check(public.job_id_by_code('zzzzzz') is null, 'unknown code resolves to nothing');
+reset role;
+update public.jobs set status = 'draft' where id = '20000000-0000-0000-0000-000000000001';
+select tests.check(public.job_id_by_code((select short_code from public.jobs where id = '20000000-0000-0000-0000-000000000001')) is null, 'draft code is not resolved');
+update public.jobs set status = 'open' where id = '20000000-0000-0000-0000-000000000001';
+
+-- Invitations go through client review ---------------------------------------------
+insert into public.jobs (id, brand_name, title, platforms, deliverables, brief, job_type, fee_type, rate_cap, rate_cap_visit, quota, top_days, status)
+values ('20000000-0000-0000-0000-0000000000d1', 'Brand rahasia', 'Undangan', '{tiktok}', '1 video', 'Brief', 'both', 'open', 300000, 500000, 5, 7, 'open');
+insert into public.job_brands (job_id, real_name) values ('20000000-0000-0000-0000-0000000000d1', 'Brand Asli');
+set role authenticated;
+select tests.act_as('00000000-0000-0000-0000-000000000002');
+select public.invite_creator('20000000-0000-0000-0000-0000000000d1', '00000000-0000-0000-0000-00000000000b', 450000, 'visit');
+select tests.act_as('00000000-0000-0000-0000-00000000000b');
+select tests.check((select count(*) = 1 from public.job_brands where job_id = '20000000-0000-0000-0000-0000000000d1'), 'invited creator sees real brand');
+select public.respond_invite((select id from public.participations where job_id = '20000000-0000-0000-0000-0000000000d1'), true);
+select tests.check((select status = 'applied' and invited_at is not null from public.participations where job_id = '20000000-0000-0000-0000-0000000000d1'),
+  'accepted invitation waits for review');
+select tests.check((select count(*) = 1 from public.job_brands where job_id = '20000000-0000-0000-0000-0000000000d1'), 'invited applicant still sees real brand');
+select tests.act_as('00000000-0000-0000-0000-000000000002');
+select public.decide_application((select id from public.participations where job_id = '20000000-0000-0000-0000-0000000000d1'), true, null, 'visit');
+select tests.check((select status = 'approved' and agreed_fee = 450000 and work_mode = 'visit' from public.participations where job_id = '20000000-0000-0000-0000-0000000000d1'),
+  'approval keeps the invited fee');
+reset role;

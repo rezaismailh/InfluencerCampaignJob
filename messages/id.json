@@ -322,7 +322,8 @@
     "quickBody": "Isi sekali di sini, sekalian jadi profilmu untuk job berikutnya.",
     "quickSocial": "Akun {platforms} kamu",
     "quickSubmit": "Kirim lamaran",
-    "quickSaved": "Datamu tersimpan di Profil dan bisa diubah kapan saja."
+    "quickSaved": "Datamu tersimpan di Profil dan bisa diubah kapan saja.",
+    "inviteReview": "Kalau kamu terima, kamu masuk daftar kandidat yang direview klien dulu. Tim Tali akan mengabari kalau kamu terpilih."
   },
   "work": {
     "title": "Kerjaan",
@@ -452,7 +453,7 @@
     "markAllRead": "Tandai sudah dibaca",
     "application_approved": "Kamu terpilih untuk {job}. Fee {fee}.",
     "application_rejected": "Kamu belum terpilih untuk {job}. Cek job lain yang buka.",
-    "invited": "Kamu diundang ke {job} dengan fee {fee}.",
+    "invited": "Kamu diundang ke {job} dengan fee {fee}. Terima undangannya untuk ikut seleksi klien.",
     "participation_cancelled": "Kerjaanmu dibatalkan tim Tali. {reason}",
     "submission_approved": "{kind} kamu disetujui.",
     "submission_revision": "{kind} kamu perlu revisi. Cek feedback-nya.",
@@ -476,6 +477,10 @@
     "insight_approved": "Insight disetujui. Fee bisa dicairkan mulai {ready_at}."
   },
   "admin": {
+    "shortLink": {
+      "title": "Link pendek",
+      "hint": "Untuk dibagikan di WhatsApp, Instagram, atau bio. Link langsung membuka halaman job ini."
+    },
     "title": "Admin Tali",
     "overview": "Ringkasan",
     "pendingReviews": "Kiriman menunggu review",
@@ -825,7 +830,11 @@
       "notesTitle": "Catatan tim",
       "notesHint": "Hanya terlihat oleh tim Tali, tidak oleh creator.",
       "notePlaceholder": "Contoh: responsif, hasil konten rapi, cocok untuk job kuliner",
-      "addNote": "Simpan catatan"
+      "addNote": "Simpan catatan",
+      "inviteReviewHint": "Creator yang menerima undangan masuk ke daftar Pelamar dan tetap direview klien sebelum diterima.",
+      "sendWa": "Kirim WA",
+      "noPhone": "No. HP belum ada",
+      "waReady": "Kirim undangan lewat WhatsApp kamu:"
     },
     "colCreator": "Creator",
     "colProfile": "Profil",
@@ -862,7 +871,13 @@
       "closed": "Ditutup: tidak tampil di daftar job dan tidak menerima pendaftar baru. Creator yang sudah diterima tetap lanjut bekerja.",
       "completed": "Selesai: campaign sudah beres. Tidak tampil dan tidak menerima pendaftar; data dan riwayat tetap tersimpan."
     },
-    "workModePickShort": "Pilih mode"
+    "workModePickShort": "Pilih mode",
+    "invitedBadge": "Diundang",
+    "offeredFee": "Fee ditawarkan: {amount}",
+    "inviteReviewHint": "Creator yang menerima undangan masuk ke daftar Pelamar dan tetap direview klien sebelum diterima.",
+    "waInvite": "{name, select, none {Halo!} other {Halo {name}!}} Kamu diundang Tali ke job *{job}* dengan fee {fee}.\n\nBuka link ini, masuk, lalu klik *Terima undangan*:\n{url}\n\nSetelah kamu terima, kamu masuk daftar kandidat yang direview klien dulu. Nanti kami kabari kalau terpilih.",
+    "sendWa": "Kirim WA",
+    "noPhone": "No. HP belum ada"
   },
   "errors": {
     "generic": "Ada yang belum berhasil. Coba lagi sebentar lagi.",
@@ -1144,6 +1159,7 @@
     "share": "Bagikan",
     "copied": "Link disalin",
     "whatsapp": "WhatsApp",
+    "copy": "Salin",
     "copyPrompt": "Salin link ini:"
   },
   "install": {

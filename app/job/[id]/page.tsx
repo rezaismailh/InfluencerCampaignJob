@@ -252,7 +252,7 @@ export default async function JobDetail({ params }: { params: Promise<{ id: stri
       </details>
 
       {/* Shares the public name (alias for disguised brands), never the real one. */}
-      <ShareButton path={`/job/${job.id}`} title={`${job.title} · ${job.brand_name}`}
+      <ShareButton path={`/j/${job.short_code}`} title={`${job.title} · ${job.brand_name}`}
         text={t('shareText', { title: job.title, brand: job.brand_name, fee })} />
 
       {creator && full ? <JoinBlock job={full} viewer={creator} /> : <SignInBlock viewer={viewer} job={full ?? job} />}
@@ -377,6 +377,7 @@ export default async function JobDetail({ params }: { params: Promise<{ id: stri
         return (
           <ActionBar>
             <p className="font-bold">{t('inviteFee', { amount: formatRupiah(part.agreed_fee ?? 0) })}</p>
+            <p className="text-[13px] text-teks-redup">{t('inviteReview')}</p>
             <div className="flex gap-2">
               <form action={respondInvite} className="flex-1">
                 <input type="hidden" name="id" value={part.id} />

@@ -4,15 +4,17 @@ import { getTranslations } from 'next-intl/server';
 import { ActionForm } from '@/components/action-form';
 import { Badge } from '@/components/ui/badge';
 import { Button, ButtonLink, buttonClass } from '@/components/ui/button';
-import { Download } from 'lucide-react';
+import { Download, MessageCircle } from 'lucide-react';
 import { Card, CardTitle } from '@/components/ui/card';
 import { Field, Input, Select } from '@/components/ui/field';
 import { PageHeader } from '@/components/ui/page';
 import { SubmitButton } from '@/components/ui/submit-button';
 import { participationTone } from '@/components/status';
+import { CopyLink } from '@/components/admin/copy-link';
 import { feeLabel } from '@/components/creator/job-card';
 import { decideApplication, inviteCreator, setJobStatus } from '@/app/admin/actions';
 import { requireStaff } from '@/lib/auth';
+import { inviteWhatsApp } from '@/lib/invite-whatsapp';
 import { cn } from '@/lib/cn';
 import { realBrand, type BrandEmbed } from '@/lib/brand';
 import { formatRupiah } from '@/lib/money';
@@ -30,7 +32,7 @@ const STATUS_ACTIONS: Record<Job['status'], Job['status'][]> = {
   completed: ['closed'],
 };
 
-type Row = Participation & { profiles: Pick<Profile, 'full_name' | 'city' | 'email' | 'persona' | 'categories' | 'gender' | 'hijab' | 'account_type'> };
+type Row = Participation & { profiles: Pick<Profile, 'full_name' | 'city' | 'email' | 'persona' | 'categories' | 'gender' | 'hijab' | 'account_type' | 'phone_enc'> };
 
 export default async function AdminJob({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -52,7 +54,7 @@ export default async function AdminJob({ params }: { params: Promise<{ id: strin
   if (!job) notFound();
   const both = job.job_type === 'both';
   const { data: rows } = await viewer.supabase
-    .from('participations').select('*, profiles!participations_creator_id_fkey(full_name, city, email, persona, categories, gender, hijab, account_type)')
+    .from('participations').select('*, profiles!participations_creator_id_fkey(full_name, city, email, persona, categories, gender, hijab, account_type, phone_enc)')
     .eq('job_id', id).order('applied_at').returns<Row[]>();
   const all = rows ?? [];
   const creatorIds = all.map((r) => r.creator_id);
@@ -65,6 +67,9 @@ export default async function AdminJob({ params }: { params: Promise<{ id: strin
   const applicants = all.filter((r) => r.status === 'applied');
   const members = all.filter((r) => r.status === 'approved' || r.status === 'invited');
   const approvedCount = all.filter((r) => r.status === 'approved').length;
+  // Invitations still waiting for an answer get a ready-made WhatsApp message.
+  const waLinks = new Map(await Promise.all(members.filter((r) => r.status === 'invited')
+    .map(async (r) => [r.id, await inviteWhatsApp(r.profiles, job, r.agreed_fee)] as const)));
 
   return (
     <div className="space-y-5">
@@ -88,6 +93,14 @@ export default async function AdminJob({ params }: { params: Promise<{ id: strin
         </div>
       </Card>
       <p className="-mt-3 text-[13px] text-teks-redup">{t(`statusHint.${job.status}`)}</p>
+
+      {job.status !== 'draft' && (
+        <Card className="space-y-2">
+          <CardTitle>{t('shortLink.title')}</CardTitle>
+          <CopyLink path={`/j/${job.short_code}`} />
+          <p className="text-[13px] text-teks-redup">{t('shortLink.hint')}</p>
+        </Card>
+      )}
 
       <Card className="space-y-3">
         <div>
@@ -135,6 +148,10 @@ export default async function AdminJob({ params }: { params: Promise<{ id: strin
                         <Link href={`/admin/creator/${r.creator_id}`} className="font-bold text-nila-800 underline-offset-4 hover:underline">
                           {r.profiles.full_name ?? r.profiles.email}
                         </Link>
+                        {r.invited_at && <Badge tone="info" className="ml-1.5">{t('invitedBadge')}</Badge>}
+                        {r.invited_at && r.agreed_fee && (
+                          <p className="font-bold tabular">{t('offeredFee', { amount: formatRupiah(r.agreed_fee) })}{both && r.work_mode ? ` · ${tt(r.work_mode)}` : ''}</p>
+                        )}
                         <p className="text-teks-redup">
                           {[r.profiles.city, r.profiles.gender && tg(r.profiles.gender), r.profiles.hijab && th(r.profiles.hijab), r.profiles.account_type && ta(r.profiles.account_type)].filter(Boolean).join(' · ')}
                         </p>
@@ -168,7 +185,7 @@ export default async function AdminJob({ params }: { params: Promise<{ id: strin
                           {(both || job.fee_type !== 'fixed') && (
                             <div className="flex gap-1.5">
                               {both && (
-                                <select name="work_mode" defaultValue={r.visit_willing ? '' : 'non_visit'} aria-label={t('workMode')}
+                                <select name="work_mode" defaultValue={r.invited_at && r.work_mode ? r.work_mode : r.visit_willing ? '' : 'non_visit'} aria-label={t('workMode')}
                                   className="h-9 min-w-0 flex-1 rounded-lg border border-garis bg-kertas px-2 text-[13px] text-teks focus:border-nila-500 focus:outline-none"
                                   title={t('workModeHint', { nonVisit: fees[0] ? formatRupiah(fees[0]) : '—', visit: fees[1] ? formatRupiah(fees[1]) : '—' })}>
                                   <option value="">{t('workModePickShort')}</option>
@@ -180,7 +197,7 @@ export default async function AdminJob({ params }: { params: Promise<{ id: strin
                                 <input name="fee" inputMode="numeric" aria-label={t('agreedFee')}
                                   className="h-9 w-24 shrink-0 rounded-lg border border-garis bg-kertas px-2 text-[13px] text-teks tabular placeholder:text-teks-redup/70 focus:border-nila-500 focus:outline-none"
                                   placeholder={both ? t('feeAuto') : undefined}
-                                  defaultValue={both ? '' : job.fee_type === 'open' ? r.proposed_rate ?? '' : (tier ? job.tier_fees[tier] : undefined) ?? ''} />
+                                  defaultValue={both ? '' : r.invited_at ? r.agreed_fee ?? '' : job.fee_type === 'open' ? r.proposed_rate ?? '' : (tier ? job.tier_fees[tier] : undefined) ?? ''} />
                               )}
                             </div>
                           )}
@@ -207,26 +224,32 @@ export default async function AdminJob({ params }: { params: Promise<{ id: strin
             const steps = timeline(r, job, latestByKind((subs ?? []).filter((s) => s.participation_id === r.id)));
             const next = steps.find((s) => !s.done && !s.optional);
             return (
-              <Link key={r.id} href={`/admin/partisipasi/${r.id}`} className="block">
-                <Card className="flex flex-wrap items-center justify-between gap-2 hover:border-nila-300">
-                  <div>
-                    <p className="font-bold">{r.profiles.full_name ?? r.profiles.email}</p>
-                    <p className="text-[13px] text-teks-redup">{next ? t('waitingFor', { step: tw(next.key) }) : tw('stepPaid')}</p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {both && r.work_mode && <Badge tone={r.work_mode === 'visit' ? 'warning' : 'success'}>{tt(r.work_mode)}</Badge>}
-                    {r.agreed_fee && <span className="font-bold tabular">{formatRupiah(r.agreed_fee)}</span>}
-                    <Badge tone={participationTone[r.status]}>{tps(r.status)}</Badge>
-                  </div>
-                </Card>
-              </Link>
+              <div key={r.id} className="flex items-stretch gap-2">
+                <Link href={`/admin/partisipasi/${r.id}`} className="block min-w-0 flex-1">
+                  <Card className="flex flex-wrap items-center justify-between gap-2 hover:border-nila-300">
+                    <div>
+                      <p className="font-bold">{r.profiles.full_name ?? r.profiles.email}</p>
+                      <p className="text-[13px] text-teks-redup">{next ? t('waitingFor', { step: tw(next.key) }) : tw('stepPaid')}</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {both && r.work_mode && <Badge tone={r.work_mode === 'visit' ? 'warning' : 'success'}>{tt(r.work_mode)}</Badge>}
+                      {r.agreed_fee && <span className="font-bold tabular">{formatRupiah(r.agreed_fee)}</span>}
+                      <Badge tone={participationTone[r.status]}>{tps(r.status)}</Badge>
+                    </div>
+                  </Card>
+                </Link>
+                {r.status === 'invited' && (waLinks.get(r.id)
+                  ? <a href={waLinks.get(r.id)!} target="_blank" rel="noreferrer" className={buttonClass('outline', 'sm', 'h-auto shrink-0')}><MessageCircle className="size-4" aria-hidden /> {t('sendWa')}</a>
+                  : <span className="flex shrink-0 items-center text-[13px] text-teks-redup">{t('noPhone')}</span>)}
+              </div>
             );
           })}
         </div>
       </section>
 
       <Card className="max-w-lg">
-        <CardTitle className="mb-3">{t('invite')}</CardTitle>
+        <CardTitle>{t('invite')}</CardTitle>
+        <p className="mb-3 text-[13px] text-teks-redup">{t('inviteReviewHint')}</p>
         <ActionForm action={inviteCreator} resetOnSuccess>
           <input type="hidden" name="job_id" value={job.id} />
           <Field label={t('inviteEmail')} htmlFor="invite-email"><Input id="invite-email" name="email" type="email" required /></Field>

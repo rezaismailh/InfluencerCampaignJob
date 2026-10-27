@@ -2,15 +2,16 @@
 
 import { useState, useTransition } from 'react';
 import { useTranslations } from 'next-intl';
+import { MessageCircle } from 'lucide-react';
 import { Alert } from '@/components/ui/alert';
-import { Button } from '@/components/ui/button';
+import { Button, buttonClass } from '@/components/ui/button';
 import { Field, Select } from '@/components/ui/field';
 import { RupiahInput } from '@/components/ui/rupiah-input';
 import { inviteCreators } from '@/app/admin/actions';
 import type { FeeType, JobType } from '@/lib/types';
 
 export type InviteJob = { id: string; title: string; job_type: JobType; fee_type: FeeType };
-type Result = { id: string; error: string | null };
+type Result = { id: string; error: string | null; wa?: string | null };
 
 /** Invites one or more creators to a job; open-rate jobs need a fee, "both" jobs a work mode. */
 export function InvitePanel({ jobs, creators, onDone, compact }: { jobs: InviteJob[]; creators: { id: string; name: string }[]; onDone?: () => void; compact?: boolean }) {
@@ -39,6 +40,7 @@ export function InvitePanel({ jobs, creators, onDone, compact }: { jobs: InviteJ
 
   return (
     <form onSubmit={submit} className="space-y-3">
+      <p className="text-[13px] text-teks-redup">{t('inviteReviewHint')}</p>
       <div className={compact ? 'grid gap-3' : 'grid gap-3 md:grid-cols-3'}>
         <Field label={t('inviteJob')} htmlFor="invite-job">
           <Select id="invite-job" value={jobId} onChange={(e) => { setJobId(e.target.value); setResults(null); }} required>
@@ -65,6 +67,21 @@ export function InvitePanel({ jobs, creators, onDone, compact }: { jobs: InviteJ
       {results && (
         <Alert tone={failed.length ? 'warning' : 'success'}>
           <p>{t('inviteResult', { ok: results.length - failed.length, total: results.length })}</p>
+          {results.some((r) => !r.error) && (
+            <>
+              <p className="mt-2 font-bold">{t('waReady')}</p>
+              <ul className="mt-1 max-h-60 space-y-1 overflow-y-auto">
+                {results.filter((r) => !r.error).map((r) => (
+                  <li key={r.id} className="flex items-center justify-between gap-2">
+                    <span className="min-w-0 truncate">{nameOf(r.id)}</span>
+                    {r.wa
+                      ? <a href={r.wa} target="_blank" rel="noreferrer" className={buttonClass('outline', 'sm', 'shrink-0')}><MessageCircle className="size-4" aria-hidden /> {t('sendWa')}</a>
+                      : <span className="shrink-0 text-[13px] text-teks-redup">{t('noPhone')}</span>}
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
           {failed.length > 0 && (
             <ul className="mt-1 list-disc pl-5">
               {failed.map((r) => <li key={r.id}>{nameOf(r.id)}: {te.has(r.error!) ? te(r.error!) : te('generic')}</li>)}

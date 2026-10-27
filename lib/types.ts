@@ -92,6 +92,8 @@ export type Job = {
   require_insight: boolean;
   brand_logo: string | null;
   brand_icon: string;
+  /** Code for the short share link /j/<code>. */
+  short_code: string;
   status: JobStatus;
   created_at: string;
 };
@@ -107,6 +109,8 @@ export type Participation = {
   work_mode: WorkMode | null;
   agreed_fee: number | null;
   applied_at: string;
+  /** Set when the participation started as an invitation; it still goes through review. */
+  invited_at: string | null;
   decided_at: string | null;
   shipping_address_enc: string | null;
   shipment_status: ShipmentStatus | null;
@@ -181,5 +185,5 @@ export type Notification = {
 export type PublicJob = Pick<Job,
   'id' | 'brand_name' | 'title' | 'product' | 'job_type' | 'platforms' | 'deliverables' | 'requirements' | 'tiers' | 'niches'
   | 'personas' | 'genders' | 'hijab' | 'account_types' | 'min_followers' | 'fee_type' | 'fee' | 'fee_visit' | 'rate_cap' | 'rate_cap_visit' | 'tier_fees' | 'tier_fees_visit' | 'tier_basis' | 'primary_platform' | 'quota' | 'review_days' | 'product_option'
-  | 'require_purchase_proof' | 'apply_deadline' | 'content_deadline' | 'top_days' | 'top_mode' | 'pay_day' | 'cutoff_day' | 'require_insight' | 'brand_logo' | 'brand_icon' | 'created_at'
+  | 'require_purchase_proof' | 'apply_deadline' | 'content_deadline' | 'top_days' | 'top_mode' | 'pay_day' | 'cutoff_day' | 'require_insight' | 'brand_logo' | 'brand_icon' | 'short_code' | 'created_at'
 > & { visit_location_names: string[] };

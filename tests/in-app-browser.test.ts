@@ -1,6 +1,6 @@
 import { runInNewContext } from 'node:vm';
 import { describe, expect, it } from 'vitest';
-import { detectInApp, GATE_SCRIPT } from '@/lib/in-app-browser';
+import { chromeIntentUrl, detectInApp, GATE_SCRIPT, safariUrl, stayUrl } from '@/lib/in-app-browser';
 import { ERROR_SCRIPT } from '@/lib/client-errors';
 
 const UA = {
@@ -54,6 +54,15 @@ describe('GATE_SCRIPT', () => {
     const r = runGate('ios');
     expect(r.open).toBe('x-safari-https://app.jointali.online/j/abc123?x=1');
     expect(r.href).toBe('https://app.jointali.online/j/abc123?x=1');
+  });
+});
+
+describe('server-built links', () => {
+  const page = 'https://app.jointali.online/job/1?a=b';
+  it('match what the script builds', () => {
+    expect(stayUrl(page)).toBe('https://app.jointali.online/api/inapp-stay?next=%2Fjob%2F1%3Fa%3Db');
+    expect(chromeIntentUrl(page)).toBe(`intent://app.jointali.online/job/1?a=b#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=${encodeURIComponent(stayUrl(page))};end`);
+    expect(safariUrl(page)).toBe('x-safari-https://app.jointali.online/job/1?a=b');
   });
 });
 

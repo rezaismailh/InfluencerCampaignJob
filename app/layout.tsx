@@ -31,8 +31,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body className="min-h-dvh antialiased">
         {/* First thing on the page, so it also catches failures of the app bundle. */}
         <script dangerouslySetInnerHTML={{ __html: ERROR_SCRIPT }} />
-        <NextIntlClientProvider>{children}</NextIntlClientProvider>
-        <InAppGate />
+        <NextIntlClientProvider>
+          {children}
+          <InAppGate />
+        </NextIntlClientProvider>
         <ServiceWorker />
       </body>
     </html>

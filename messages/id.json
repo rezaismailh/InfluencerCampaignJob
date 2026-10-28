@@ -1227,7 +1227,10 @@
       "tiktok": "TikTok",
       "line": "LINE",
       "other": "aplikasi"
-    }
+    },
+    "copyTitle": "Atau salin link-nya:",
+    "copyIos": "Buka Safari, lalu tempel di kolom alamat.",
+    "copyAndroid": "Buka Chrome, lalu tempel di kolom alamat."
   },
   "errorPage": {
     "title": "Halaman belum bisa dibuka",

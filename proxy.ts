@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
+import { PAGE_URL_HEADER } from '@/lib/in-app-browser';
 import { publicOrigin } from '@/lib/public-origin';
 
 const PUBLIC_PATHS = ['/', '/masuk', '/auth', '/offline', '/privasi', '/ketentuan', '/job', '/j', '/api/cron', '/api/inapp-stay', '/api/client-error'];
@@ -11,6 +12,8 @@ function isPublic(pathname: string) {
 // Refreshes the Supabase session cookie on every request and sends signed-out
 // visitors of private pages to the login screen.
 export async function proxy(request: NextRequest) {
+  // The page's public address, for server components that build links to it (in-app gate).
+  request.headers.set(PAGE_URL_HEADER, `${publicOrigin(request)}${request.nextUrl.pathname}${request.nextUrl.search}`);
   let response = NextResponse.next({ request });
 
   const supabase = createServerClient(

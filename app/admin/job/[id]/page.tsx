@@ -10,7 +10,7 @@ import { Field, Input, Select } from '@/components/ui/field';
 import { PageHeader } from '@/components/ui/page';
 import { SubmitButton } from '@/components/ui/submit-button';
 import { participationTone } from '@/components/status';
-import { CopyLink } from '@/components/admin/copy-link';
+import { CopyLink } from '@/components/copy-link';
 import { CopySheetButton } from '@/components/admin/copy-sheet-button';
 import { feeLabel } from '@/components/creator/job-card';
 import { decideApplication, inviteCreator, setJobStatus } from '@/app/admin/actions';

@@ -27,7 +27,7 @@ export function detectInApp(ua: string | null | undefined): InAppBrowser | null 
 
 /**
  * Inline script (plain ES5, so it runs even where the app bundle does not) for the
- * "open in your browser" screen: fills in the links for the current page and, on Android,
+ * "open in your browser" screen: fills in the links when the server could not and, on Android,
  * tries Chrome once per visit. Without Chrome the intent falls back to the "continue here"
  * link, which sets STAY_COOKIE and so cannot loop.
  */
@@ -39,10 +39,30 @@ var stayUrl=l.origin+'/api/inapp-stay?next='+encodeURIComponent(here);
 var target=os==='android'
 ?'intent://'+l.host+here+'#Intent;scheme='+l.protocol.replace(':','')+';package=com.android.chrome;S.browser_fallback_url='+encodeURIComponent(stayUrl)+';end'
 :'x-safari-'+l.href;
-open.setAttribute('href',target);stay.setAttribute('href',stayUrl);
+if(!open.getAttribute('href')||open.getAttribute('href')==='#'){open.setAttribute('href',target);stay.setAttribute('href',stayUrl);}else{target=open.getAttribute('href');}
 if(os==='android'){var tried=false;try{tried=!!sessionStorage.getItem('tali-inapp-tried');sessionStorage.setItem('tali-inapp-tried','1');}catch(e){}
 if(!tried)l.href=target;}
 }catch(e){}})();`;
+
+/** Request header set by proxy.ts with the public URL of the page being rendered. */
+export const PAGE_URL_HEADER = 'x-tali-page-url';
+
+/** "Continue here" link that remembers the choice and comes back to `url`. */
+export function stayUrl(url: string): string {
+  const u = new URL(url);
+  return `${u.origin}/api/inapp-stay?next=${encodeURIComponent(u.pathname + u.search)}`;
+}
+
+/** Opens `url` in Chrome on Android; without Chrome, the "continue here" link instead (no loop). */
+export function chromeIntentUrl(url: string): string {
+  const u = new URL(url);
+  return `intent://${u.host}${u.pathname}${u.search}#Intent;scheme=${u.protocol.replace(':', '')};package=com.android.chrome;S.browser_fallback_url=${encodeURIComponent(stayUrl(url))};end`;
+}
+
+/** Opens `url` in Safari from an in-app browser (iOS 17 and newer). */
+export function safariUrl(url: string): string {
+  return `x-safari-${url}`;
+}
 
 /** Cookie set by "continue here", so the prompt stays away for the rest of the visit. */
 export const STAY_COOKIE = 'tali_inapp_stay';

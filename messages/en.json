@@ -1227,7 +1227,10 @@
       "tiktok": "TikTok",
       "line": "LINE",
       "other": "the app"
-    }
+    },
+    "copyTitle": "Or copy the link:",
+    "copyIos": "Open Safari and paste it in the address bar.",
+    "copyAndroid": "Open Chrome and paste it in the address bar."
   },
   "errorPage": {
     "title": "This page couldn't open",
